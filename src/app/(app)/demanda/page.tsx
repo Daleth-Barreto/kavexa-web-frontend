@@ -7,17 +7,21 @@ import { useAppContext } from "@/contexts/app-context";
 
 export default function DemandaPage() {
   const { inventory } = useAppContext();
-  const deadProducts = inventory.filter(item => item.stock > 50); // Mock logic
   
+  // Lógica de ejemplo para identificar productos "muertos" o de baja rotación.
+  // Por ahora, consideramos "muerto" a un producto con más de 50 unidades en stock.
+  // Esto se puede refinar con datos de ventas para usar media móvil o regresión.
+  const deadProducts = inventory.filter(item => item.stock > 50);
+
   return (
     <PageWrapper>
       <PageHeader
-        title="Demanda y Productos Muertos"
+        title="Análisis de Demanda"
         description="Analiza la rotación de tus productos e identifica aquellos con poco movimiento."
       />
        <Card>
         <CardHeader>
-          <CardTitle>Productos de Baja Rotación</CardTitle>
+          <CardTitle>Productos de Baja Rotación (Ejemplo)</CardTitle>
         </CardHeader>
         <CardContent>
           {deadProducts.length > 0 ? (
@@ -34,14 +38,15 @@ export default function DemandaPage() {
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell>{item.stock}</TableCell>
-                    <TableCell>Hace 90 días</TableCell>
+                    {/* Este dato es un marcador de posición hasta tener historial de ventas */}
+                    <TableCell>Fecha no disponible</TableCell> 
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           ) : (
             <div className="text-center text-muted-foreground py-8">
-              No hay productos de baja rotación.
+              No se han identificado productos de baja rotación.
             </div>
           )}
         </CardContent>
