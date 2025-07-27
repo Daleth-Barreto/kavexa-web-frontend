@@ -40,6 +40,33 @@ const COLORS = [
   'hsl(var(--chart-5))',
 ];
 
+const CustomTooltip = ({ active, payload }: any) => {
+  const { formatCurrency } = useCurrency();
+  const { theme } = useTheme();
+
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    const percentage = data.payload?.percent ? `(${(data.payload.percent * 100).toFixed(0)}%)` : '';
+    
+    return (
+      <div 
+        className="rounded-lg border bg-background p-2.5 text-sm shadow-md"
+        style={{
+          background: theme === 'dark' ? 'hsl(240 10% 3.9%)' : '#fff',
+          borderColor: 'hsl(var(--border))',
+        }}
+       >
+        <p className="font-medium" style={{ color: data.payload.fill }}>
+            {`${data.name}: ${formatCurrency(data.value)} ${percentage}`}
+        </p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+
 export default function MovimientosPage() {
   const { transactions, deleteTransaction } = useAppContext();
   const { formatCurrency } = useCurrency();
@@ -183,24 +210,13 @@ export default function MovimientosPage() {
                     fill="#8884d8"
                     dataKey="value"
                     nameKey="name"
+                    label={false}
                   >
                     {egressByCategory.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    formatter={(value: number, name: string, props) => {
-                      const formattedValue = formatCurrency(value);
-                      const percentage = props.payload?.percent ? `(${(props.payload.percent * 100).toFixed(0)}%)` : '';
-                      return [formattedValue, name, percentage];
-                    }}
-                    contentStyle={{
-                        background: theme === 'dark' ? 'hsl(240 10% 3.9%)' : '#fff',
-                        borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                        color: theme === 'dark' ? '#fff' : 'hsl(240 10% 3.9%)',
-                    }}
-                  />
+                  <Tooltip content={<CustomTooltip />} />
                   <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "20px", color: "hsl(var(--muted-foreground))" }}/>
                 </PieChart>
               </ResponsiveContainer>
