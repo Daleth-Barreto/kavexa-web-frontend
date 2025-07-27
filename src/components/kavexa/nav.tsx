@@ -26,7 +26,7 @@ const menuItems = [
   { href: '/proyeccion', label: 'Proyección', icon: TrendingUp, auth: true },
   { href: '/alertas', label: 'Alertas', icon: Bell, auth: false },
   { href: '/inventario', label: 'Inventario', icon: Archive, auth: false },
-  { href: '/demanda', label: 'Demanda', icon: LineChart, auth: true },
+  { href: '/demanda', label: 'Demanda', icon: LineChart, auth: false },
   { href: '/reportes', label: 'Reportes', icon: FileDown, auth: true },
 ];
 
