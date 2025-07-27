@@ -27,7 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { Transaction } from '@/lib/types';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useAppContext, useCurrency } from '@/contexts/app-context';
 
 
@@ -175,12 +175,14 @@ export default function MovimientosPage() {
                     fill="#8884d8"
                     dataKey="value"
                     nameKey="name"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
                     {egressByCategory.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Legend wrapperStyle={{ fontSize: "12px" }}/>
                 </PieChart>
               </ResponsiveContainer>
             ) : (

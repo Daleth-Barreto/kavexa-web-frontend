@@ -82,8 +82,8 @@ export default function ProyeccionPage() {
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis tickFormatter={(value) => formatCurrency(value, { notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 })} />
+                <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
+                <YAxis stroke="hsl(var(--muted-foreground))" tickFormatter={(value) => formatCurrency(value, { notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 })} />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
                 <Line type="monotone" dataKey="balance" stroke="var(--color-chart-1)" strokeWidth={2} activeDot={{ r: 8 }} name="Balance Proyectado"/>
