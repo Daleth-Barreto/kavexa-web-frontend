@@ -195,10 +195,11 @@ export default function MovimientosPage() {
                     contentStyle={{
                         background: 'hsl(var(--background))',
                         borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)'
+                        borderRadius: 'var(--radius)',
+                        color: 'hsl(var(--foreground))'
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "20px" }}/>
+                  <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "20px", color: "hsl(var(--muted-foreground))" }}/>
                 </PieChart>
               </ResponsiveContainer>
             ) : (
