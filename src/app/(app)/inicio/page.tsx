@@ -20,7 +20,6 @@ export default function InicioPage() {
   const { transactions, alerts, inventory, setInventory } = useAppContext();
   const [isTransactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [isProductSheetOpen, setProductSheetOpen] = useState(false);
-  const [runTour, setRunTour] = useState(false);
   const { formatCurrency } = useCurrency();
 
   const summary = useMemo(() => {
@@ -79,157 +78,151 @@ export default function InicioPage() {
     setProductSheetOpen(false);
   };
 
-  const handleTourStart = () => {
-    setRunTour(true);
-  };
-
 
   return (
-    <PageWrapper>
-       <AppTour run={runTour} setRun={setRunTour} />
-      <PageHeader
-        title="Inicio"
-        description="Un resumen de la salud financiera y operativa de tu negocio."
-      >
-        <div className="flex items-center gap-2">
-           <Button variant="ghost" size="icon" onClick={handleTourStart}>
-              <HelpCircle className="h-5 w-5" />
-              <span className="sr-only">Iniciar Tour</span>
-            </Button>
-          <div className="flex gap-2" id="tour-step-4">
-            <Button variant="outline" onClick={() => setProductSheetOpen(true)}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Añadir Producto
-            </Button>
-            <Button onClick={() => setTransactionSheetOpen(true)}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Registrar Movimiento
-            </Button>
+    <AppTour>
+      <PageWrapper>
+        <PageHeader
+          title="Inicio"
+          description="Un resumen de la salud financiera y operativa de tu negocio."
+        >
+          <div className="flex items-center gap-2">
+            <AppTour.Trigger />
+            <div className="flex gap-2" data-tour-step="4">
+              <Button variant="outline" onClick={() => setProductSheetOpen(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Añadir Producto
+              </Button>
+              <Button onClick={() => setTransactionSheetOpen(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Registrar Movimiento
+              </Button>
+            </div>
           </div>
+        </PageHeader>
+        <div data-tour-step="2" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(summary.totalIncome)}</div>
+              <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Egresos Totales</CardTitle>
+              <TrendingDown className="h-4 w-4 text-muted-foreground text-red-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(summary.totalEgress)}</div>
+              <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Balance Actual</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(summary.balance)}</div>
+              <p className="text-xs text-muted-foreground">Balance total calculado</p>
+            </CardContent>
+          </Card>
         </div>
-      </PageHeader>
-      <div id="tour-step-2" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(summary.totalIncome)}</div>
-            <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Egresos Totales</CardTitle>
-            <TrendingDown className="h-4 w-4 text-muted-foreground text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(summary.totalEgress)}</div>
-            <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Balance Actual</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(summary.balance)}</div>
-            <p className="text-xs text-muted-foreground">Balance total calculado</p>
-          </CardContent>
-        </Card>
-      </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-8">
-        <Card id="tour-step-3" className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Ingresos vs. Egresos</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            {transactions.length > 0 ? (
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value: number) => formatCurrency(value, {
-                    notation: 'compact',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 1
-                  })} />
-                  <Tooltip
-                    contentStyle={{
-                        background: 'hsl(var(--background))',
-                        borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                        color: 'hsl(var(--foreground))'
-                    }}
-                    formatter={(value: number) => formatCurrency(value)} />
-                  <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))" }}/>
-                  <Bar dataKey="Ingresos" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Egresos" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="text-center text-muted-foreground h-[350px] flex items-center justify-center">
-                No hay transacciones para mostrar un gráfico.
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        <Card id="tour-step-5" className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Actividad Reciente</CardTitle>
-          </CardHeader>
-          <CardContent>
-             {recentActivity.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Descripción</TableHead>
-                      <TableHead>Tipo</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentActivity.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium flex items-center gap-2">
-                          {item.activityType === 'alert' ? 
-                            <AlertTriangle className="h-4 w-4 text-yellow-500" /> : 
-                            <Package className="h-4 w-4 text-blue-500" />
-                          }
-                          {item.message}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={item.activityType === 'alert' ? 'destructive' : 'secondary'}>
-                            {item.activityType === 'alert' ? 'Alerta' : 'Inventario'}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-             ) : (
-                <div className="text-center text-muted-foreground py-8">
-                    No hay actividad reciente.
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-8">
+          <Card data-tour-step="3" className="lg:col-span-4">
+            <CardHeader>
+              <CardTitle>Ingresos vs. Egresos</CardTitle>
+            </CardHeader>
+            <CardContent className="pl-2">
+              {transactions.length > 0 ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value: number) => formatCurrency(value, {
+                      notation: 'compact',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 1
+                    })} />
+                    <Tooltip
+                      contentStyle={{
+                          background: 'hsl(var(--background))',
+                          borderColor: 'hsl(var(--border))',
+                          borderRadius: 'var(--radius)',
+                          color: 'hsl(var(--foreground))'
+                      }}
+                      formatter={(value: number) => formatCurrency(value)} />
+                    <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))" }}/>
+                    <Bar dataKey="Ingresos" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Egresos" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center text-muted-foreground h-[350px] flex items-center justify-center">
+                  No hay transacciones para mostrar un gráfico.
                 </div>
-             )}
-          </CardContent>
-        </Card>
-      </div>
+              )}
+            </CardContent>
+          </Card>
+          <Card data-tour-step="5" className="lg:col-span-3">
+            <CardHeader>
+              <CardTitle>Actividad Reciente</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {recentActivity.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Descripción</TableHead>
+                        <TableHead>Tipo</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {recentActivity.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium flex items-center gap-2">
+                            {item.activityType === 'alert' ? 
+                              <AlertTriangle className="h-4 w-4 text-yellow-500" /> : 
+                              <Package className="h-4 w-4 text-blue-500" />
+                            }
+                            {item.message}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={item.activityType === 'alert' ? 'destructive' : 'secondary'}>
+                              {item.activityType === 'alert' ? 'Alerta' : 'Inventario'}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+              ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                      No hay actividad reciente.
+                  </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-       <AddTransactionSheet 
-        open={isTransactionSheetOpen} 
-        onOpenChange={setTransactionSheetOpen}
-        defaultValues={null} // Forcing creation mode from dashboard
-      />
+        <AddTransactionSheet 
+          open={isTransactionSheetOpen} 
+          onOpenChange={setTransactionSheetOpen}
+          defaultValues={null} // Forcing creation mode from dashboard
+        />
 
-       <ProductFormSheet 
-        open={isProductSheetOpen}
-        onOpenChange={setProductSheetOpen}
-        onSubmit={handleProductFormSubmit}
-        defaultValues={null}
-      />
-    </PageWrapper>
+        <ProductFormSheet 
+          open={isProductSheetOpen}
+          onOpenChange={setProductSheetOpen}
+          onSubmit={handleProductFormSubmit}
+          defaultValues={null}
+        />
+      </PageWrapper>
+    </AppTour>
   );
 }

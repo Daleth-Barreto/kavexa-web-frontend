@@ -1,83 +1,86 @@
 'use client';
 
-import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+import { TourProvider, useTour, type StepType } from '@reactour/tour';
+import { Button } from '../ui/button';
+import { HelpCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
-interface AppTourProps {
-  run: boolean;
-  setRun: (run: boolean) => void;
-}
+const steps: StepType[] = [
+  {
+    selector: 'body',
+    content: '¡Bienvenido a Kavexa! Te mostraremos rápidamente las funciones principales.',
+  },
+  {
+    selector: '[data-tour-step="1"]',
+    content: 'Usa este menú para navegar por las diferentes secciones de la aplicación.',
+  },
+  {
+    selector: '[data-tour-step="2"]',
+    content: 'Aquí tienes un resumen rápido de tus finanzas: ingresos, egresos y el balance total.',
+  },
+  {
+    selector: '[data-tour-step="3"]',
+    content: 'Este gráfico te muestra una comparación visual de tus ingresos y egresos a lo largo del tiempo.',
+  },
+  {
+    selector: '[data-tour-step="4"]',
+    content: 'Desde aquí puedes añadir nuevos productos a tu inventario o registrar transacciones financieras.',
+  },
+  {
+    selector: '[data-tour-step="5"]',
+    content: 'Mantente al día con las alertas importantes y las actividades recientes de tu negocio.',
+  },
+  {
+    selector: 'body',
+    content: '¡Listo! Ya conoces lo básico. Explora las demás secciones para descubrir más herramientas.',
+  },
+];
 
-export function AppTour({ run, setRun }: AppTourProps) {
-  const { theme } = useTheme();
-
-  const steps: Step[] = [
-    {
-      target: 'body',
-      content: '¡Bienvenido a Kavexa! Te mostraremos rápidamente las funciones principales.',
-      placement: 'center',
-    },
-    {
-      target: '#tour-step-1',
-      content: 'Usa este menú para navegar por las diferentes secciones de la aplicación.',
-      placement: 'right',
-    },
-    {
-      target: '#tour-step-2',
-      content: 'Aquí tienes un resumen rápido de tus finanzas: ingresos, egresos y el balance total.',
-      placement: 'bottom',
-    },
-    {
-      target: '#tour-step-3',
-      content: 'Este gráfico te muestra una comparación visual de tus ingresos y egresos a lo largo del tiempo.',
-      placement: 'bottom',
-    },
-    {
-      target: '#tour-step-4',
-      content: 'Desde aquí puedes añadir nuevos productos a tu inventario o registrar transacciones financieras.',
-      placement: 'bottom',
-    },
-    {
-        target: '#tour-step-5',
-        content: 'Mantente al día con las alertas importantes y las actividades recientes de tu negocio.',
-        placement: 'bottom',
-    },
-     {
-      target: 'body',
-      content: '¡Listo! Ya conoces lo básico. Explora las demás secciones para descubrir más herramientas.',
-      placement: 'center',
-    },
-  ];
-
-  const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status } = data;
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
-      setRun(false);
-    }
-  };
-
+function TourTrigger() {
+  const { setIsOpen } = useTour();
   return (
-    <Joyride
-      callback={handleJoyrideCallback}
-      continuous
-      run={run}
-      scrollToFirstStep
-      showProgress
-      showSkipButton
-      steps={steps}
-      styles={{
-        options: {
-          arrowColor: theme === 'dark' ? '#1f2937' : '#fff',
-          backgroundColor: theme === 'dark' ? '#1f2937' : '#fff',
-          overlayColor: 'rgba(0, 0, 0, 0.5)',
-          primaryColor: 'hsl(var(--primary))',
-          textColor: theme === 'dark' ? '#fff' : '#000',
-          zIndex: 1000,
-        },
-        buttonClose: {
-            color: theme === 'dark' ? '#fff' : '#000',
-        }
-      }}
-    />
+    <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+      <HelpCircle className="h-5 w-5" />
+      <span className="sr-only">Iniciar Tour</span>
+    </Button>
   );
 }
+
+function AppTour({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+
+  return (
+    <TourProvider 
+        steps={steps}
+        styles={{
+            popover: (base) => ({
+              ...base,
+              '--reactour-accent': 'hsl(var(--primary))',
+              borderRadius: 'var(--radius)',
+              backgroundColor: 'hsl(var(--background))',
+              color: 'hsl(var(--foreground))',
+            }),
+            maskArea: (base) => ({ ...base, rx: 'var(--radius)' }),
+            maskWrapper: (base) => ({ ...base, color: '#00000080' }),
+            badge: (base) => ({ ...base, backgroundColor: 'hsl(var(--primary))' }),
+            dot: (base, { current }) => ({
+              ...base,
+              backgroundColor: current ? 'hsl(var(--primary))' : 'hsl(var(--border))',
+            }),
+            close: (base) => ({
+              ...base,
+              color: theme === 'dark' ? '#fff' : '#000',
+              '&:hover': {
+                color: 'hsl(var(--primary))',
+              }
+            }),
+          }}
+        >
+      {children}
+    </TourProvider>
+  );
+}
+
+AppTour.Trigger = TourTrigger;
+
+export { AppTour };

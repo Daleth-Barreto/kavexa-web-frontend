@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Loader2, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { AppProvider, useAppContext } from '@/contexts/app-context';
 
 
@@ -43,7 +43,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             <span className="font-bold text-lg text-sidebar-foreground font-headline">Kavexa</span>
           </div>
         </SidebarHeader>
-        <SidebarContent id="tour-step-1">
+        <SidebarContent data-tour-step="1">
           <MainNav />
         </SidebarContent>
         <SidebarFooter>
