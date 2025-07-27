@@ -31,7 +31,13 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { useAppContext, useCurrency } from '@/contexts/app-context';
 
 
-const COLORS = ['#A085CF', '#7FB7BE', '#FFC658', '#FF8042', '#82ca9d'];
+const COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+];
 
 export default function MovimientosPage() {
   const { transactions, deleteTransaction } = useAppContext();
@@ -175,14 +181,24 @@ export default function MovimientosPage() {
                     fill="#8884d8"
                     dataKey="value"
                     nameKey="name"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
                     {egressByCategory.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                  <Legend wrapperStyle={{ fontSize: "12px" }}/>
+                  <Tooltip
+                    formatter={(value: number, name: string, props) => {
+                      const formattedValue = formatCurrency(value);
+                      const percentage = props.payload?.percent ? `(${(props.payload.percent * 100).toFixed(0)}%)` : '';
+                      return [formattedValue, name, percentage];
+                    }}
+                    contentStyle={{
+                        background: 'hsl(var(--background))',
+                        borderColor: 'hsl(var(--border))',
+                        borderRadius: 'var(--radius)'
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "20px" }}/>
                 </PieChart>
               </ResponsiveContainer>
             ) : (
