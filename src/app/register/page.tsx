@@ -9,8 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Zap } from 'lucide-react';
-import { useAuth } from '@/contexts/auth-context';
-import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'El nombre es requerido.'),
@@ -21,8 +20,7 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const { login } = useAuth();
-  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -33,12 +31,11 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = (data: RegisterFormValues) => {
-    // Aquí iría la llamada a la API
-    console.log('Register data:', data);
-    // Simular registro y login exitoso
-    login();
-    router.push('/inicio');
+  const onSubmit = () => {
+    toast({
+        title: "Función no disponible",
+        description: "El sistema de cuentas y guardado en la nube estará disponible próximamente.",
+    });
   };
 
   return (
