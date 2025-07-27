@@ -75,7 +75,7 @@ export default function DemandaPage() {
         <CardHeader>
           <CardTitle>Productos con Tendencia de Demanda a la Baja</CardTitle>
           <CardDescription>
-            Estos productos muestran una tendencia de ventas decreciente según el análisis de tus transacciones.
+            Estos productos muestran una tendencia de ventas decreciente según el análisis de tus transacciones. El análisis requiere al menos dos ventas registradas para cada producto.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -85,7 +85,7 @@ export default function DemandaPage() {
                 <TableRow>
                   <TableHead>Producto</TableHead>
                   <TableHead>Stock Actual</TableHead>
-                  <TableHead className='text-center'>Tendencia</TableHead>
+                  <TableHead className='text-center'>Tendencia (Ventas/Día)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -94,8 +94,8 @@ export default function DemandaPage() {
                     <TableCell className="font-medium">{item.name}</TableCell>
                     <TableCell>{item.stock}</TableCell>
                     <TableCell className='text-center'>
-                       <span className={`flex items-center justify-center gap-2 font-semibold ${item.trend < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                         {item.trend < 0 ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                       <span className={`flex items-center justify-center gap-2 font-semibold text-red-500`}>
+                         <TrendingDown size={16} />
                          {item.trend.toFixed(4)}
                        </span>
                     </TableCell> 
