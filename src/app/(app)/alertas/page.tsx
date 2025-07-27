@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check, Trash2, ShieldAlert } from "lucide-react";
-import type { Alert } from "@/lib/types";
 import { useAppContext } from "@/contexts/app-context";
 
 const statusVariant = {
@@ -72,7 +71,7 @@ export default function AlertasPage() {
             </Table>
           ) : (
             <div className="text-center text-muted-foreground py-8">
-              No hay alertas para mostrar.
+              No hay alertas para mostrar. El sistema te notificará aquí si detecta alguna anomalía.
             </div>
           )}
         </CardContent>
