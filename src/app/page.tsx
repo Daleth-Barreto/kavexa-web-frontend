@@ -4,12 +4,20 @@ import { Zap } from 'lucide-react';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background">
       <header className="px-4 lg:px-6 h-14 flex items-center">
         <Link href="#" className="flex items-center justify-center" prefetch={false}>
           <Zap className="h-6 w-6 text-primary" />
           <span className="sr-only">Kavexa</span>
         </Link>
+        <nav className="ml-auto flex gap-4 sm:gap-6">
+          <Button variant="ghost" asChild>
+            <Link href="/login">Iniciar Sesión</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/register">Registrarse</Link>
+          </Button>
+        </nav>
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -27,7 +35,7 @@ export default function LandingPage() {
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
                     <Link href="/inicio">
-                      Empezar ahora
+                      Empezar como invitado
                     </Link>
                   </Button>
                 </div>

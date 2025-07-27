@@ -32,7 +32,6 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Wand2 } from 'lucide-react';
-import { categorizeTransaction } from '@/ai/flows/categorize-transaction';
 
 const transactionSchema = z.object({
   description: z.string().min(1, 'La descripción es requerida.'),
@@ -51,8 +50,7 @@ type AddTransactionSheetProps = {
 
 export function AddTransactionSheet({ open, onOpenChange, onTransactionAdd }: AddTransactionSheetProps) {
   const { toast } = useToast();
-  const [isCategorizing, setIsCategorizing] = useState(false);
-
+  
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
@@ -63,37 +61,6 @@ export function AddTransactionSheet({ open, onOpenChange, onTransactionAdd }: Ad
     },
   });
 
-  const handleSuggestCategory = async () => {
-    const description = form.getValues('description');
-    if (!description) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Por favor, introduce una descripción para sugerir una categoría.',
-      });
-      return;
-    }
-    setIsCategorizing(true);
-    try {
-      const result = await categorizeTransaction({ description });
-      if (result.category) {
-        form.setValue('category', result.category, { shouldValidate: true });
-        toast({
-          title: 'Categoría Sugerida',
-          description: `Se ha sugerido la categoría "${result.category}".`,
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Error de IA',
-        description: 'No se pudo sugerir una categoría.',
-      });
-    } finally {
-      setIsCategorizing(false);
-    }
-  };
 
   function onSubmit(data: TransactionFormValues) {
     onTransactionAdd(data);
@@ -169,15 +136,9 @@ export function AddTransactionSheet({ open, onOpenChange, onTransactionAdd }: Ad
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categoría</FormLabel>
-                  <div className="flex gap-2">
-                    <FormControl>
-                      <Input placeholder="Ej: Ventas" {...field} />
-                    </FormControl>
-                    <Button type="button" variant="outline" size="icon" onClick={handleSuggestCategory} disabled={isCategorizing}>
-                      {isCategorizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                      <span className="sr-only">Sugerir Categoría</span>
-                    </Button>
-                  </div>
+                  <FormControl>
+                    <Input placeholder="Ej: Ventas" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

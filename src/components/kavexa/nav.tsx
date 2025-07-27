@@ -11,8 +11,8 @@ import {
   LineChart,
   FileDown,
   UserCog,
-  Zap,
 } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
 
 import {
   SidebarMenu,
@@ -21,34 +21,38 @@ import {
 } from '@/components/ui/sidebar';
 
 const menuItems = [
-  { href: '/inicio', label: 'Inicio', icon: Home },
-  { href: '/movimientos', label: 'Movimientos', icon: ArrowLeftRight },
-  { href: '/proyeccion', label: 'Proyección', icon: TrendingUp },
-  { href: '/alertas', label: 'Alertas', icon: Bell },
-  { href: '/inventario', label: 'Inventario', icon: Archive },
-  { href: '/demanda', label: 'Demanda', icon: LineChart },
-  { href: '/reportes', label: 'Reportes', icon: FileDown },
+  { href: '/inicio', label: 'Inicio', icon: Home, auth: false },
+  { href: '/movimientos', label: 'Movimientos', icon: ArrowLeftRight, auth: false },
+  { href: '/proyeccion', label: 'Proyección', icon: TrendingUp, auth: true },
+  { href: '/alertas', label: 'Alertas', icon: Bell, auth: false },
+  { href: '/inventario', label: 'Inventario', icon: Archive, auth: false },
+  { href: '/demanda', label: 'Demanda', icon: LineChart, auth: true },
+  { href: '/reportes', label: 'Reportes', icon: FileDown, auth: true },
 ];
 
 export function MainNav() {
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
 
   return (
     <SidebarMenu>
-      {menuItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton
-            asChild
-            isActive={pathname === item.href}
-            tooltip={item.label}
-          >
-            <Link href={item.href}>
-              <item.icon />
-              <span>{item.label}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+      {menuItems.map((item) => {
+        if (item.auth && !isAuthenticated) return null;
+        return (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === item.href}
+              tooltip={item.label}
+            >
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )
+      })}
     </SidebarMenu>
   );
 }

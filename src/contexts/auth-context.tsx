@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
 interface AuthContextType {
@@ -15,8 +15,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated, isLoaded] = useLocalStorage('kavexa_auth', false);
 
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
+  const login = useCallback(() => setIsAuthenticated(true), [setIsAuthenticated]);
+  const logout = useCallback(() => setIsAuthenticated(false), [setIsAuthenticated]);
 
   const value = useMemo(() => ({
     isAuthenticated,
