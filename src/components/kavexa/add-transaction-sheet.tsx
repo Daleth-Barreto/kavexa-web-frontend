@@ -96,7 +96,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
 
   useEffect(() => {
     if (open) {
-      if (isEditing) {
+      if (isEditing && defaultValues) {
         // Editing an existing transaction
         const valuesToSet: any = {
             ...defaultValues,
@@ -191,6 +191,8 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
   const isGeneralIncome = transactionType === 'income' && incomeType === 'general';
   const isEgress = transactionType === 'egress';
 
+  const shouldDisableProductFields = isEditing && isSale;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="overflow-y-auto">
@@ -266,7 +268,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                       render={({ field }) => (
                           <FormItem>
                           <FormLabel>Producto</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value} disabled={isEditing}>
+                          <Select onValueChange={field.onChange} value={field.value} disabled={shouldDisableProductFields}>
                               <FormControl>
                               <SelectTrigger>
                                   <SelectValue placeholder="Selecciona un producto a vender" />
@@ -291,7 +293,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                           <FormItem>
                           <FormLabel>Cantidad a vender</FormLabel>
                           <FormControl>
-                              <Input type="number" placeholder="0" {...field} disabled={isEditing} />
+                              <Input type="number" placeholder="0" {...field} disabled={shouldDisableProductFields} />
                           </FormControl>
                           <FormMessage />
                           </FormItem>
@@ -363,12 +365,10 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                 </SheetClose>
               <Button type="submit">Guardar</Button>
             </SheetFooter>
-             {isEditing && isSale && <p className="text-xs text-muted-foreground text-center pt-2">Solo se puede editar la fecha de una venta para mantener la consistencia del inventario.</p>}
+             {shouldDisableProductFields && <p className="text-xs text-muted-foreground text-center pt-2">Solo se puede editar la fecha de una venta para mantener la consistencia del inventario.</p>}
           </form>
         </Form>
       </SheetContent>
     </Sheet>
   );
 }
-
-    
