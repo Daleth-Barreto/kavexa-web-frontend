@@ -26,15 +26,15 @@ export default function InicioPage() {
 
   const summary = useMemo(() => {
     const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-    const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
-    const balance = totalIncome - totalExpenses;
-    return { totalIncome, totalExpenses, balance };
+    const totalEgress = transactions.filter(t => t.type === 'egress').reduce((acc, t) => acc + t.amount, 0);
+    const balance = totalIncome - totalEgress;
+    return { totalIncome, totalEgress, balance };
   }, [transactions]);
 
   const chartData = useMemo(() => {
     if (transactions.length === 0) return [];
     
-    const monthlyData: { [key: string]: { Ingresos: number, Gastos: number } } = {};
+    const monthlyData: { [key: string]: { Ingresos: number, Egresos: number } } = {};
     const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
     transactions.forEach(t => {
@@ -43,13 +43,13 @@ export default function InicioPage() {
       const monthKey = `${monthNames[month]}`;
       
       if (!monthlyData[monthKey]) {
-        monthlyData[monthKey] = { Ingresos: 0, Gastos: 0 };
+        monthlyData[monthKey] = { Ingresos: 0, Egresos: 0 };
       }
 
       if (t.type === 'income') {
         monthlyData[monthKey].Ingresos += t.amount;
       } else {
-        monthlyData[monthKey].Gastos += t.amount;
+        monthlyData[monthKey].Egresos += t.amount;
       }
     });
 
@@ -94,7 +94,7 @@ export default function InicioPage() {
           </Button>
            <Button onClick={() => setTransactionSheetOpen(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            Registrar Venta
+            Registrar Movimiento
           </Button>
         </div>
       </PageHeader>
@@ -111,11 +111,11 @@ export default function InicioPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gastos Totales</CardTitle>
+            <CardTitle className="text-sm font-medium">Egresos Totales</CardTitle>
             <TrendingDown className="h-4 w-4 text-muted-foreground text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(summary.totalExpenses)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(summary.totalEgress)}</div>
             <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
           </CardContent>
         </Card>
@@ -134,7 +134,7 @@ export default function InicioPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-8">
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>Ingresos vs. Gastos</CardTitle>
+            <CardTitle>Ingresos vs. Egresos</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             {transactions.length > 0 ? (
@@ -146,7 +146,7 @@ export default function InicioPage() {
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="Ingresos" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Gastos" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Egresos" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (

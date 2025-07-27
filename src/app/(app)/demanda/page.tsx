@@ -6,26 +6,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAppContext } from "@/contexts/app-context";
 import { calculateLinearRegression } from '@/lib/math-utils';
-import { TrendingDown, TrendingUp } from 'lucide-react';
+import { TrendingDown } from 'lucide-react';
 import type { InventoryItem, Transaction } from '@/lib/types';
 
 // Función para asociar transacciones a productos del inventario
 const getSalesDataPerProduct = (transactions: Transaction[], inventory: InventoryItem[]) => {
   const sales: Record<string, { date: Date; quantity: number }[]> = {};
 
-  const incomeTransactions = transactions.filter(t => t.type === 'income');
+  // Solo consideramos transacciones de ingreso que sean ventas de producto
+  const incomeTransactions = transactions.filter(t => t.type === 'income' && t.productId);
 
   incomeTransactions.forEach(t => {
-    const productSold = inventory.find(p => t.description.toLowerCase().includes(p.name.toLowerCase()));
-    
-    if (productSold) {
-      if (!sales[productSold.id]) {
-        sales[productSold.id] = [];
-      }
-      // Asumimos que la cantidad es el monto de la transacción dividido por el precio del producto
-      const quantity = Math.round(t.amount / productSold.price) || 1; 
-      sales[productSold.id].push({ date: new Date(t.date), quantity });
+    const productId = t.productId!;
+    if (!sales[productId]) {
+      sales[productId] = [];
     }
+    // Asumimos que la cantidad es la que viene en la transacción
+    sales[productId].push({ date: new Date(t.date), quantity: t.quantity || 1 });
   });
 
   return sales;

@@ -3,7 +3,7 @@ export type Transaction = {
   date: string;
   description: string;
   amount: number;
-  type: 'income' | 'expense';
+  type: 'income' | 'egress';
   category: string;
   // Fields for sales linked to inventory
   productId?: string;
@@ -19,7 +19,7 @@ export type InventoryItem = {
 };
 
 export type Alert = {
-  id: string;
+  id:string;
   type: 'low_stock' | 'unusual_expense' | 'duplicate_entry';
   message: string;
   date: string;

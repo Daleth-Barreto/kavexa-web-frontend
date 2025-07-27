@@ -7,7 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { useAppContext } from "@/contexts/app-context";
-import { subDays, format } from 'date-fns';
+import { subDays, format, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const formatCurrency = (amount: number) => {
@@ -40,8 +40,7 @@ const calculateMovingAverageProjection = (transactions: any[], daysToProject: nu
 
   for (let i = 0; i < daysToProject; i++) {
     currentBalance += movingAverage;
-    const date = new Date();
-    date.setDate(today.getDate() + i);
+    const date = addDays(today, i);
     projection.push({
       date: format(date, 'MMM d', { locale: es }),
       balance: currentBalance,
@@ -105,7 +104,7 @@ export default function ProyeccionPage() {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>¡Atención!</AlertTitle>
           <AlertDescription>
-            Se proyecta un flujo de caja negativo en los próximos 90 días. Considera reducir gastos o aumentar ingresos.
+            Se proyecta un flujo de caja negativo en los próximos 90 días. Considera reducir egresos o aumentar ingresos.
           </AlertDescription>
         </Alert>
       )}

@@ -50,9 +50,9 @@ export default function MovimientosPage() {
     return transactions.filter(t => t.description.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [transactions, searchTerm]);
 
-  const expenseByCategory = useMemo(() => {
-    const expenses = transactions.filter(t => t.type === 'expense');
-    const grouped = expenses.reduce((acc, curr) => {
+  const egressByCategory = useMemo(() => {
+    const egresses = transactions.filter(t => t.type === 'egress');
+    const grouped = egresses.reduce((acc, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
       return acc;
     }, {} as Record<string, number>);
@@ -162,14 +162,14 @@ export default function MovimientosPage() {
         </Card>
         <Card className="lg:col-span-2">
            <CardHeader>
-            <CardTitle>Gastos por Categoría</CardTitle>
+            <CardTitle>Egresos por Categoría</CardTitle>
           </CardHeader>
           <CardContent>
-            {expenseByCategory.length > 0 ? (
+            {egressByCategory.length > 0 ? (
                <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={expenseByCategory}
+                    data={egressByCategory}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -178,7 +178,7 @@ export default function MovimientosPage() {
                     dataKey="value"
                     nameKey="name"
                   >
-                    {expenseByCategory.map((entry, index) => (
+                    {egressByCategory.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -187,7 +187,7 @@ export default function MovimientosPage() {
               </ResponsiveContainer>
             ) : (
               <div className="text-center text-muted-foreground py-8 h-[300px] flex items-center justify-center">
-                No hay gastos para mostrar.
+                No hay egresos para mostrar.
               </div>
             )}
           </CardContent>

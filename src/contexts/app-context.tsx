@@ -66,16 +66,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       description: data.description,
       amount: data.amount,
       type: data.type,
-      category: data.category
+      category: data.category,
+      productId: data.productId,
+      quantity: data.quantity
     };
 
     const updatedTransactions = [newTransaction, ...transactions];
     setTransactions(updatedTransactions);
 
     // Z-Score Alert Logic for expenses
-    if (newTransaction.type === 'expense') {
+    if (newTransaction.type === 'egress') {
       const expenseAmounts = updatedTransactions
-        .filter(t => t.type === 'expense')
+        .filter(t => t.type === 'egress')
         .map(t => t.amount);
       
       if (expenseAmounts.length > 5) { // Only run if we have enough data
@@ -84,7 +86,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const newAlert: Alert = {
             id: `alert-${Date.now()}`,
             type: 'unusual_expense',
-            message: `Gasto inusual detectado: ${newTransaction.description} por $${newTransaction.amount.toFixed(2)}`,
+            message: `Egreso inusual detectado: ${newTransaction.description} por $${newTransaction.amount.toFixed(2)}`,
             date: new Date().toISOString().split('T')[0],
             status: 'new',
             relatedId: newTransaction.id,
@@ -92,17 +94,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
           setAlerts(prev => [newAlert, ...prev]);
            toast({
             title: 'Alerta generada',
-            description: `Se detectó un gasto inusualmente alto.`,
+            description: `Se detectó un egreso inusualmente alto.`,
             variant: 'destructive'
           });
         }
       }
     }
     
-    // Inventory update logic for income
-    if (newTransaction.type === 'income' && data.category === 'Ventas') {
-        const productId = data.productId;
-        const quantitySold = data.quantity || 1;
+    // Inventory update logic for income from sales
+    if (newTransaction.type === 'income' && newTransaction.productId && newTransaction.quantity) {
+        const productId = newTransaction.productId;
+        const quantitySold = newTransaction.quantity;
         
         setInventory(currentInventory => {
             return currentInventory.map(item => {

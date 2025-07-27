@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -14,9 +15,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated, isLoaded] = useLocalStorage('kavexa_auth', false);
+  const router = useRouter();
 
-  const login = useCallback(() => setIsAuthenticated(true), [setIsAuthenticated]);
-  const logout = useCallback(() => setIsAuthenticated(false), [setIsAuthenticated]);
+  const login = useCallback(() => {
+    setIsAuthenticated(true);
+    router.push('/inicio');
+  }, [setIsAuthenticated, router]);
+  
+  const logout = useCallback(() => {
+    setIsAuthenticated(false);
+    router.push('/login');
+  }, [setIsAuthenticated, router]);
 
   const value = useMemo(() => ({
     isAuthenticated,
