@@ -1,10 +1,19 @@
 'use client';
 
-import React, { createContext, useContext, ReactNode, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Transaction, InventoryItem, Alert, CashFlowData } from '@/lib/types';
 import { mockTransactions, mockInventory, mockAlerts, mockCashFlow } from '@/lib/data';
 import { calculateZScore, Z_SCORE_THRESHOLD } from '@/lib/math-utils';
+
+// IDs from old mock data to ensure they are cleaned up
+const MOCK_ALERT_IDS_TO_CLEAN = [
+  "alert-1",
+  "alert-2",
+  "alert-3",
+  "alert-4",
+  "alert-5",
+];
 
 interface AppContextType {
   transactions: Transaction[];
@@ -29,6 +38,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const isLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isCashFlowLoaded;
 
+  useEffect(() => {
+    // This effect runs once on load to clean up any persisted mock data from localStorage
+    if (isAlertsLoaded) {
+      const hasOldMockData = alerts.some(alert => MOCK_ALERT_IDS_TO_CLEAN.includes(alert.id));
+      if (hasOldMockData) {
+        setAlerts([]); // Clear the alerts if old mock data is found
+      }
+    }
+    if (isTransactionsLoaded && transactions.length > 0 && transactions[0].id?.startsWith('txn-mock')) {
+       setTransactions([]);
+    }
+    if (isInventoryLoaded && inventory.length > 0 && inventory[0].id?.startsWith('item-mock')) {
+       setInventory([]);
+    }
+  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded]);
+
+
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'>) => {
     const newTransaction: Transaction = {
       ...data,
@@ -36,17 +62,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       date: new Date().toISOString().split('T')[0],
     };
 
-    setTransactions(prev => [newTransaction, ...prev]);
+    const updatedTransactions = [newTransaction, ...transactions];
+    setTransactions(updatedTransactions);
 
     // Z-Score Alert Logic
     if (newTransaction.type === 'expense') {
-      const expenseAmounts = transactions
+      const expenseAmounts = updatedTransactions
         .filter(t => t.type === 'expense')
         .map(t => t.amount);
       
       if (expenseAmounts.length > 5) { // Only run if we have enough data
         const zScore = calculateZScore(newTransaction.amount, expenseAmounts);
-        if (zScore > Z_SCORE_THRESHOLD) {
+        if (Math.abs(zScore) > Z_SCORE_THRESHOLD) {
           const newAlert: Alert = {
             id: `alert-${Date.now()}`,
             type: 'unusual_expense',
