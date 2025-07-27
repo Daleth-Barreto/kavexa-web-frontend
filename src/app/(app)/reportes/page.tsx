@@ -3,9 +3,8 @@ import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download } from "lucide-react";
+import { FileText, Download, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
-import { Lock } from "lucide-react";
 import Link from "next/link";
 
 const reports = [

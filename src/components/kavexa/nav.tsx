@@ -23,7 +23,7 @@ import {
 const menuItems = [
   { href: '/inicio', label: 'Inicio', icon: Home, auth: false },
   { href: '/movimientos', label: 'Movimientos', icon: ArrowLeftRight, auth: false },
-  { href: '/proyeccion', label: 'Proyección', icon: TrendingUp, auth: true },
+  { href: '/proyeccion', label: 'Proyección', icon: TrendingUp, auth: false },
   { href: '/alertas', label: 'Alertas', icon: Bell, auth: false },
   { href: '/inventario', label: 'Inventario', icon: Archive, auth: false },
   { href: '/demanda', label: 'Demanda', icon: LineChart, auth: false },
