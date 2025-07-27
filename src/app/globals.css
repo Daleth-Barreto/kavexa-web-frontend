@@ -27,11 +27,11 @@ body {
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 261 38% 66%;
-    --chart-1: 261 38% 66%;
-    --chart-2: 187 30% 62%;
-    --chart-3: 240 5.9% 10%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 261 38% 66%; /* Lilac */
+    --chart-2: 261 40% 80%; /* Lighter Lilac */
+    --chart-3: 187 30% 62%; /* Teal */
+    --chart-4: 43 74% 66%; /* Gold */
+    --chart-5: 27 87% 67%; /* Orange */
     --radius: 0.5rem;
 
     /* Sidebar styles */
@@ -56,7 +56,7 @@ body {
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 240 5% 90%; /* Brighter text for dark mode charts */
     --accent: 187 30% 62%;
     --accent-foreground: 187 30% 12%;
     --destructive: 0 62.8% 30.6%;
@@ -64,9 +64,11 @@ body {
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 261 38% 66%;
-    --chart-1: 261 38% 66%;
-    --chart-2: 187 30% 62%;
-    --chart-3: 0 0% 98%;
+    --chart-1: 261 38% 66%; /* Lilac */
+    --chart-2: 261 40% 80%; /* Lighter Lilac */
+    --chart-3: 187 30% 62%; /* Teal */
+    --chart-4: 43 74% 66%;  /* Gold */
+    --chart-5: 27 87% 67%;  /* Orange */
 
     /* Sidebar dark styles */
     --sidebar-background: 240 10% 3.9%;

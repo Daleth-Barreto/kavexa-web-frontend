@@ -144,10 +144,16 @@ export default function InicioPage() {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 1
                   })} />
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                  <Legend />
-                  <Bar dataKey="Ingresos" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Egresos" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
+                  <Tooltip
+                    contentStyle={{
+                        background: 'hsl(var(--background))',
+                        borderColor: 'hsl(var(--border))',
+                        borderRadius: 'var(--radius)'
+                    }}
+                    formatter={(value: number) => formatCurrency(value)} />
+                  <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))" }}/>
+                  <Bar dataKey="Ingresos" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Egresos" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
