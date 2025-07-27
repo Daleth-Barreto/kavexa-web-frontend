@@ -1,6 +1,6 @@
 'use client';
 
-import { TourProvider, useTour, type StepType } from '@reactour/tour';
+import { TourProvider, useTour, type StepType, Popover as TourPopover } from '@reactour/tour';
 import { Button } from '../ui/button';
 import { HelpCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -52,6 +52,25 @@ function AppTour({ children }: { children: React.ReactNode }) {
   return (
     <TourProvider 
         steps={steps}
+        components={{
+          Popover: ({ children, ...props }) => {
+            const { currentStep, setIsOpen } = useTour();
+            const isLastStep = currentStep === steps.length - 1;
+
+            return (
+              <TourPopover {...props}>
+                {children}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                  {isLastStep ? (
+                    <Button onClick={() => setIsOpen(false)}>Finalizar</Button>
+                  ) : (
+                    <Button onClick={() => props.nextStep()}>Siguiente</Button>
+                  )}
+                </div>
+              </TourPopover>
+            );
+          },
+        }}
         styles={{
             popover: (base) => ({
               ...base,
