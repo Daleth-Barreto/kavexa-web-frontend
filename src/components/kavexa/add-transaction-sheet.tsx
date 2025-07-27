@@ -35,16 +35,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/contexts/app-context';
 import type { Transaction } from '@/lib/types';
 
-const baseSchema = z.object({
-  date: z.string().optional(),
-});
-
 // Schema for income from product sale
-const incomeSaleSchema = baseSchema.extend({
+const incomeSaleSchema = z.object({
   type: z.literal('income'),
   incomeType: z.literal('sale'),
   productId: z.string({ required_error: 'Debes seleccionar un producto.' }),
   quantity: z.coerce.number().int().positive('La cantidad debe ser mayor que 0.'),
+  date: z.string().optional(),
   // Fields not present in this form, but needed for type consistency
   description: z.string().optional(),
   amount: z.number().optional(),
@@ -52,23 +49,25 @@ const incomeSaleSchema = baseSchema.extend({
 });
 
 // Schema for general income
-const incomeGeneralSchema = baseSchema.extend({
+const incomeGeneralSchema = z.object({
   type: z.literal('income'),
   incomeType: z.literal('general'),
   description: z.string().min(1, 'La descripción es requerida.'),
   amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
   category: z.string().min(1, 'La categoría es requerida.'),
+  date: z.string().optional(),
   // Fields not present in this form, but needed for type consistency
   productId: z.string().optional(),
   quantity: z.number().optional(),
 });
 
 // Schema for egress
-const egressSchema = baseSchema.extend({
+const egressSchema = z.object({
     type: z.literal('egress'),
     description: z.string().min(1, 'La descripción es requerida.'),
     category: z.string().min(1, 'La categoría es requerida.'),
     amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
+    date: z.string().optional(),
      // Fields not present in this form, but needed for type consistency
     incomeType: z.string().optional(),
     productId: z.string().optional(),
@@ -82,7 +81,7 @@ type TransactionFormValues = z.infer<typeof transactionSchema>;
 
 type AddTransactionSheetProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpencha: (open: boolean) => void;
   defaultValues: Transaction | null;
 };
 
@@ -100,35 +99,22 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
 
   useEffect(() => {
     if (open) {
-      setIsEditing(!!defaultValues);
-      if (defaultValues) {
-        if (defaultValues.type === 'egress') {
-          form.reset({
+      const isEditMode = !!defaultValues;
+      setIsEditing(isEditMode);
+      
+      if (isEditMode) {
+        // Editing an existing transaction
+        const valuesToSet: any = {
             ...defaultValues,
-            date: defaultValues.date.split('T')[0]
-          });
-        } else if (defaultValues.type === 'income') {
-          if (defaultValues.productId) { // It's a sale
-             form.reset({
-                type: 'income',
-                incomeType: 'sale',
-                productId: defaultValues.productId,
-                quantity: defaultValues.quantity,
-                date: defaultValues.date.split('T')[0],
-            });
-          } else { // It's general income
-            form.reset({
-                type: 'income',
-                incomeType: 'general',
-                description: defaultValues.description,
-                amount: defaultValues.amount,
-                category: defaultValues.category,
-                date: defaultValues.date.split('T')[0],
-            });
-          }
+            date: defaultValues.date.split('T')[0],
+        };
+
+        if (defaultValues.type === 'income') {
+            valuesToSet.incomeType = defaultValues.productId ? 'sale' : 'general';
         }
+        form.reset(valuesToSet);
       } else {
-        // Default for creation
+        // Creating a new transaction
         form.reset({
           type: 'egress',
           description: '',
@@ -163,7 +149,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               toast({ title: 'Error', description: 'Producto no encontrado.', variant: 'destructive' });
               return;
           }
-          if (data.quantity! > product.stock) {
+          if (!isEditing && data.quantity! > product.stock) {
               toast({ title: 'Stock insuficiente', description: `No puedes vender ${data.quantity} unidades de ${product.name}. Solo hay ${product.stock} disponibles.`, variant: 'destructive' });
               form.setError('quantity', { message: `Máximo: ${product.stock}`});
               return;
@@ -293,7 +279,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                               </FormControl>
                               <SelectContent>
                               {inventory.length > 0 ? inventory.map(item => (
-                                  <SelectItem key={item.id} value={item.id} disabled={item.stock <= 0}>
+                                  <SelectItem key={item.id} value={item.id} disabled={item.stock <= 0 && !isEditing}>
                                     {item.name} (Stock: {item.stock})
                                   </SelectItem>
                               )) : <div className='p-4 text-sm text-muted-foreground'>No hay productos.</div>}
@@ -389,3 +375,5 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
     </Sheet>
   );
 }
+
+    
