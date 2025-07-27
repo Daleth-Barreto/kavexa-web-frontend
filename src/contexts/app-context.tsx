@@ -60,7 +60,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (isInventoryLoaded && inventory.length > 0 && inventory[0]?.id?.startsWith('item-mock')) {
        setInventory([]);
     }
-  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded, setAlerts, setTransactions, setInventory, alerts, transactions, inventory]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded]);
 
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
