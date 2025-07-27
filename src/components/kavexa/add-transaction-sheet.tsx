@@ -42,7 +42,6 @@ const incomeSaleSchema = z.object({
   productId: z.string({ required_error: 'Debes seleccionar un producto.' }),
   quantity: z.coerce.number().int().positive('La cantidad debe ser mayor que 0.'),
   date: z.string().optional(),
-  // Fields not present in this form, but needed for type consistency
   description: z.string().optional(),
   amount: z.number().optional(),
   category: z.string().optional(),
@@ -56,7 +55,6 @@ const incomeGeneralSchema = z.object({
   amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
   category: z.string().min(1, 'La categoría es requerida.'),
   date: z.string().optional(),
-  // Fields not present in this form, but needed for type consistency
   productId: z.string().optional(),
   quantity: z.number().optional(),
 });
@@ -68,7 +66,6 @@ const egressSchema = z.object({
     category: z.string().min(1, 'La categoría es requerida.'),
     amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
     date: z.string().optional(),
-     // Fields not present in this form, but needed for type consistency
     incomeType: z.string().optional(),
     productId: z.string().optional(),
     quantity: z.number().optional(),
@@ -88,21 +85,18 @@ type AddTransactionSheetProps = {
 export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTransactionSheetProps) {
   const { toast } = useToast();
   const { inventory, addTransaction, editTransaction } = useAppContext();
-  const [ isEditing, setIsEditing ] = useState(false);
+  const isEditing = !!defaultValues;
   
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
   });
 
-  const transactionType = useWatch({ control: form.control, name: "type", defaultValue: defaultValues?.type || 'egress' });
-  const incomeType = useWatch({ control: form.control, name: "incomeType", defaultValue: defaultValues?.productId ? 'sale' : 'general' });
+  const transactionType = useWatch({ control: form.control, name: "type" });
+  const incomeType = useWatch({ control: form.control, name: "incomeType" });
 
   useEffect(() => {
     if (open) {
-      const isEditMode = !!defaultValues;
-      setIsEditing(isEditMode);
-      
-      if (isEditMode) {
+      if (isEditing) {
         // Editing an existing transaction
         const valuesToSet: any = {
             ...defaultValues,
@@ -121,10 +115,11 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
           amount: 0,
           category: '',
           date: new Date().toISOString().split('T')[0],
+          incomeType: 'general',
         });
       }
     }
-  }, [open, defaultValues, form]);
+  }, [open, defaultValues, isEditing, form]);
 
 
   function onSubmit(data: TransactionFormValues) {
@@ -192,9 +187,9 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
     onOpenChange(false);
   }
 
-  const isEgress = transactionType === 'egress';
   const isSale = transactionType === 'income' && incomeType === 'sale';
   const isGeneralIncome = transactionType === 'income' && incomeType === 'general';
+  const isEgress = transactionType === 'egress';
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -375,3 +370,5 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
     </Sheet>
   );
 }
+
+    
