@@ -18,7 +18,9 @@ export default function PerfilPage() {
   const { isAuthenticated, login, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const { currency, setCurrency, clearAllData, transactions, inventory } = useAppContext();
-  const [deleteStep, setDeleteStep] = useState(0);
+  const [isAlertOpen, setAlertOpen] = useState(false);
+  const [deleteConfirmationInput, setDeleteConfirmationInput] = useState('');
+
 
   const handleExportCSV = () => {
     const transactionCsv = Papa.unparse(transactions);
@@ -45,21 +47,10 @@ export default function PerfilPage() {
   }
 
   const handleDeleteData = () => {
-    if (deleteStep === 2) {
       clearAllData();
-      setDeleteStep(0);
+      setAlertOpen(false);
+      setDeleteConfirmationInput('');
       toast({ title: "Datos Eliminados", description: "Toda tu información ha sido borrada.", variant: "destructive" });
-    } else {
-      setDeleteStep(s => s + 1);
-    }
-  }
-
-  const resetDelete = () => setDeleteStep(0);
-
-  const deleteDialogContent = {
-    0: { title: '¿Estás seguro?', description: 'Esta acción no se puede deshacer. Esto eliminará permanentemente TODOS tus datos de transacciones, inventario y alertas.', cta: 'Sí, eliminar mis datos' },
-    1: { title: '¿Estás ABSOLUTAMENTE seguro?', description: 'Última oportunidad. Al continuar, todos tus datos se perderán para siempre. No hay vuelta atrás.', cta: 'Entiendo, eliminar todo' },
-    2: { title: 'Confirmación final requerida', description: 'Escribe "ELIMINAR" en el campo de abajo para confirmar.', cta: 'Confirmar y Eliminar Permanentemente' }
   }
 
   return (
@@ -102,7 +93,7 @@ export default function PerfilPage() {
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row gap-4">
                <Button variant="outline" onClick={handleExportCSV}>Exportar a CSV</Button>
-               <Button variant="destructive" onClick={() => setDeleteStep(1)}>Eliminar todos los datos</Button>
+               <Button variant="destructive" onClick={() => setAlertOpen(true)}>Eliminar todos los datos</Button>
             </CardContent>
         </Card>
         
@@ -124,18 +115,29 @@ export default function PerfilPage() {
         </Card>
       </div>
 
-       <AlertDialog open={deleteStep > 0} onOpenChange={(open) => !open && resetDelete()}>
+       <AlertDialog open={isAlertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{deleteDialogContent[deleteStep as keyof typeof deleteDialogContent]?.title}</AlertDialogTitle>
+            <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              {deleteDialogContent[deleteStep as keyof typeof deleteDialogContent]?.description}
+              Esta acción no se puede deshacer. Para confirmar, escribe "ELIMINAR" en el campo de abajo.
             </AlertDialogDescription>
           </AlertDialogHeader>
+            <Input 
+              type="text"
+              placeholder='Escribe "ELIMINAR"'
+              value={deleteConfirmationInput}
+              onChange={(e) => setDeleteConfirmationInput(e.target.value)}
+              className="mt-4"
+            />
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={resetDelete}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteData} variant="destructive">
-               {deleteDialogContent[deleteStep as keyof typeof deleteDialogContent]?.cta}
+            <AlertDialogCancel onClick={() => setDeleteConfirmationInput('')}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteData} 
+              variant="destructive"
+              disabled={deleteConfirmationInput !== 'ELIMINAR'}
+            >
+               Confirmar y Eliminar Permanentemente
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
