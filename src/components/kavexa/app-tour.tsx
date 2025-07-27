@@ -1,6 +1,7 @@
 'use client';
 
-import { TourProvider, useTour, type StepType, Popover as TourPopover } from '@reactour/tour';
+import { TourProvider, useTour, type StepType } from '@reactour/tour';
+import { Popover as TourPopover } from '@reactour/popover';
 import { Button } from '../ui/button';
 import { HelpCircle } from 'lucide-react';
 import { useTheme } from 'next-themes';
