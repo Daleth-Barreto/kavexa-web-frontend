@@ -81,7 +81,7 @@ type TransactionFormValues = z.infer<typeof transactionSchema>;
 
 type AddTransactionSheetProps = {
   open: boolean;
-  onOpencha: (open: boolean) => void;
+  onOpenChange: (open: boolean) => void;
   defaultValues: Transaction | null;
 };
 
@@ -95,7 +95,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
   });
 
   const transactionType = useWatch({ control: form.control, name: "type", defaultValue: defaultValues?.type || 'egress' });
-  const incomeType = useWatch({ control: form.control, name: "incomeType" });
+  const incomeType = useWatch({ control: form.control, name: "incomeType", defaultValue: defaultValues?.productId ? 'sale' : 'general' });
 
   useEffect(() => {
     if (open) {
@@ -156,16 +156,16 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
           }
           transactionData = {
               type: 'income',
-              description: `Venta de ${product.name} (x${data.quantity})`,
-              amount: product.price * data.quantity!,
-              category: 'Ventas',
+              description: defaultValues?.description || `Venta de ${product.name} (x${data.quantity})`,
+              amount: defaultValues?.amount || (product.price * data.quantity!),
+              category: defaultValues?.category || 'Ventas',
               date: data.date || new Date().toISOString().split('T')[0],
               productId: data.productId,
               quantity: data.quantity,
           };
           toast({
-              title: 'Venta registrada',
-              description: `Se ha vendido ${data.quantity} x ${product.name}.`,
+              title: isEditing ? 'Venta actualizada' : 'Venta registrada',
+              description: isEditing ? 'Se ha actualizado la fecha de la venta.' : `Se ha vendido ${data.quantity} x ${product.name}.`,
           });
       } else { // General income
           transactionData = {
@@ -366,14 +366,12 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                 <SheetClose asChild>
                     <Button type="button" variant="outline">Cancelar</Button>
                 </SheetClose>
-              <Button type="submit" disabled={isEditing && isSale}>Guardar</Button>
+              <Button type="submit">Guardar</Button>
             </SheetFooter>
-            {isEditing && isSale && <p className="text-xs text-muted-foreground text-center pt-2">La edición de ventas no está permitida para mantener la consistencia del inventario.</p>}
+             {isEditing && isSale && <p className="text-xs text-muted-foreground text-center pt-2">Solo se puede editar la fecha de una venta para mantener la consistencia del inventario.</p>}
           </form>
         </Form>
       </SheetContent>
     </Sheet>
   );
 }
-
-    
