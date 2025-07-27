@@ -97,7 +97,6 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
   useEffect(() => {
     if (open) {
       if (isEditing && defaultValues) {
-        // Editing an existing transaction
         const valuesToSet: any = {
             ...defaultValues,
             date: defaultValues.date.split('T')[0],
@@ -108,7 +107,6 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
         }
         form.reset(valuesToSet);
       } else {
-        // Creating a new transaction
         form.reset({
           type: 'egress',
           description: '',
@@ -190,7 +188,6 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
   const isSale = transactionType === 'income' && incomeType === 'sale';
   const isGeneralIncome = transactionType === 'income' && incomeType === 'general';
   const isEgress = transactionType === 'egress';
-
   const shouldDisableProductFields = isEditing && isSale;
 
   return (
