@@ -27,7 +27,6 @@ export type Alert = {
   relatedId?: string;
 };
 
-export type CashFlowData = {
-  date: string;
-  balance: number;
+export type AppConfig = {
+    currency: string;
 };

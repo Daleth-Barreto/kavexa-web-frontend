@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit, PlusCircle, Trash, MoreVertical } from "lucide-react";
 import type { InventoryItem } from "@/lib/types";
-import { useAppContext } from "@/contexts/app-context";
+import { useAppContext, useCurrency } from "@/contexts/app-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,14 +28,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ProductFormSheet } from "@/components/kavexa/product-form-sheet";
 
-
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount);
-};
-
-
 export default function InventarioPage() {
   const { inventory, setInventory } = useAppContext();
+  const { formatCurrency } = useCurrency();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isAlertOpen, setAlertOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);

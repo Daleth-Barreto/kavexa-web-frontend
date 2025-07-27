@@ -28,16 +28,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import type { Transaction } from '@/lib/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { useAppContext } from '@/contexts/app-context';
+import { useAppContext, useCurrency } from '@/contexts/app-context';
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount);
-};
 
 const COLORS = ['#A085CF', '#7FB7BE', '#FFC658', '#FF8042', '#82ca9d'];
 
 export default function MovimientosPage() {
   const { transactions, deleteTransaction } = useAppContext();
+  const { formatCurrency } = useCurrency();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isAlertOpen, setAlertOpen] = useState(false);

@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Transaction, InventoryItem, Alert, CashFlowData } from '@/lib/types';
-import { mockTransactions, mockInventory, mockAlerts, mockCashFlow } from '@/lib/data';
+import { Transaction, InventoryItem, Alert, AppConfig } from '@/lib/types';
+import { mockTransactions, mockInventory, mockAlerts } from '@/lib/data';
 import { calculateZScore, Z_SCORE_THRESHOLD } from '@/lib/math-utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -23,12 +23,16 @@ interface AppContextType {
   setInventory: (value: InventoryItem[] | ((val: InventoryItem[]) => InventoryItem[])) => void;
   alerts: Alert[];
   setAlerts: (value: Alert[] | ((val: Alert[]) => Alert[])) => void;
-  cashFlow: CashFlowData[];
-  setCashFlow: (value: CashFlowData[] | ((val: CashFlowData[]) => CashFlowData[])) => void;
+  config: AppConfig;
+  setConfig: (value: AppConfig | ((val: AppConfig) => AppConfig)) => void;
+  
   isLoaded: boolean;
   addTransaction: (transaction: Omit<Transaction, 'id' | 'date'> & { date?: string }) => void;
   editTransaction: (transaction: Transaction) => void;
   deleteTransaction: (transactionId: string) => void;
+  clearAllData: () => void;
+  currency: string;
+  setCurrency: (currency: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,10 +41,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions, isTransactionsLoaded] = useLocalStorage<Transaction[]>('kavexa_transactions', mockTransactions);
   const [inventory, setInventory, isInventoryLoaded] = useLocalStorage<InventoryItem[]>('kavexa_inventory', mockInventory);
   const [alerts, setAlerts, isAlertsLoaded] = useLocalStorage<Alert[]>('kavexa_alerts', mockAlerts);
-  const [cashFlow, setCashFlow, isCashFlowLoaded] = useLocalStorage<CashFlowData[]>('kavexa_cashflow', mockCashFlow);
+  const [config, setConfig, isConfigLoaded] = useLocalStorage<AppConfig>('kavexa_config', { currency: 'USD' });
   const { toast } = useToast();
 
-  const isLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isCashFlowLoaded;
+  const isLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isConfigLoaded;
 
   useEffect(() => {
     // This effect runs once on load to clean up any persisted mock data from localStorage
@@ -147,6 +151,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTransactions(prev => prev.filter(t => t.id !== transactionId));
   }, [setTransactions]);
 
+  const clearAllData = useCallback(() => {
+    setTransactions([]);
+    setInventory([]);
+    setAlerts([]);
+  }, [setTransactions, setInventory, setAlerts]);
+
+  const setCurrency = useCallback((currency: string) => {
+    setConfig(prev => ({ ...prev, currency }));
+  }, [setConfig]);
 
   const value = useMemo(() => ({
     transactions,
@@ -155,18 +168,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setInventory,
     alerts,
     setAlerts,
-    cashFlow,
-    setCashFlow,
+    config,
+    setConfig,
     isLoaded,
     addTransaction,
     editTransaction,
-    deleteTransaction
+    deleteTransaction,
+    clearAllData,
+    currency: config.currency,
+    setCurrency,
   }), [
     transactions, setTransactions,
     inventory, setInventory,
     alerts, setAlerts,
-    cashFlow, setCashFlow,
-    isLoaded, addTransaction, editTransaction, deleteTransaction
+    config, setConfig,
+    isLoaded, addTransaction, editTransaction, deleteTransaction, clearAllData, setCurrency
   ]);
 
   return (
@@ -182,4 +198,14 @@ export function useAppContext() {
     throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;
+}
+
+export function useCurrency() {
+  const { currency } = useAppContext();
+
+  const formatCurrency = useCallback((amount: number, options?: Intl.NumberFormatOptions) => {
+    return new Intl.NumberFormat('es-ES', { style: 'currency', currency, ...options }).format(amount);
+  }, [currency]);
+
+  return { currency, formatCurrency };
 }

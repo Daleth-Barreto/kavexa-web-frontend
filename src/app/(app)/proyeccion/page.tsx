@@ -6,15 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { useAppContext } from "@/contexts/app-context";
+import { useAppContext, useCurrency } from "@/contexts/app-context";
+import type { Transaction } from '@/lib/types';
 import { subDays, format, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount);
-};
-
-const calculateMovingAverageProjection = (transactions: any[], daysToProject: number, period: number) => {
+const calculateMovingAverageProjection = (transactions: Transaction[], daysToProject: number, period: number) => {
   if (transactions.length === 0) return [];
   
   const today = new Date();
@@ -53,6 +50,7 @@ const calculateMovingAverageProjection = (transactions: any[], daysToProject: nu
 
 export default function ProyeccionPage() {
   const { transactions } = useAppContext();
+  const { formatCurrency } = useCurrency();
 
   const projectionData = useMemo(() => {
     // Usamos una media móvil de 30 días para la proyección
@@ -85,7 +83,7 @@ export default function ProyeccionPage() {
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
-                <YAxis tickFormatter={(value) => formatCurrency(value)} />
+                <YAxis tickFormatter={(value) => formatCurrency(value, { notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 })} />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Legend />
                 <Line type="monotone" dataKey="balance" stroke="var(--color-chart-1)" strokeWidth={2} activeDot={{ r: 8 }} name="Balance Proyectado"/>

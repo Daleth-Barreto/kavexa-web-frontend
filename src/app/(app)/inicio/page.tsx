@@ -8,21 +8,18 @@ import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircl
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { useAppContext } from '@/contexts/app-context';
+import { useAppContext, useCurrency } from '@/contexts/app-context';
 import { Button } from '@/components/ui/button';
 import { AddTransactionSheet } from '@/components/kavexa/add-transaction-sheet';
 import { ProductFormSheet } from '@/components/kavexa/product-form-sheet';
 import type { InventoryItem } from '@/lib/types';
 
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount);
-};
-
 export default function InicioPage() {
   const { transactions, alerts, inventory, setInventory } = useAppContext();
   const [isTransactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [isProductSheetOpen, setProductSheetOpen] = useState(false);
+  const { formatCurrency } = useCurrency();
 
   const summary = useMemo(() => {
     const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
@@ -142,8 +139,12 @@ export default function InicioPage() {
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                  <Tooltip />
+                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value: number) => formatCurrency(value, {
+                    notation: 'compact',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 1
+                  })} />
+                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
                   <Legend />
                   <Bar dataKey="Ingresos" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="Egresos" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
