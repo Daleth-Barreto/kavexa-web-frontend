@@ -35,30 +35,32 @@ import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/contexts/app-context';
 import type { Transaction } from '@/lib/types';
 
-// Base schema for common fields
 const baseSchema = z.object({
-  type: z.enum(['income', 'egress'], { required_error: 'El tipo es requerido.' }),
   date: z.string().optional(),
 });
-
-// Discriminated union key
-const INCOME_TYPE = "incomeType";
 
 // Schema for income from product sale
 const incomeSaleSchema = baseSchema.extend({
   type: z.literal('income'),
-  [INCOME_TYPE]: z.literal('sale'),
+  incomeType: z.literal('sale'),
   productId: z.string({ required_error: 'Debes seleccionar un producto.' }),
   quantity: z.coerce.number().int().positive('La cantidad debe ser mayor que 0.'),
+  // Fields not present in this form, but needed for type consistency
+  description: z.string().optional(),
+  amount: z.number().optional(),
+  category: z.string().optional(),
 });
 
 // Schema for general income
 const incomeGeneralSchema = baseSchema.extend({
   type: z.literal('income'),
-  [INCOME_TYPE]: z.literal('general'),
+  incomeType: z.literal('general'),
   description: z.string().min(1, 'La descripción es requerida.'),
   amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
   category: z.string().min(1, 'La categoría es requerida.'),
+  // Fields not present in this form, but needed for type consistency
+  productId: z.string().optional(),
+  quantity: z.number().optional(),
 });
 
 // Schema for egress
@@ -67,13 +69,13 @@ const egressSchema = baseSchema.extend({
     description: z.string().min(1, 'La descripción es requerida.'),
     category: z.string().min(1, 'La categoría es requerida.'),
     amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
+     // Fields not present in this form, but needed for type consistency
+    incomeType: z.string().optional(),
+    productId: z.string().optional(),
+    quantity: z.number().optional(),
 });
 
-// Discriminated union schema
-const transactionSchema = z.discriminatedUnion('type', [
-  z.discriminatedUnion(INCOME_TYPE, [incomeSaleSchema, incomeGeneralSchema]),
-  egressSchema
-]);
+const transactionSchema = z.union([incomeSaleSchema, incomeGeneralSchema, egressSchema]);
 
 
 type TransactionFormValues = z.infer<typeof transactionSchema>;
@@ -94,7 +96,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
   });
 
   const transactionType = useWatch({ control: form.control, name: "type", defaultValue: defaultValues?.type || 'egress' });
-  const incomeType = useWatch({ control: form.control, name: "incomeType", defaultValue: 'sale' });
+  const incomeType = useWatch({ control: form.control, name: "incomeType" });
 
   useEffect(() => {
     if (open) {
@@ -144,7 +146,10 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
 
     if (data.type === 'egress') {
       transactionData = {
-          ...data,
+          type: 'egress',
+          description: data.description!,
+          category: data.category!,
+          amount: data.amount!,
           date: data.date || new Date().toISOString().split('T')[0],
       };
       toast({
@@ -158,7 +163,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               toast({ title: 'Error', description: 'Producto no encontrado.', variant: 'destructive' });
               return;
           }
-          if (data.quantity > product.stock) {
+          if (data.quantity! > product.stock) {
               toast({ title: 'Stock insuficiente', description: `No puedes vender ${data.quantity} unidades de ${product.name}. Solo hay ${product.stock} disponibles.`, variant: 'destructive' });
               form.setError('quantity', { message: `Máximo: ${product.stock}`});
               return;
@@ -166,7 +171,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
           transactionData = {
               type: 'income',
               description: `Venta de ${product.name} (x${data.quantity})`,
-              amount: product.price * data.quantity,
+              amount: product.price * data.quantity!,
               category: 'Ventas',
               date: data.date || new Date().toISOString().split('T')[0],
               productId: data.productId,
@@ -179,9 +184,9 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
       } else { // General income
           transactionData = {
               type: 'income',
-              description: data.description,
-              amount: data.amount,
-              category: data.category,
+              description: data.description!,
+              amount: data.amount!,
+              category: data.category!,
               date: data.date || new Date().toISOString().split('T')[0],
           };
           toast({
@@ -222,7 +227,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tipo de Movimiento</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isEditing}>
+                  <Select onValueChange={field.onChange} value={field.value} disabled={isEditing}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecciona un tipo" />
@@ -248,7 +253,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                         className="flex flex-col space-y-1"
                         disabled={isEditing}
                       >
@@ -280,7 +285,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                       render={({ field }) => (
                           <FormItem>
                           <FormLabel>Producto</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isEditing}>
+                          <Select onValueChange={field.onChange} value={field.value} disabled={isEditing}>
                               <FormControl>
                               <SelectTrigger>
                                   <SelectValue placeholder="Selecciona un producto a vender" />
