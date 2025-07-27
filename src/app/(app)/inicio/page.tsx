@@ -24,22 +24,41 @@ export default function InicioPage() {
     return { totalIncome, totalExpenses, balance };
   }, [transactions]);
 
-  const chartData = [
-    { name: 'Ene', Ingresos: 4000, Gastos: 2400 },
-    { name: 'Feb', Ingresos: 3000, Gastos: 1398 },
-    { name: 'Mar', Ingresos: 2000, Gastos: 9800 },
-    { name: 'Abr', Ingresos: 2780, Gastos: 3908 },
-    { name: 'May', Ingresos: 1890, Gastos: 4800 },
-    { name: 'Jun', Ingresos: 2390, Gastos: 3800 },
-  ];
+  const chartData = useMemo(() => {
+    if (transactions.length === 0) return [];
+    
+    const monthlyData: { [key: string]: { Ingresos: number, Gastos: number } } = {};
+    const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+    transactions.forEach(t => {
+      const date = new Date(t.date);
+      const month = date.getMonth();
+      const monthKey = `${monthNames[month]}`;
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { Ingresos: 0, Gastos: 0 };
+      }
+
+      if (t.type === 'income') {
+        monthlyData[monthKey].Ingresos += t.amount;
+      } else {
+        monthlyData[monthKey].Gastos += t.amount;
+      }
+    });
+
+    return Object.entries(monthlyData).map(([name, values]) => ({
+      name,
+      ...values,
+    }));
+  }, [transactions]);
 
   const recentActivity = useMemo(() => {
     const newAlerts = alerts.filter(a => a.status === 'new').slice(0, 3);
     const lowStockItems = inventory.filter(i => i.stock < i.lowStockThreshold).slice(0, 2);
     
     const activity = [
-      ...newAlerts.map(a => ({...a, activityType: 'alert'})),
-      ...lowStockItems.map(i => ({id: i.id, message: `Stock bajo para ${i.name}`, date: new Date().toISOString().split('T')[0], activityType: 'inventory'})),
+      ...newAlerts.map(a => ({id: a.id, message: a.message, date: a.date, activityType: 'alert' as const})),
+      ...lowStockItems.map(i => ({id: i.id, message: `Stock bajo para ${i.name}`, date: new Date().toISOString().split('T')[0], activityType: 'inventory' as const})),
     ];
     return activity.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
   }, [alerts, inventory]);
@@ -58,7 +77,7 @@ export default function InicioPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(summary.totalIncome)}</div>
-            <p className="text-xs text-muted-foreground">+20.1% desde el mes pasado</p>
+            <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
           </CardContent>
         </Card>
         <Card>
@@ -68,7 +87,7 @@ export default function InicioPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(summary.totalExpenses)}</div>
-            <p className="text-xs text-muted-foreground">+18.1% desde el mes pasado</p>
+            <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
           </CardContent>
         </Card>
         <Card>
@@ -89,17 +108,23 @@ export default function InicioPage() {
             <CardTitle>Ingresos vs. Gastos</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="Ingresos" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Gastos" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {transactions.length > 0 ? (
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="Ingresos" fill="var(--color-chart-1)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Gastos" fill="var(--color-chart-2)" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center text-muted-foreground h-[350px] flex items-center justify-center">
+                No hay transacciones para mostrar un gráfico.
+              </div>
+            )}
           </CardContent>
         </Card>
         <Card className="lg:col-span-3">
