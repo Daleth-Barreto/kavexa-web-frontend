@@ -41,3 +41,30 @@ export function calculateZScore(value: number, data: number[]): number {
   if (stdDev === 0) return 0; // Avoid division by zero
   return (value - mean) / stdDev;
 }
+
+
+/**
+ * Calculates the slope and intercept for a simple linear regression.
+ * y = slope * x + intercept
+ * @param data - An array of objects with x and y properties.
+ * @returns An object with slope and intercept.
+ */
+export function calculateLinearRegression(data: { x: number; y: number }[]): { slope: number; intercept: number } {
+  const n = data.length;
+  if (n < 2) {
+    return { slope: 0, intercept: 0 }; // Not enough data
+  }
+
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+  for (const point of data) {
+    sumX += point.x;
+    sumY += point.y;
+    sumXY += point.x * point.y;
+    sumXX += point.x * point.x;
+  }
+
+  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  return { slope, intercept };
+}
