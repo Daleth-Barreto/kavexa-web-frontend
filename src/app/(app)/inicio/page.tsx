@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { PageWrapper } from '@/components/kavexa/page-wrapper';
 import { PageHeader } from '@/components/kavexa/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle, HelpCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -13,12 +13,14 @@ import { Button } from '@/components/ui/button';
 import { AddTransactionSheet } from '@/components/kavexa/add-transaction-sheet';
 import { ProductFormSheet } from '@/components/kavexa/product-form-sheet';
 import type { InventoryItem } from '@/lib/types';
+import { AppTour } from '@/components/kavexa/app-tour';
 
 
 export default function InicioPage() {
   const { transactions, alerts, inventory, setInventory } = useAppContext();
   const [isTransactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [isProductSheetOpen, setProductSheetOpen] = useState(false);
+  const [runTour, setRunTour] = useState(false);
   const { formatCurrency } = useCurrency();
 
   const summary = useMemo(() => {
@@ -77,25 +79,36 @@ export default function InicioPage() {
     setProductSheetOpen(false);
   };
 
+  const handleTourStart = () => {
+    setRunTour(true);
+  };
+
 
   return (
     <PageWrapper>
+       <AppTour run={runTour} setRun={setRunTour} />
       <PageHeader
         title="Inicio"
         description="Un resumen de la salud financiera y operativa de tu negocio."
       >
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setProductSheetOpen(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Añadir Producto
-          </Button>
-           <Button onClick={() => setTransactionSheetOpen(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Registrar Movimiento
-          </Button>
+        <div className="flex items-center gap-2">
+           <Button variant="ghost" size="icon" onClick={handleTourStart}>
+              <HelpCircle className="h-5 w-5" />
+              <span className="sr-only">Iniciar Tour</span>
+            </Button>
+          <div className="flex gap-2" id="tour-step-4">
+            <Button variant="outline" onClick={() => setProductSheetOpen(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Añadir Producto
+            </Button>
+            <Button onClick={() => setTransactionSheetOpen(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Registrar Movimiento
+            </Button>
+          </div>
         </div>
       </PageHeader>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div id="tour-step-2" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
@@ -129,7 +142,7 @@ export default function InicioPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-8">
-        <Card className="lg:col-span-4">
+        <Card id="tour-step-3" className="lg:col-span-4">
           <CardHeader>
             <CardTitle>Ingresos vs. Egresos</CardTitle>
           </CardHeader>
@@ -148,7 +161,8 @@ export default function InicioPage() {
                     contentStyle={{
                         background: 'hsl(var(--background))',
                         borderColor: 'hsl(var(--border))',
-                        borderRadius: 'var(--radius)'
+                        borderRadius: 'var(--radius)',
+                        color: 'hsl(var(--foreground))'
                     }}
                     formatter={(value: number) => formatCurrency(value)} />
                   <Legend wrapperStyle={{ color: "hsl(var(--muted-foreground))" }}/>
@@ -163,7 +177,7 @@ export default function InicioPage() {
             )}
           </CardContent>
         </Card>
-        <Card className="lg:col-span-3">
+        <Card id="tour-step-5" className="lg:col-span-3">
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
           </CardHeader>

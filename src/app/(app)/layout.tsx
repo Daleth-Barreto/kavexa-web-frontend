@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { MainNav, SettingsNav } from '@/components/kavexa/nav';
@@ -42,7 +43,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             <span className="font-bold text-lg text-sidebar-foreground font-headline">Kavexa</span>
           </div>
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent id="tour-step-1">
           <MainNav />
         </SidebarContent>
         <SidebarFooter>
