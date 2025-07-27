@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,14 +13,17 @@ import { useTheme } from 'next-themes';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
 import Papa from 'papaparse';
+import type { Transaction, InventoryItem } from '@/lib/types';
 
 export default function PerfilPage() {
   const { isAuthenticated, login, logout } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { currency, setCurrency, clearAllData, transactions, inventory } = useAppContext();
+  const { currency, setCurrency, clearAllData, transactions, inventory, setTransactions, setInventory } = useAppContext();
   const [isAlertOpen, setAlertOpen] = useState(false);
   const [deleteConfirmationInput, setDeleteConfirmationInput] = useState('');
-
+  
+  const transactionFileInputRef = useRef<HTMLInputElement>(null);
+  const inventoryFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExportCSV = () => {
     const transactionCsv = Papa.unparse(transactions);
@@ -51,6 +54,55 @@ export default function PerfilPage() {
       setAlertOpen(false);
       setDeleteConfirmationInput('');
       toast({ title: "Datos Eliminados", description: "Toda tu información ha sido borrada.", variant: "destructive" });
+  }
+
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>, type: 'transactions' | 'inventory') => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      toast({ title: 'Error', description: 'No se seleccionó ningún archivo.', variant: 'destructive' });
+      return;
+    }
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        try {
+          if (type === 'transactions') {
+            const importedTransactions = results.data.map((row: any): Transaction => ({
+              id: `txn-imported-${Date.now()}-${Math.random()}`,
+              date: row.date || new Date().toISOString().split('T')[0],
+              description: row.description || 'N/A',
+              amount: parseFloat(row.amount) || 0,
+              type: row.type === 'income' ? 'income' : 'egress',
+              category: row.category || 'Sin categoría',
+              productId: row.productId,
+              quantity: row.quantity ? parseInt(row.quantity) : undefined
+            }));
+            setTransactions(prev => [...prev, ...importedTransactions]);
+            toast({ title: "Éxito", description: `${importedTransactions.length} transacciones importadas.` });
+          } else { // inventory
+            const importedInventory = results.data.map((row: any): InventoryItem => ({
+              id: `item-imported-${Date.now()}-${Math.random()}`,
+              name: row.name || 'N/A',
+              stock: parseInt(row.stock) || 0,
+              lowStockThreshold: parseInt(row.lowStockThreshold) || 10,
+              price: parseFloat(row.price) || 0,
+            }));
+            setInventory(prev => [...prev, ...importedInventory]);
+            toast({ title: "Éxito", description: `${importedInventory.length} productos importados.` });
+          }
+        } catch (error) {
+          toast({ title: 'Error de Importación', description: 'El archivo CSV no tiene el formato correcto.', variant: 'destructive'});
+        }
+      },
+      error: (error: any) => {
+        toast({ title: 'Error al leer el archivo', description: error.message, variant: 'destructive'});
+      }
+    });
+
+    // Reset file input
+    if(event.target) event.target.value = '';
   }
 
   return (
@@ -89,11 +141,19 @@ export default function PerfilPage() {
         <Card>
             <CardHeader>
                 <CardTitle>Gestión de Datos</CardTitle>
-                <CardDescription>Exporta o elimina todos tus datos de la aplicación.</CardDescription>
+                <CardDescription>Importa, exporta o elimina todos tus datos de la aplicación.</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col sm:flex-row gap-4">
-               <Button variant="outline" onClick={handleExportCSV}>Exportar a CSV</Button>
-               <Button variant="destructive" onClick={() => setAlertOpen(true)}>Eliminar todos los datos</Button>
+            <CardContent className="space-y-4">
+               <div className="flex flex-col sm:flex-row gap-4">
+                 <Button variant="outline" onClick={() => transactionFileInputRef.current?.click()}>Importar Transacciones (CSV)</Button>
+                 <Button variant="outline" onClick={() => inventoryFileInputRef.current?.click()}>Importar Inventario (CSV)</Button>
+               </div>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button variant="outline" onClick={handleExportCSV}>Exportar a CSV</Button>
+                  <Button variant="destructive" onClick={() => setAlertOpen(true)}>Eliminar todos los datos</Button>
+                </div>
+                <input type="file" ref={transactionFileInputRef} className="hidden" accept=".csv" onChange={(e) => handleFileImport(e, 'transactions')} />
+                <input type="file" ref={inventoryFileInputRef} className="hidden" accept=".csv" onChange={(e) => handleFileImport(e, 'inventory')} />
             </CardContent>
         </Card>
         
