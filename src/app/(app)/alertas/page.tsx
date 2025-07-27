@@ -8,12 +8,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check, Trash2, ShieldAlert } from "lucide-react";
 import { useAppContext } from "@/contexts/app-context";
+import type { Alert } from "@/lib/types";
 
-const statusVariant = {
+const statusVariant: Record<Alert['status'], 'destructive' | 'secondary' | 'default'> = {
   new: 'destructive',
   ignored: 'secondary',
   resolved: 'default',
-} as const;
+};
+
+const statusText: Record<Alert['status'], string> = {
+  new: 'Nueva',
+  ignored: 'Ignorada',
+  resolved: 'Resuelta',
+};
+
 
 export default function AlertasPage() {
   const { alerts, setAlerts } = useAppContext();
@@ -51,7 +59,7 @@ export default function AlertasPage() {
                     </TableCell>
                     <TableCell>{new Date(alert.date).toLocaleDateString('es-ES')}</TableCell>
                     <TableCell>
-                      <Badge variant={statusVariant[alert.status]}>{alert.status}</Badge>
+                      <Badge variant={statusVariant[alert.status]}>{statusText[alert.status]}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       {alert.status === 'new' && (
