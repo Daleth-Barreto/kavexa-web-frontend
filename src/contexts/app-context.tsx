@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, ReactNode, useMemo, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo, useCallback, useEffect, useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Transaction, InventoryItem, Alert, AppConfig } from '@/lib/types';
 import { mockTransactions, mockInventory, mockAlerts } from '@/lib/data';
@@ -54,14 +54,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setAlerts([]); // Clear the alerts if old mock data is found
       }
     }
-    if (isTransactionsLoaded && transactions.length > 0 && transactions[0]?.id?.startsWith('txn-mock')) {
-       setTransactions([]);
+    if (isTransactionsLoaded) {
+       if (transactions.length > 0 && transactions[0]?.id?.startsWith('txn-mock')) {
+         setTransactions([]);
+       }
     }
-    if (isInventoryLoaded && inventory.length > 0 && inventory[0]?.id?.startsWith('item-mock')) {
-       setInventory([]);
+    if (isInventoryLoaded) {
+      if (inventory.length > 0 && inventory[0]?.id?.startsWith('item-mock')) {
+        setInventory([]);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded]);
+  }, [isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded]);
 
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
