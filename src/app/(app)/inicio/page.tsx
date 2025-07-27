@@ -1,21 +1,28 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { PageWrapper } from '@/components/kavexa/page-wrapper';
 import { PageHeader } from '@/components/kavexa/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { useMemo } from 'react';
 import { useAppContext } from '@/contexts/app-context';
+import { Button } from '@/components/ui/button';
+import { AddTransactionSheet } from '@/components/kavexa/add-transaction-sheet';
+import { ProductFormSheet } from '@/components/kavexa/product-form-sheet';
+import type { InventoryItem } from '@/lib/types';
+
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'USD' }).format(amount);
 };
 
 export default function InicioPage() {
-  const { transactions, alerts, inventory } = useAppContext();
+  const { transactions, alerts, inventory, setInventory } = useAppContext();
+  const [isTransactionSheetOpen, setTransactionSheetOpen] = useState(false);
+  const [isProductSheetOpen, setProductSheetOpen] = useState(false);
 
   const summary = useMemo(() => {
     const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
@@ -63,12 +70,34 @@ export default function InicioPage() {
     return activity.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
   }, [alerts, inventory]);
 
+  const handleProductFormSubmit = (data: Omit<InventoryItem, 'id'>) => {
+    // Solo creación desde el dashboard
+    const newItem: InventoryItem = {
+      id: `item-${Date.now()}`,
+      ...data
+    }
+    setInventory(prev => [newItem, ...prev]);
+    setProductSheetOpen(false);
+  };
+
+
   return (
     <PageWrapper>
       <PageHeader
         title="Inicio"
         description="Un resumen de la salud financiera y operativa de tu negocio."
-      />
+      >
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setProductSheetOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Añadir Producto
+          </Button>
+           <Button onClick={() => setTransactionSheetOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Registrar Venta
+          </Button>
+        </div>
+      </PageHeader>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -167,6 +196,19 @@ export default function InicioPage() {
           </CardContent>
         </Card>
       </div>
+
+       <AddTransactionSheet 
+        open={isTransactionSheetOpen} 
+        onOpenChange={setTransactionSheetOpen}
+        defaultValues={null} // Forcing creation mode from dashboard
+      />
+
+       <ProductFormSheet 
+        open={isProductSheetOpen}
+        onOpenChange={setProductSheetOpen}
+        onSubmit={handleProductFormSubmit}
+        defaultValues={null}
+      />
     </PageWrapper>
   );
 }

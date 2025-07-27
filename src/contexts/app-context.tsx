@@ -25,7 +25,9 @@ interface AppContextType {
   cashFlow: CashFlowData[];
   setCashFlow: (value: CashFlowData[] | ((val: CashFlowData[]) => CashFlowData[])) => void;
   isLoaded: boolean;
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'date'>) => void;
+  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
+  editTransaction: (transaction: Transaction) => void;
+  deleteTransaction: (transactionId: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,14 +54,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (isInventoryLoaded && inventory.length > 0 && inventory[0].id?.startsWith('item-mock')) {
        setInventory([]);
     }
-  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded]);
+  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded, setAlerts, setTransactions, setInventory]);
 
 
-  const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'>) => {
+  const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
     const newTransaction: Transaction = {
-      ...data,
       id: `txn-${Date.now()}`,
-      date: new Date().toISOString().split('T')[0],
+      date: data.date ? data.date : new Date().toISOString().split('T')[0],
+      description: data.description,
+      amount: data.amount,
+      type: data.type,
+      category: data.category
     };
 
     const updatedTransactions = [newTransaction, ...transactions];
@@ -88,6 +93,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [transactions, setTransactions, setAlerts]);
 
+  const editTransaction = useCallback((updatedTransaction: Transaction) => {
+    setTransactions(prev => prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));
+  }, [setTransactions]);
+
+  const deleteTransaction = useCallback((transactionId: string) => {
+    setTransactions(prev => prev.filter(t => t.id !== transactionId));
+  }, [setTransactions]);
+
 
   const value = useMemo(() => ({
     transactions,
@@ -100,12 +113,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setCashFlow,
     isLoaded,
     addTransaction,
+    editTransaction,
+    deleteTransaction
   }), [
     transactions, setTransactions,
     inventory, setInventory,
     alerts, setAlerts,
     cashFlow, setCashFlow,
-    isLoaded, addTransaction
+    isLoaded, addTransaction, editTransaction, deleteTransaction
   ]);
 
   return (

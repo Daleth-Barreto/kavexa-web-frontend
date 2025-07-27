@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, MoreVertical, Edit, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PageWrapper } from '@/components/kavexa/page-wrapper';
@@ -10,6 +10,22 @@ import { AddTransactionSheet } from '@/components/kavexa/add-transaction-sheet';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { Transaction } from '@/lib/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useAppContext } from '@/contexts/app-context';
@@ -21,10 +37,15 @@ const formatCurrency = (amount: number) => {
 const COLORS = ['#A085CF', '#7FB7BE', '#FFC658', '#FF8042', '#82ca9d'];
 
 export default function MovimientosPage() {
+  const { transactions, deleteTransaction } = useAppContext();
+
   const [sheetOpen, setSheetOpen] = useState(false);
-  const { transactions } = useAppContext();
+  const [isAlertOpen, setAlertOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
+
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => t.description.toLowerCase().includes(searchTerm.toLowerCase()));
   }, [transactions, searchTerm]);
@@ -39,12 +60,35 @@ export default function MovimientosPage() {
     return Object.entries(grouped).map(([name, value]) => ({ name, value }));
   }, [transactions]);
 
+  const handleAddClick = () => {
+    setSelectedTransaction(null);
+    setSheetOpen(true);
+  };
+
+  const handleEditClick = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setSheetOpen(true);
+  };
+  
+  const handleDeleteClick = (transaction: Transaction) => {
+    setTransactionToDelete(transaction);
+    setAlertOpen(true);
+  }
+
+  const confirmDelete = () => {
+    if(transactionToDelete) {
+      deleteTransaction(transactionToDelete.id);
+    }
+    setAlertOpen(false);
+    setTransactionToDelete(null);
+  }
+
   return (
     <PageWrapper>
       <PageHeader
         title="Movimientos Financieros"
         description="Revisa, busca y gestiona todas tus transacciones.">
-        <Button onClick={() => setSheetOpen(true)}>
+        <Button onClick={handleAddClick}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Añadir Movimiento
         </Button>
@@ -71,6 +115,7 @@ export default function MovimientosPage() {
                     <TableHead>Categoría</TableHead>
                     <TableHead>Fecha</TableHead>
                     <TableHead className="text-right">Monto</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -85,6 +130,25 @@ export default function MovimientosPage() {
                         {transaction.type === 'income' ? '+' : '-'}
                         {formatCurrency(transaction.amount)}
                       </TableCell>
+                       <TableCell className="text-right">
+                       <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleEditClick(transaction)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteClick(transaction)} className="text-destructive focus:text-destructive">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -133,7 +197,23 @@ export default function MovimientosPage() {
       <AddTransactionSheet 
         open={sheetOpen} 
         onOpenChange={setSheetOpen}
+        defaultValues={selectedTransaction}
       />
+
+       <AlertDialog open={isAlertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente la transacción "{transactionToDelete?.description}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setTransactionToDelete(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Continuar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageWrapper>
   );
 }
