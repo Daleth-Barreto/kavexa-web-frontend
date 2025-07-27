@@ -29,6 +29,7 @@ import {
 import type { Transaction } from '@/lib/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useAppContext, useCurrency } from '@/contexts/app-context';
+import { useTheme } from 'next-themes';
 
 
 const COLORS = [
@@ -42,6 +43,7 @@ const COLORS = [
 export default function MovimientosPage() {
   const { transactions, deleteTransaction } = useAppContext();
   const { formatCurrency } = useCurrency();
+  const { theme } = useTheme();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isAlertOpen, setAlertOpen] = useState(false);
@@ -193,10 +195,10 @@ export default function MovimientosPage() {
                       return [formattedValue, name, percentage];
                     }}
                     contentStyle={{
-                        background: 'hsl(var(--background))',
+                        background: theme === 'dark' ? 'hsl(240 10% 3.9%)' : '#fff',
                         borderColor: 'hsl(var(--border))',
                         borderRadius: 'var(--radius)',
-                        color: 'hsl(var(--foreground))'
+                        color: theme === 'dark' ? '#fff' : 'hsl(240 10% 3.9%)',
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "20px", color: "hsl(var(--muted-foreground))" }}/>
