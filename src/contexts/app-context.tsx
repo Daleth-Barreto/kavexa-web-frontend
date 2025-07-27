@@ -5,6 +5,7 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Transaction, InventoryItem, Alert, CashFlowData } from '@/lib/types';
 import { mockTransactions, mockInventory, mockAlerts, mockCashFlow } from '@/lib/data';
 import { calculateZScore, Z_SCORE_THRESHOLD } from '@/lib/math-utils';
+import { useToast } from '@/hooks/use-toast';
 
 // IDs from old mock data to ensure they are cleaned up
 const MOCK_ALERT_IDS_TO_CLEAN = [
@@ -25,7 +26,7 @@ interface AppContextType {
   cashFlow: CashFlowData[];
   setCashFlow: (value: CashFlowData[] | ((val: CashFlowData[]) => CashFlowData[])) => void;
   isLoaded: boolean;
-  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'date'> & { date?: string }) => void;
   editTransaction: (transaction: Transaction) => void;
   deleteTransaction: (transactionId: string) => void;
 }
@@ -37,6 +38,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [inventory, setInventory, isInventoryLoaded] = useLocalStorage<InventoryItem[]>('kavexa_inventory', mockInventory);
   const [alerts, setAlerts, isAlertsLoaded] = useLocalStorage<Alert[]>('kavexa_alerts', mockAlerts);
   const [cashFlow, setCashFlow, isCashFlowLoaded] = useLocalStorage<CashFlowData[]>('kavexa_cashflow', mockCashFlow);
+  const { toast } = useToast();
 
   const isLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isCashFlowLoaded;
 
@@ -48,13 +50,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setAlerts([]); // Clear the alerts if old mock data is found
       }
     }
-    if (isTransactionsLoaded && transactions.length > 0 && transactions[0].id?.startsWith('txn-mock')) {
+    if (isTransactionsLoaded && transactions.length > 0 && transactions[0]?.id?.startsWith('txn-mock')) {
        setTransactions([]);
     }
-    if (isInventoryLoaded && inventory.length > 0 && inventory[0].id?.startsWith('item-mock')) {
+    if (isInventoryLoaded && inventory.length > 0 && inventory[0]?.id?.startsWith('item-mock')) {
        setInventory([]);
     }
-  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded, setAlerts, setTransactions, setInventory]);
+  }, [isLoaded, isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded, setAlerts, setTransactions, setInventory, alerts, transactions, inventory]);
 
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
@@ -70,7 +72,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const updatedTransactions = [newTransaction, ...transactions];
     setTransactions(updatedTransactions);
 
-    // Z-Score Alert Logic
+    // Z-Score Alert Logic for expenses
     if (newTransaction.type === 'expense') {
       const expenseAmounts = updatedTransactions
         .filter(t => t.type === 'expense')
@@ -88,16 +90,58 @@ export function AppProvider({ children }: { children: ReactNode }) {
             relatedId: newTransaction.id,
           };
           setAlerts(prev => [newAlert, ...prev]);
+           toast({
+            title: 'Alerta generada',
+            description: `Se detectó un gasto inusualmente alto.`,
+            variant: 'destructive'
+          });
         }
       }
     }
-  }, [transactions, setTransactions, setAlerts]);
+    
+    // Inventory update logic for income
+    if (newTransaction.type === 'income' && data.category === 'Ventas') {
+        const productId = data.productId;
+        const quantitySold = data.quantity || 1;
+        
+        setInventory(currentInventory => {
+            return currentInventory.map(item => {
+                if (item.id === productId) {
+                    const newStock = item.stock - quantitySold;
+                    
+                    // Low stock alert logic
+                    if (newStock <= item.lowStockThreshold && item.stock > item.lowStockThreshold) {
+                         const newAlert: Alert = {
+                            id: `alert-stock-${Date.now()}`,
+                            type: 'low_stock',
+                            message: `Nivel de stock bajo para ${item.name}`,
+                            date: new Date().toISOString().split('T')[0],
+                            status: 'new',
+                            relatedId: item.id,
+                        };
+                        setAlerts(prev => [newAlert, ...prev]);
+                        toast({
+                            title: 'Alerta de Inventario',
+                            description: `El producto "${item.name}" tiene pocas unidades.`,
+                        });
+                    }
+                    return { ...item, stock: newStock };
+                }
+                return item;
+            });
+        });
+    }
+
+  }, [transactions, setTransactions, setAlerts, setInventory, toast]);
 
   const editTransaction = useCallback((updatedTransaction: Transaction) => {
+    // Note: Editing transactions does not currently revert stock changes. 
+    // This could be complex to implement and might require a more advanced transaction model.
     setTransactions(prev => prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));
   }, [setTransactions]);
 
   const deleteTransaction = useCallback((transactionId: string) => {
+     // Note: Deleting transactions does not currently revert stock changes.
     setTransactions(prev => prev.filter(t => t.id !== transactionId));
   }, [setTransactions]);
 

@@ -5,6 +5,9 @@ export type Transaction = {
   amount: number;
   type: 'income' | 'expense';
   category: string;
+  // Fields for sales linked to inventory
+  productId?: string;
+  quantity?: number;
 };
 
 export type InventoryItem = {
