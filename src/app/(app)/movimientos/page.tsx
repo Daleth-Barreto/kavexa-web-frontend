@@ -22,17 +22,8 @@ const COLORS = ['#A085CF', '#7FB7BE', '#FFC658', '#FF8042', '#82ca9d'];
 
 export default function MovimientosPage() {
   const [sheetOpen, setSheetOpen] = useState(false);
-  const { transactions, setTransactions } = useAppContext();
+  const { transactions } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
-
-  const handleAddTransaction = (data: Omit<Transaction, 'id' | 'date'>) => {
-    const newTransaction: Transaction = {
-      ...data,
-      id: (transactions.length + 1).toString(),
-      date: new Date().toISOString().split('T')[0],
-    };
-    setTransactions([newTransaction, ...transactions]);
-  };
   
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => t.description.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -142,7 +133,6 @@ export default function MovimientosPage() {
       <AddTransactionSheet 
         open={sheetOpen} 
         onOpenChange={setSheetOpen}
-        onTransactionAdd={handleAddTransaction}
       />
     </PageWrapper>
   );

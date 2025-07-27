@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -31,7 +30,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Wand2 } from 'lucide-react';
+import { useAppContext } from '@/contexts/app-context';
+
 
 const transactionSchema = z.object({
   description: z.string().min(1, 'La descripción es requerida.'),
@@ -45,11 +45,11 @@ type TransactionFormValues = z.infer<typeof transactionSchema>;
 type AddTransactionSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onTransactionAdd: (data: TransactionFormValues) => void;
 };
 
-export function AddTransactionSheet({ open, onOpenChange, onTransactionAdd }: AddTransactionSheetProps) {
+export function AddTransactionSheet({ open, onOpenChange }: AddTransactionSheetProps) {
   const { toast } = useToast();
+  const { addTransaction } = useAppContext();
   
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -63,7 +63,7 @@ export function AddTransactionSheet({ open, onOpenChange, onTransactionAdd }: Ad
 
 
   function onSubmit(data: TransactionFormValues) {
-    onTransactionAdd(data);
+    addTransaction(data);
     toast({
       title: 'Transacción añadida',
       description: `Se ha añadido "${data.description}" a tus movimientos.`,
