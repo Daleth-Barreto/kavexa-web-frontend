@@ -145,12 +145,12 @@ export default function PerfilPage() {
             </CardHeader>
             <CardContent className="space-y-4">
                <div className="flex flex-col sm:flex-row gap-4">
-                 <Button variant="outline" onClick={() => transactionFileInputRef.current?.click()}>Importar Transacciones (CSV)</Button>
-                 <Button variant="outline" onClick={() => inventoryFileInputRef.current?.click()}>Importar Inventario (CSV)</Button>
+                 <Button variant="outline" className="w-full justify-center" onClick={() => transactionFileInputRef.current?.click()}>Importar Transacciones (CSV)</Button>
+                 <Button variant="outline" className="w-full justify-center" onClick={() => inventoryFileInputRef.current?.click()}>Importar Inventario (CSV)</Button>
                </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button variant="outline" onClick={handleExportCSV}>Exportar a CSV</Button>
-                  <Button variant="destructive" onClick={() => setAlertOpen(true)}>Eliminar todos los datos</Button>
+                  <Button variant="outline" className="w-full justify-center" onClick={handleExportCSV}>Exportar a CSV</Button>
+                  <Button variant="destructive" className="w-full justify-center" onClick={() => setAlertOpen(true)}>Eliminar todos los datos</Button>
                 </div>
                 <input type="file" ref={transactionFileInputRef} className="hidden" accept=".csv" onChange={(e) => handleFileImport(e, 'transactions')} />
                 <input type="file" ref={inventoryFileInputRef} className="hidden" accept=".csv" onChange={(e) => handleFileImport(e, 'inventory')} />

@@ -88,7 +88,7 @@ export default function InicioPage() {
         >
           <div className="flex items-center gap-2">
             <AppTour.Trigger />
-            <div className="flex gap-2" data-tour-step="4">
+            <div className="flex flex-col sm:flex-row gap-2" data-tour-step="4">
               <Button variant="outline" onClick={() => setProductSheetOpen(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Añadir Producto
@@ -179,7 +179,7 @@ export default function InicioPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Descripción</TableHead>
-                        <TableHead>Tipo</TableHead>
+                        <TableHead className="text-right">Tipo</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -192,7 +192,7 @@ export default function InicioPage() {
                             }
                             {item.message}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">
                             <Badge variant={item.activityType === 'alert' ? 'destructive' : 'secondary'}>
                               {item.activityType === 'alert' ? 'Alerta' : 'Inventario'}
                             </Badge>

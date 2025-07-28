@@ -14,7 +14,7 @@ export function PageHeader({ title, description, children, className }: PageHead
         <h1 className="text-2xl md:text-3xl font-bold font-headline text-primary">{title}</h1>
         {description && <p className="text-muted-foreground">{description}</p>}
       </div>
-      {children && <div className="flex-shrink-0">{children}</div>}
+      {children && <div className="flex-shrink-0 w-full md:w-auto">{children}</div>}
     </div>
   );
 }
