@@ -44,17 +44,13 @@ export function InstallPwaButton() {
   
   // This button will only be rendered if the browser supports the PWA installation prompt
   if (!installPrompt) {
-    return (
-        <p className="text-sm text-muted-foreground">
-            La aplicación ya está instalada o tu navegador no soporta la instalación directa.
-        </p>
-    );
+    return null;
   }
 
   return (
-    <Button onClick={handleInstallClick} className="w-full">
+    <Button onClick={handleInstallClick} className="w-full" size="lg" variant="outline">
       <Download className="mr-2 h-4 w-4" />
-      Instalar Aplicación en el Escritorio
+      Instalar Aplicación
     </Button>
   );
 }

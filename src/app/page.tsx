@@ -1,8 +1,11 @@
 
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Zap, MessageSquareQuote } from 'lucide-react';
+import { Zap, MessageSquareQuote, Download } from 'lucide-react';
 import Image from 'next/image';
+import { InstallPwaButton } from '@/components/kavexa/install-pwa-button';
 
 export default function LandingPage() {
   const GOOGLE_FORM_URL = "https://forms.gle/sYJRQ3rWXpjxjcCZ7"; 
@@ -36,7 +39,7 @@ export default function LandingPage() {
                     Finanzas, inventario, clientes y más. Elige los módulos que necesitas y gestiona tu pyme de forma inteligente y personalizada.
                   </p>
                 </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                <div className="flex flex-col gap-2 min-[400px]:flex-row flex-wrap">
                   <Button asChild size="lg" className="w-full sm:w-auto">
                     <Link href="/welcome">
                       Empezar
@@ -48,6 +51,9 @@ export default function LandingPage() {
                        Danos tu opinión
                     </Link>
                   </Button>
+                  <div className="w-full sm:w-auto">
+                    <InstallPwaButton />
+                  </div>
                 </div>
               </div>
               <div className="mx-auto flex items-center justify-center aspect-[3/2] overflow-hidden rounded-xl sm:w-full lg:order-last">
