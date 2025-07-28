@@ -43,13 +43,54 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="mx-auto flex items-center justify-center aspect-[3/2] overflow-hidden rounded-xl sm:w-full lg:order-last">
-                 <Image
-                  src="/hero-image.png"
-                  width={600}
-                  height={400}
-                  alt="Gestión de negocio con Kavexa"
+                 <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 600 400"
+                  xmlns="http://www.w3.org/2000/svg"
                   className="rounded-xl object-cover"
-                />
+                >
+                  <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.1 }} />
+                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 0.1 }} />
+                    </linearGradient>
+                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))' }} />
+                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))' }} />
+                    </linearGradient>
+                  </defs>
+                  
+                  <rect width="600" height="400" rx="12" fill="hsl(var(--muted))" />
+                  
+                  <g transform="translate(50 50) scale(0.9)">
+                    <rect x="0" y="0" width="500" height="300" rx="8" fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth="2" />
+                    
+                    <path d="M 20 20 L 220 20" stroke="hsl(var(--muted-foreground))" strokeWidth="10" strokeLinecap="round" />
+                    <path d="M 20 40 L 180 40" stroke="hsl(var(--muted-foreground))" strokeWidth="10" strokeLinecap="round" />
+
+                    <rect x="250" y="20" width="230" height="60" rx="4" fill="url(#grad1)" />
+                    
+                    <g transform="translate(340 50) scale(1.5)">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="hsl(var(--primary))" stroke="hsl(var(--primary-foreground))" strokeWidth="0.5" />
+                    </g>
+                    
+                    <g transform="translate(20 80)">
+                      <rect x="0" y="0" width="210" height="200" rx="4" fill="hsl(var(--background))" stroke="hsl(var(--border))" />
+                       <path d="M 10 180 L 40 150 L 70 165 L 100 130 L 130 145 L 160 110 L 190 125" stroke="hsl(var(--primary))" strokeWidth="3" fill="none" />
+                       <circle cx="160" cy="110" r="4" fill="hsl(var(--primary))" />
+                    </g>
+
+                     <g transform="translate(250 100)">
+                      <rect x="0" y="0" width="230" height="180" rx="4" fill="hsl(var(--background))" stroke="hsl(var(--border))" />
+                        <rect x="20" y="20" width="190" height="20" rx="2" fill="hsl(var(--muted))" />
+                        <rect x="20" y="50" width="120" height="20" rx="2" fill="hsl(var(--muted))" />
+                        <rect x="20" y="80" width="190" height="20" rx="2" fill="hsl(var(--muted))" />
+                        <rect x="20" y="110" width="150" height="20" rx="2" fill="hsl(var(--muted))" />
+                         <rect x="20" y="140" width="190" height="20" rx="2" fill="hsl(var(--muted))" />
+                    </g>
+                  </g>
+                </svg>
               </div>
             </div>
           </div>
@@ -69,4 +110,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
