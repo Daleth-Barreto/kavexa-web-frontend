@@ -125,6 +125,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
 
   function onSubmit(data: TransactionFormValues) {
     let transactionData: Omit<Transaction, 'id'>;
+    const finalClientId = data.clientId === 'none' ? undefined : data.clientId;
 
     if (data.type === 'egress') {
       transactionData = {
@@ -133,7 +134,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
           category: data.category!,
           amount: data.amount!,
           date: data.date || new Date().toISOString().split('T')[0],
-          clientId: data.clientId,
+          clientId: finalClientId,
       };
       toast({
           title: defaultValues ? 'Egreso actualizado' : 'Egreso registrado',
@@ -159,7 +160,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               date: data.date || new Date().toISOString().split('T')[0],
               productId: data.productId,
               quantity: data.quantity,
-              clientId: data.clientId,
+              clientId: finalClientId,
           };
           toast({
               title: isEditing ? 'Venta actualizada' : 'Venta registrada',
@@ -172,7 +173,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               amount: data.amount!,
               category: data.category!,
               date: data.date || new Date().toISOString().split('T')[0],
-              clientId: data.clientId,
+              clientId: finalClientId,
           };
           toast({
               title: defaultValues ? 'Ingreso actualizado' : 'Ingreso registrado',
@@ -355,14 +356,14 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Cliente (Opcional)</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || ''} >
+                  <Select onValueChange={field.onChange} value={field.value || 'none'}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Asociar a un cliente" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">Ninguno</SelectItem>
+                      <SelectItem value="none">Ninguno</SelectItem>
                       {clients.map(client => (
                         <SelectItem key={client.id} value={client.id}>
                           {client.name}

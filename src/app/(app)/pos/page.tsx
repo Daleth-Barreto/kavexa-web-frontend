@@ -23,7 +23,7 @@ export default function POSPage() {
     const { formatCurrency } = useCurrency();
     const [cart, setCart] = useState<CartItem[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+    const [selectedClientId, setSelectedClientId] = useState<string>('none');
 
     const filteredInventory = useMemo(() => {
         return inventory.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()) && item.stock > 0);
@@ -88,7 +88,7 @@ export default function POSPage() {
                 category: 'Ventas',
                 productId: item.id,
                 quantity: item.quantity,
-                clientId: selectedClient?.id,
+                clientId: selectedClientId === 'none' ? undefined : selectedClientId,
             });
         });
 
@@ -98,7 +98,7 @@ export default function POSPage() {
         });
 
         setCart([]);
-        setSelectedClient(null);
+        setSelectedClientId('none');
     };
 
     return (
@@ -190,11 +190,12 @@ export default function POSPage() {
                        </ScrollArea>
                     </CardContent>
                     <CardFooter className="flex flex-col gap-4">
-                         <Select onValueChange={(value) => setSelectedClient(clients.find(c => c.id === value) || null)}>
+                         <Select value={selectedClientId} onValueChange={setSelectedClientId}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Asociar cliente (opcional)" />
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value="none">Cliente Genérico</SelectItem>
                                 {clients.map(client => (
                                     <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
                                 ))}
