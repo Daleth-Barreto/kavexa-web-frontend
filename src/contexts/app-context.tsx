@@ -19,7 +19,7 @@ interface AppContextType {
   setInventory: (value: InventoryItem[] | ((val: InventoryItem[]) => InventoryItem[])) => void;
   alerts: Alert[];
   setAlerts: (value: Alert[] | ((val: Alert[]) => Alert[])) => void;
-  addAlert: (alert: Omit<Alert, 'id' | 'date' | 'status' | 'type'>) => void;
+  addAlert: (alert: Omit<Alert, 'id' | 'status' | 'type'> & { date: string }) => void;
   subscriptions: Subscription[];
   setSubscriptions: (value: Subscription[] | ((val: Subscription[]) => Subscription[])) => void;
   clients: Client[];
@@ -176,15 +176,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
   }, [inventory, alerts, setAlerts, toast, config.enabledModules.alertas]);
 
-    const addAlert = useCallback((data: Omit<Alert, 'id' | 'date' | 'status' | 'type'>) => {
-        const today = new Date();
+    const addAlert = useCallback((data: Omit<Alert, 'id' | 'status' | 'type'> & { date: string }) => {
+        const startDate = new Date(data.date);
         let nextRecurrenceDate: string | undefined = undefined;
 
         if (data.recurrence && data.recurrence !== 'none') {
             switch(data.recurrence) {
-                case 'daily': nextRecurrenceDate = addDays(today, 1).toISOString(); break;
-                case 'weekly': nextRecurrenceDate = addWeeks(today, 1).toISOString(); break;
-                case 'monthly': nextRecurrenceDate = addMonths(today, 1).toISOString(); break;
+                case 'daily': nextRecurrenceDate = addDays(startDate, 1).toISOString(); break;
+                case 'weekly': nextRecurrenceDate = addWeeks(startDate, 1).toISOString(); break;
+                case 'monthly': nextRecurrenceDate = addMonths(startDate, 1).toISOString(); break;
             }
         }
 
@@ -192,7 +192,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             id: `alert-custom-${Date.now()}`,
             type: 'custom',
             status: 'new',
-            date: today.toISOString().split('T')[0],
+            date: data.date,
             message: data.message,
             recurrence: data.recurrence,
             nextRecurrenceDate,
