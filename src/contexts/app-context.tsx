@@ -68,7 +68,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Subscription alerts check
   useEffect(() => {
-    if (!isDataLoaded) return;
+    if (!isDataLoaded || !config.enabledModules?.alertas) return;
     
     const today = new Date();
     const currentMonth = today.getMonth();
@@ -95,17 +95,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     if (dueSubscriptions.length > 0) {
       setAlerts(prev => [...dueSubscriptions, ...prev]);
-      if (config.enabledModules.alertas) {
         toast({
             title: 'Suscripciones Pendientes',
             description: `Tienes ${dueSubscriptions.length} pago(s) de suscripción pendiente(s) este mes.`,
             variant: 'destructive',
         });
-      }
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDataLoaded, subscriptions, config.enabledModules.alertas]);
+  }, [isDataLoaded, subscriptions, config.enabledModules?.alertas]);
 
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
@@ -189,7 +187,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
     }
 
-  }, [transactions, setTransactions, setAlerts, setInventory, setClients, toast, config.enabledModules.alertas]);
+  }, [transactions, setTransactions, setAlerts, setInventory, setClients, toast, config.enabledModules]);
 
   const editTransaction = useCallback((updatedTransaction: Transaction) => {
     setTransactions(prev => prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));
