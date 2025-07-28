@@ -1,3 +1,4 @@
+
 'use client';
 
 import { TourProvider, useTour, type StepType } from '@reactour/tour';
@@ -60,13 +61,13 @@ function AppTour({ children }: { children: React.ReactNode }) {
 
             return (
               <TourPopover {...props}>
-                {children}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  {isLastStep ? (
-                    <Button onClick={() => setIsOpen(false)}>Finalizar</Button>
-                  ) : (
-                    <Button onClick={() => props.nextStep()}>Siguiente</Button>
-                  )}
+                <div className='flex flex-col gap-4'>
+                    {children}
+                    <div className="flex justify-end">
+                    <Button onClick={() => isLastStep ? setIsOpen(false) : props.nextStep()}>
+                        {isLastStep ? 'Finalizar' : 'Siguiente'}
+                    </Button>
+                    </div>
                 </div>
               </TourPopover>
             );
@@ -79,6 +80,7 @@ function AppTour({ children }: { children: React.ReactNode }) {
               borderRadius: 'var(--radius)',
               backgroundColor: 'hsl(var(--background))',
               color: 'hsl(var(--foreground))',
+              padding: '1rem'
             }),
             maskArea: (base) => ({ ...base, rx: 'var(--radius)' }),
             maskWrapper: (base) => ({ ...base, color: '#00000080' }),
