@@ -16,7 +16,7 @@ export function KavexaLogoIcon({ className }: KavexaLogoIconProps) {
       strokeLinejoin="round"
       className={cn("lucide lucide-zap", className)}
     >
-      <path d="M4 12 L12 2 L14.5 10 L20 11 L12 22 L9.5 14 L4 12 Z" />
+      <path d="M4 12 L12 2 L14.5 10 L20 11 L12 22 L9.5 14 Z" />
     </svg>
   );
 }
