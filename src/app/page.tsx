@@ -4,9 +4,9 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { MessageSquareQuote } from 'lucide-react';
-import Image from 'next/image';
 import { InstallPwaButton } from '@/components/kavexa/install-pwa-button';
 import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
+import { AbstractDashboard } from '@/components/kavexa/abstract-dashboard';
 
 export default function LandingPage() {
   const GOOGLE_FORM_URL = "https://forms.gle/sYJRQ3rWXpjxjcCZ7"; 
@@ -57,14 +57,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <Image
-                src="https://placehold.co/600x400.png"
-                width={600}
-                height={400}
-                alt="Kavexa Dashboard"
-                data-ai-hint="dashboard analytics"
-                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-              />
+              <AbstractDashboard className="mx-auto aspect-[4/3] w-full overflow-hidden rounded-xl lg:order-last" />
             </div>
           </div>
         </section>
