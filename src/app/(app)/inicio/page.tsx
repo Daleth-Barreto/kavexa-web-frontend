@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -23,7 +24,7 @@ export default function InicioPage() {
   const [isProductSheetOpen, setProductSheetOpen] = useState(false);
   const { formatCurrency } = useCurrency();
   
-  const GOOGLE_FORM_URL = "https://forms.gle/your-survey-link-here"; // <-- Reemplaza con tu enlace
+  const GOOGLE_FORM_URL = "https://forms.gle/sYJRQ3rWXpjxjcCZ7";
 
   const summary = useMemo(() => {
     const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);

@@ -5,7 +5,7 @@ import { Zap, MessageSquareQuote } from 'lucide-react';
 import Image from 'next/image';
 
 export default function LandingPage() {
-  const GOOGLE_FORM_URL = "https://forms.gle/your-survey-link-here"; // <-- Reemplaza con tu enlace
+  const GOOGLE_FORM_URL = "https://forms.gle/sYJRQ3rWXpjxjcCZ7"; 
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
