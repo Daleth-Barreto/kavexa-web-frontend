@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Zap } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LandingPage() {
   return (
@@ -26,7 +27,7 @@ export default function LandingPage() {
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
-                  <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline text-primary">
+                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline text-primary">
                     La herramienta que se adapta a tu negocio
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">

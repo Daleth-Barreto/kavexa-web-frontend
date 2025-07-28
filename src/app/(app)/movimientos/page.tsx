@@ -152,7 +152,7 @@ export default function MovimientosPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full sm:w-auto flex-grow"
               />
-               <Select value={selectedYear} onValueChange={setSelectedYear}>
+               <Select value={selectedYear} onValuechange={setSelectedYear}>
                 <SelectTrigger className="w-full sm:w-[120px]">
                   <SelectValue placeholder="Año" />
                 </SelectTrigger>
@@ -187,7 +187,7 @@ export default function MovimientosPage() {
                       <TableCell>
                         <div className="font-medium">{transaction.description}</div>
                         <div className="text-xs text-muted-foreground sm:hidden">
-                            {new Date(transaction.date).toLocaleDateString('es-ES')} &middot; {transaction.category}
+                            {new Date(transaction.date).toLocaleDateString('es-ES')}
                         </div>
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">

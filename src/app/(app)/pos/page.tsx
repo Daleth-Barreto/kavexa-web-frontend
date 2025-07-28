@@ -122,7 +122,7 @@ export default function POSPage() {
                     </CardHeader>
                     <CardContent>
                         <ScrollArea className="h-[450px]">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
                                 {filteredInventory.length > 0 ? filteredInventory.map(item => (
                                     <Card key={item.id} className="flex flex-col cursor-pointer hover:border-primary" onClick={() => addToCart(item)}>
                                         <CardHeader className="p-4 flex-grow">
