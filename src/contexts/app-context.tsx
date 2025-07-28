@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, ReactNode, useMemo, useCallback, useEffect, useState } from 'react';
@@ -18,6 +19,7 @@ interface AppContextType {
   setInventory: (value: InventoryItem[] | ((val: InventoryItem[]) => InventoryItem[])) => void;
   alerts: Alert[];
   setAlerts: (value: Alert[] | ((val: Alert[]) => Alert[])) => void;
+  addAlert: (alert: Omit<Alert, 'id' | 'date' | 'status' | 'type'>) => void;
   subscriptions: Subscription[];
   setSubscriptions: (value: Subscription[] | ((val: Subscription[]) => Subscription[])) => void;
   clients: Client[];
@@ -147,6 +149,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
   }, [inventory, alerts, setAlerts, toast, config.enabledModules.alertas]);
 
+    const addAlert = useCallback((data: Omit<Alert, 'id' | 'date' | 'status' | 'type'>) => {
+        const newAlert: Alert = {
+            id: `alert-custom-${Date.now()}`,
+            type: 'custom',
+            status: 'new',
+            date: new Date().toISOString().split('T')[0],
+            ...data
+        };
+        setAlerts(prev => [newAlert, ...prev]);
+        toast({
+            title: 'Recordatorio Creado',
+            description: 'Se ha añadido una nueva alerta a tu lista.',
+        });
+    }, [setAlerts, toast]);
+
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
     const newTransaction: Transaction = {
@@ -273,6 +290,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setInventory,
     alerts,
     setAlerts,
+    addAlert,
     subscriptions,
     setSubscriptions,
     clients,
@@ -292,7 +310,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }), [
     transactions, setTransactions,
     inventory, setInventory,
-    alerts, setAlerts,
+    alerts, setAlerts, addAlert,
     subscriptions, setSubscriptions,
     clients, setClients,
     providers, setProviders,

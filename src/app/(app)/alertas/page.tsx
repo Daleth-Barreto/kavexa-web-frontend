@@ -1,15 +1,17 @@
-'use client';
 
+'use client';
+import { useState } from 'react';
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles } from "lucide-react";
+import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles, Megaphone, PlusCircle } from "lucide-react";
 import { useAppContext, useCurrency } from "@/contexts/app-context";
-import type { Alert, Subscription } from "@/lib/types";
+import type { Alert } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { AddAlertSheet } from '@/components/kavexa/add-alert-sheet';
 
 const statusVariant: Record<Alert['status'], 'destructive' | 'secondary' | 'default'> = {
   new: 'destructive',
@@ -28,12 +30,14 @@ const alertIcons = {
   low_stock: <ShieldAlert className="h-4 w-4 text-orange-500" />,
   subscription_due: <Repeat className="h-4 w-4 text-blue-500" />,
   selling_opportunity: <Sparkles className="h-4 w-4 text-purple-500" />,
+  custom: <Megaphone className="h-4 w-4 text-gray-500" />
 }
 
 export default function AlertasPage() {
   const { alerts, setAlerts, addTransaction, subscriptions, setSubscriptions } = useAppContext();
   const { toast } = useToast();
   const { formatCurrency } = useCurrency();
+  const [isSheetOpen, setSheetOpen] = useState(false);
 
   const handleStatusChange = (id: string, status: 'ignored' | 'resolved') => {
     setAlerts(currentAlerts => currentAlerts.map(alert => 
@@ -71,8 +75,13 @@ export default function AlertasPage() {
     <PageWrapper>
       <PageHeader
         title="Alertas y Análisis"
-        description="Gestiona las alertas generadas por el sistema para mantener tu negocio en buen camino."
-      />
+        description="Gestiona las alertas generadas por el sistema y añade tus propios recordatorios."
+      >
+        <Button onClick={() => setSheetOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Añadir Alerta
+        </Button>
+      </PageHeader>
       <Card>
         <CardContent className="pt-6">
           {alerts.length > 0 ? (
@@ -125,6 +134,11 @@ export default function AlertasPage() {
           )}
         </CardContent>
       </Card>
+
+      <AddAlertSheet 
+        open={isSheetOpen}
+        onOpenChange={setSheetOpen}
+      />
     </PageWrapper>
   );
 }
