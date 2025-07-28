@@ -6,9 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Trash2, ShieldAlert } from "lucide-react";
-import { useAppContext } from "@/contexts/app-context";
-import type { Alert } from "@/lib/types";
+import { Check, Trash2, ShieldAlert, Repeat, DollarSign } from "lucide-react";
+import { useAppContext, useCurrency } from "@/contexts/app-context";
+import type { Alert, Subscription } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 const statusVariant: Record<Alert['status'], 'destructive' | 'secondary' | 'default'> = {
   new: 'destructive',
@@ -22,15 +23,48 @@ const statusText: Record<Alert['status'], string> = {
   resolved: 'Resuelta',
 };
 
+const alertIcons = {
+  unusual_expense: <ShieldAlert className="h-4 w-4 text-yellow-500" />,
+  low_stock: <ShieldAlert className="h-4 w-4 text-orange-500" />,
+  subscription_due: <Repeat className="h-4 w-4 text-blue-500" />,
+}
 
 export default function AlertasPage() {
-  const { alerts, setAlerts } = useAppContext();
+  const { alerts, setAlerts, addTransaction, subscriptions, setSubscriptions } = useAppContext();
+  const { toast } = useToast();
+  const { formatCurrency } = useCurrency();
 
   const handleStatusChange = (id: string, status: 'ignored' | 'resolved') => {
     setAlerts(currentAlerts => currentAlerts.map(alert => 
       alert.id === id ? { ...alert, status } : alert
     ));
   };
+
+  const handlePaySubscription = (alert: Alert) => {
+    const subscription = subscriptions.find(s => s.id === alert.relatedId);
+    if (!subscription) {
+      toast({ title: 'Error', description: 'Suscripción no encontrada', variant: 'destructive'});
+      return;
+    }
+
+    addTransaction({
+      type: 'egress',
+      description: `Pago de suscripción: ${subscription.name}`,
+      amount: subscription.amount,
+      category: subscription.category,
+      date: new Date().toISOString().split('T')[0],
+    });
+
+    const today = new Date();
+    setSubscriptions(prev => prev.map(s => s.id === subscription.id ? {
+      ...s,
+      lastPaidMonth: today.getMonth(),
+      lastPaidYear: today.getFullYear(),
+    } : s));
+
+    handleStatusChange(alert.id, 'resolved');
+    toast({ title: 'Suscripción Pagada', description: `Se registró el pago de ${subscription.name}`});
+  }
   
   return (
     <PageWrapper>
@@ -54,7 +88,7 @@ export default function AlertasPage() {
                 {alerts.map((alert) => (
                   <TableRow key={alert.id}>
                     <TableCell className="font-medium flex items-center gap-2">
-                      <ShieldAlert className="h-4 w-4 text-yellow-500" />
+                      {alertIcons[alert.type as keyof typeof alertIcons] || <ShieldAlert className="h-4 w-4" />}
                       {alert.message}
                     </TableCell>
                     <TableCell>{new Date(alert.date).toLocaleDateString('es-ES')}</TableCell>
@@ -64,9 +98,15 @@ export default function AlertasPage() {
                     <TableCell className="text-right">
                       {alert.status === 'new' && (
                         <div className="flex gap-2 justify-end">
-                          <Button variant="outline" size="sm" onClick={() => handleStatusChange(alert.id, 'resolved')}>
-                            <Check className="mr-2 h-4 w-4"/> Resolver
-                          </Button>
+                          {alert.type === 'subscription_due' ? (
+                            <Button variant="outline" size="sm" onClick={() => handlePaySubscription(alert)}>
+                              <DollarSign className="mr-2 h-4 w-4"/> Pagar
+                            </Button>
+                          ) : (
+                            <Button variant="outline" size="sm" onClick={() => handleStatusChange(alert.id, 'resolved')}>
+                              <Check className="mr-2 h-4 w-4"/> Resolver
+                            </Button>
+                          )}
                           <Button variant="ghost" size="sm" onClick={() => handleStatusChange(alert.id, 'ignored')}>
                             <Trash2 className="mr-2 h-4 w-4" /> Ignorar
                           </Button>

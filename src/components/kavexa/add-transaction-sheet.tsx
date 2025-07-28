@@ -35,44 +35,46 @@ import { useToast } from '@/hooks/use-toast';
 import { useAppContext } from '@/contexts/app-context';
 import type { Transaction } from '@/lib/types';
 
+// Base schema for common fields
+const baseSchema = z.object({
+  date: z.string().optional(),
+  clientId: z.string().optional(),
+});
+
 // Schema for income from product sale
-const incomeSaleSchema = z.object({
+const incomeSaleSchema = baseSchema.extend({
   type: z.literal('income'),
   incomeType: z.literal('sale'),
   productId: z.string({ required_error: 'Debes seleccionar un producto.' }),
   quantity: z.coerce.number().int().positive('La cantidad debe ser mayor que 0.'),
-  date: z.string().optional(),
   description: z.string().optional(),
   amount: z.number().optional(),
   category: z.string().optional(),
 });
 
 // Schema for general income
-const incomeGeneralSchema = z.object({
+const incomeGeneralSchema = baseSchema.extend({
   type: z.literal('income'),
   incomeType: z.literal('general'),
   description: z.string().min(1, 'La descripción es requerida.'),
   amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
   category: z.string().min(1, 'La categoría es requerida.'),
-  date: z.string().optional(),
   productId: z.string().optional(),
   quantity: z.number().optional(),
 });
 
 // Schema for egress
-const egressSchema = z.object({
+const egressSchema = baseSchema.extend({
     type: z.literal('egress'),
     description: z.string().min(1, 'La descripción es requerida.'),
     category: z.string().min(1, 'La categoría es requerida.'),
     amount: z.coerce.number().positive('El monto debe ser un número positivo.'),
-    date: z.string().optional(),
     incomeType: z.string().optional(),
     productId: z.string().optional(),
     quantity: z.number().optional(),
 });
 
 const transactionSchema = z.union([incomeSaleSchema, incomeGeneralSchema, egressSchema]);
-
 
 type TransactionFormValues = z.infer<typeof transactionSchema>;
 
@@ -84,7 +86,7 @@ type AddTransactionSheetProps = {
 
 export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTransactionSheetProps) {
   const { toast } = useToast();
-  const { inventory, addTransaction, editTransaction } = useAppContext();
+  const { inventory, clients, addTransaction, editTransaction } = useAppContext();
   const isEditing = !!defaultValues;
   
   const form = useForm<TransactionFormValues>({
@@ -114,6 +116,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
           category: '',
           date: new Date().toISOString().split('T')[0],
           incomeType: 'general',
+          clientId: '',
         });
       }
     }
@@ -130,6 +133,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
           category: data.category!,
           amount: data.amount!,
           date: data.date || new Date().toISOString().split('T')[0],
+          clientId: data.clientId,
       };
       toast({
           title: defaultValues ? 'Egreso actualizado' : 'Egreso registrado',
@@ -155,6 +159,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               date: data.date || new Date().toISOString().split('T')[0],
               productId: data.productId,
               quantity: data.quantity,
+              clientId: data.clientId,
           };
           toast({
               title: isEditing ? 'Venta actualizada' : 'Venta registrada',
@@ -167,6 +172,7 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
               amount: data.amount!,
               category: data.category!,
               date: data.date || new Date().toISOString().split('T')[0],
+              clientId: data.clientId,
           };
           toast({
               title: defaultValues ? 'Ingreso actualizado' : 'Ingreso registrado',
@@ -342,6 +348,32 @@ export function AddTransactionSheet({ open, onOpenChange, defaultValues }: AddTr
                 />
               </>
             )}
+
+            <FormField
+              control={form.control}
+              name="clientId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cliente (Opcional)</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value || ''} >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Asociar a un cliente" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="">Ninguno</SelectItem>
+                      {clients.map(client => (
+                        <SelectItem key={client.id} value={client.id}>
+                          {client.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

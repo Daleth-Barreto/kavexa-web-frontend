@@ -8,6 +8,8 @@ export type Transaction = {
   // Fields for sales linked to inventory
   productId?: string;
   quantity?: number;
+  // Field for linking to a client
+  clientId?: string;
 };
 
 export type InventoryItem = {
@@ -20,7 +22,7 @@ export type InventoryItem = {
 
 export type Alert = {
   id:string;
-  type: 'low_stock' | 'unusual_expense' | 'duplicate_entry';
+  type: 'low_stock' | 'unusual_expense' | 'subscription_due';
   message: string;
   date: string;
   status: 'new' | 'ignored' | 'resolved';
@@ -29,4 +31,23 @@ export type Alert = {
 
 export type AppConfig = {
     currency: string;
+};
+
+export type Subscription = {
+  id: string;
+  name: string;
+  amount: number;
+  category: string;
+  paymentDay: number; // Day of the month (1-31)
+  lastPaidMonth: number; // 0-11 for month
+  lastPaidYear: number;
+};
+
+export type Client = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  status: 'active' | 'inactive';
+  lastPurchaseDate?: string;
 };

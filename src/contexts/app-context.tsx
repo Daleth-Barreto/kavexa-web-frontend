@@ -2,19 +2,11 @@
 
 import React, { createContext, useContext, ReactNode, useMemo, useCallback, useEffect, useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Transaction, InventoryItem, Alert, AppConfig } from '@/lib/types';
-import { mockTransactions, mockInventory, mockAlerts } from '@/lib/data';
+import { Transaction, InventoryItem, Alert, AppConfig, Subscription, Client } from '@/lib/types';
+import { mockTransactions, mockInventory, mockAlerts, mockSubscriptions, mockClients } from '@/lib/data';
 import { calculateZScore, Z_SCORE_THRESHOLD } from '@/lib/math-utils';
 import { useToast } from '@/hooks/use-toast';
-
-// IDs from old mock data to ensure they are cleaned up
-const MOCK_ALERT_IDS_TO_CLEAN = [
-  "alert-1",
-  "alert-2",
-  "alert-3",
-  "alert-4",
-  "alert-5",
-];
+import { isSameMonth, isSameYear } from 'date-fns';
 
 interface AppContextType {
   transactions: Transaction[];
@@ -23,6 +15,10 @@ interface AppContextType {
   setInventory: (value: InventoryItem[] | ((val: InventoryItem[]) => InventoryItem[])) => void;
   alerts: Alert[];
   setAlerts: (value: Alert[] | ((val: Alert[]) => Alert[])) => void;
+  subscriptions: Subscription[];
+  setSubscriptions: (value: Subscription[] | ((val: Subscription[]) => Subscription[])) => void;
+  clients: Client[];
+  setClients: (value: Client[] | ((val: Client[]) => Client[])) => void;
   config: AppConfig;
   setConfig: (value: AppConfig | ((val: AppConfig) => AppConfig)) => void;
   
@@ -41,45 +37,62 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [transactions, setTransactions, isTransactionsLoaded] = useLocalStorage<Transaction[]>('kavexa_transactions', mockTransactions);
   const [inventory, setInventory, isInventoryLoaded] = useLocalStorage<InventoryItem[]>('kavexa_inventory', mockInventory);
   const [alerts, setAlerts, isAlertsLoaded] = useLocalStorage<Alert[]>('kavexa_alerts', mockAlerts);
+  const [subscriptions, setSubscriptions, isSubscriptionsLoaded] = useLocalStorage<Subscription[]>('kavexa_subscriptions', mockSubscriptions);
+  const [clients, setClients, isClientsLoaded] = useLocalStorage<Client[]>('kavexa_clients', mockClients);
   const [config, setConfig, isConfigLoaded] = useLocalStorage<AppConfig>('kavexa_config', { currency: 'USD' });
   const { toast } = useToast();
 
   const [isAppLoading, setIsAppLoading] = useState(true);
 
-  const isDataLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isConfigLoaded;
+  const isDataLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isConfigLoaded && isSubscriptionsLoaded && isClientsLoaded;
 
   useEffect(() => {
     if (isDataLoaded) {
-      // Simulate a minimum loading time for better UX
       const timer = setTimeout(() => {
         setIsAppLoading(false);
-      }, 500); // Minimum 500ms loading screen
-
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [isDataLoaded]);
 
-
+  // Subscription alerts check
   useEffect(() => {
-    // This effect runs once on load to clean up any persisted mock data from localStorage
-    if (isAlertsLoaded) {
-      const hasOldMockData = alerts.some(alert => MOCK_ALERT_IDS_TO_CLEAN.includes(alert.id));
-      if (hasOldMockData) {
-        setAlerts([]); // Clear the alerts if old mock data is found
+    if (!isDataLoaded) return;
+    
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const currentDate = today.getDate();
+
+    const dueSubscriptions: Alert[] = [];
+
+    subscriptions.forEach(sub => {
+      const isAlreadyPaid = sub.lastPaidMonth === currentMonth && sub.lastPaidYear === currentYear;
+      const isAlertExisting = alerts.some(a => a.type === 'subscription_due' && a.relatedId === sub.id && a.status === 'new' && isSameMonth(new Date(a.date), today) && isSameYear(new Date(a.date), today));
+
+      if (currentDate >= sub.paymentDay && !isAlreadyPaid && !isAlertExisting) {
+        dueSubscriptions.push({
+          id: `alert-sub-${sub.id}-${currentYear}-${currentMonth}`,
+          type: 'subscription_due',
+          message: `Suscripción pendiente: ${sub.name}`,
+          date: new Date().toISOString().split('T')[0],
+          status: 'new',
+          relatedId: sub.id,
+        });
       }
+    });
+
+    if (dueSubscriptions.length > 0) {
+      setAlerts(prev => [...dueSubscriptions, ...prev]);
+      toast({
+        title: 'Suscripciones Pendientes',
+        description: `Tienes ${dueSubscriptions.length} pago(s) de suscripción pendiente(s) este mes.`,
+        variant: 'destructive',
+      });
     }
-    if (isTransactionsLoaded) {
-       if (transactions.length > 0 && transactions[0]?.id?.startsWith('txn-mock')) {
-         setTransactions([]);
-       }
-    }
-    if (isInventoryLoaded) {
-      if (inventory.length > 0 && inventory[0]?.id?.startsWith('item-mock')) {
-        setInventory([]);
-      }
-    }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAlertsLoaded, isTransactionsLoaded, isInventoryLoaded]);
+  }, [isDataLoaded, subscriptions]);
 
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
@@ -91,11 +104,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       type: data.type,
       category: data.category,
       productId: data.productId,
-      quantity: data.quantity
+      quantity: data.quantity,
+      clientId: data.clientId,
     };
 
     const updatedTransactions = [newTransaction, ...transactions];
     setTransactions(updatedTransactions);
+
+    // Update client last purchase date
+    if (newTransaction.clientId) {
+      setClients(prevClients => prevClients.map(client => 
+        client.id === newTransaction.clientId 
+          ? { ...client, lastPurchaseDate: newTransaction.date, status: 'active' }
+          : client
+      ));
+    }
 
     // Z-Score Alert Logic for expenses
     if (newTransaction.type === 'egress') {
@@ -103,7 +126,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         .filter(t => t.type === 'egress')
         .map(t => t.amount);
       
-      if (expenseAmounts.length > 5) { // Only run if we have enough data
+      if (expenseAmounts.length > 5) {
         const zScore = calculateZScore(newTransaction.amount, expenseAmounts);
         if (Math.abs(zScore) > Z_SCORE_THRESHOLD) {
           const newAlert: Alert = {
@@ -134,7 +157,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 if (item.id === productId) {
                     const newStock = item.stock - quantitySold;
                     
-                    // Low stock alert logic
                     if (newStock <= item.lowStockThreshold && item.stock > item.lowStockThreshold) {
                          const newAlert: Alert = {
                             id: `alert-stock-${Date.now()}`,
@@ -157,16 +179,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
     }
 
-  }, [transactions, setTransactions, setAlerts, setInventory, toast]);
+  }, [transactions, setTransactions, setAlerts, setInventory, setClients, toast]);
 
   const editTransaction = useCallback((updatedTransaction: Transaction) => {
-    // Note: Editing transactions does not currently revert stock changes. 
-    // This could be complex to implement and might require a more advanced transaction model.
     setTransactions(prev => prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));
   }, [setTransactions]);
 
   const deleteTransaction = useCallback((transactionId: string) => {
-     // Note: Deleting transactions does not currently revert stock changes.
     setTransactions(prev => prev.filter(t => t.id !== transactionId));
   }, [setTransactions]);
 
@@ -174,7 +193,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTransactions([]);
     setInventory([]);
     setAlerts([]);
-  }, [setTransactions, setInventory, setAlerts]);
+    setSubscriptions([]);
+    setClients([]);
+  }, [setTransactions, setInventory, setAlerts, setSubscriptions, setClients]);
 
   const setCurrency = useCallback((currency: string) => {
     setConfig(prev => ({ ...prev, currency }));
@@ -187,6 +208,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setInventory,
     alerts,
     setAlerts,
+    subscriptions,
+    setSubscriptions,
+    clients,
+    setClients,
     config,
     setConfig,
     isLoaded: !isAppLoading,
@@ -200,6 +225,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     transactions, setTransactions,
     inventory, setInventory,
     alerts, setAlerts,
+    subscriptions, setSubscriptions,
+    clients, setClients,
     config, setConfig,
     isAppLoading, addTransaction, editTransaction, deleteTransaction, clearAllData, setCurrency
   ]);

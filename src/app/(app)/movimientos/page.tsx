@@ -10,6 +10,7 @@ import { AddTransactionSheet } from '@/components/kavexa/add-transaction-sheet';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +31,7 @@ import type { Transaction } from '@/lib/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useAppContext, useCurrency } from '@/contexts/app-context';
 import { useTheme } from 'next-themes';
-
+import { getYear, getMonth } from 'date-fns';
 
 const COLORS = [
   'hsl(var(--chart-1))',
@@ -66,11 +67,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-
 export default function MovimientosPage() {
   const { transactions, deleteTransaction } = useAppContext();
   const { formatCurrency } = useCurrency();
-  const { theme } = useTheme();
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isAlertOpen, setAlertOpen] = useState(false);
@@ -78,20 +77,35 @@ export default function MovimientosPage() {
   
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
+  
+  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth()).toString());
+
+  const { years, months } = useMemo(() => {
+    const years = [...new Set(transactions.map(t => getYear(new Date(t.date))))].sort((a,b) => b-a);
+    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    return { years: years.map(String), months };
+  }, [transactions]);
 
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(t => t.description.toLowerCase().includes(searchTerm.toLowerCase()));
-  }, [transactions, searchTerm]);
+    return transactions.filter(t => {
+      const date = new Date(t.date);
+      const matchesSearch = t.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesYear = getYear(date).toString() === selectedYear;
+      const matchesMonth = getMonth(date).toString() === selectedMonth;
+      return matchesSearch && matchesYear && matchesMonth;
+    });
+  }, [transactions, searchTerm, selectedYear, selectedMonth]);
 
   const egressByCategory = useMemo(() => {
-    const egresses = transactions.filter(t => t.type === 'egress');
+    const egresses = filteredTransactions.filter(t => t.type === 'egress');
     const grouped = egresses.reduce((acc, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
       return acc;
     }, {} as Record<string, number>);
 
     return Object.entries(grouped).map(([name, value]) => ({ name, value }));
-  }, [transactions]);
+  }, [filteredTransactions]);
 
   const handleAddClick = () => {
     setSelectedTransaction(null);
@@ -131,12 +145,29 @@ export default function MovimientosPage() {
         <Card className="lg:col-span-5">
           <CardHeader>
             <CardTitle>Todas las transacciones</CardTitle>
-             <div className="mt-4">
+             <div className="mt-4 flex flex-col sm:flex-row gap-4">
               <Input 
                 placeholder="Buscar por descripción..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full sm:w-auto flex-grow"
               />
+               <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-full sm:w-[120px]">
+                  <SelectValue placeholder="Año" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map(year => <SelectItem key={year} value={year}>{year}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Mes" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((month, index) => <SelectItem key={month} value={index.toString()}>{month}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </CardHeader>
           <CardContent>
@@ -188,7 +219,7 @@ export default function MovimientosPage() {
               </Table>
             ) : (
                 <div className="text-center text-muted-foreground py-8">
-                  No hay transacciones. Añade una para empezar.
+                  No hay transacciones para los filtros seleccionados.
                 </div>
             )}
           </CardContent>

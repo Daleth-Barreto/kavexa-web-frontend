@@ -11,6 +11,9 @@ import {
   LineChart,
   FileDown,
   UserCog,
+  Repeat,
+  ShoppingCart,
+  Users
 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 
@@ -21,13 +24,16 @@ import {
 } from '@/components/ui/sidebar';
 
 const menuItems = [
-  { href: '/inicio', label: 'Inicio', icon: Home, auth: false },
-  { href: '/movimientos', label: 'Movimientos', icon: ArrowLeftRight, auth: false },
-  { href: '/proyeccion', label: 'Proyección', icon: TrendingUp, auth: false },
-  { href: '/alertas', label: 'Alertas', icon: Bell, auth: false },
-  { href: '/inventario', label: 'Inventario', icon: Archive, auth: false },
-  { href: '/demanda', label: 'Demanda', icon: LineChart, auth: false },
-  { href: '/reportes', label: 'Reportes', icon: FileDown, auth: true },
+  { href: '/inicio', label: 'Inicio', icon: Home },
+  { href: '/movimientos', label: 'Movimientos', icon: ArrowLeftRight },
+  { href: '/pos', label: 'Punto de Venta', icon: ShoppingCart },
+  { href: '/inventario', label: 'Inventario', icon: Archive },
+  { href: '/clientes', label: 'Clientes', icon: Users },
+  { href: '/suscripciones', label: 'Suscripciones', icon: Repeat },
+  { href: '/demanda', label: 'Demanda', icon: LineChart },
+  { href: '/proyeccion', label: 'Proyección', icon: TrendingUp },
+  { href: '/alertas', label: 'Alertas', icon: Bell },
+  { href: '/reportes', label: 'Reportes', icon: FileDown },
 ];
 
 export function MainNav() {
@@ -37,7 +43,6 @@ export function MainNav() {
   return (
     <SidebarMenu>
       {menuItems.map((item) => {
-        if (item.auth && !isAuthenticated) return null;
         return (
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
