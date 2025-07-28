@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Zap, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
 
 export default function PrivacyPage() {
   return (
@@ -14,7 +15,7 @@ export default function PrivacyPage() {
                 </Link>
             </Button>
             <div className="ml-auto flex items-center gap-2">
-                <Zap className="h-6 w-6 text-primary" />
+                <KavexaLogoIcon className="h-6 w-6 text-primary" />
                 <span className="font-bold font-headline">Kavexa</span>
             </div>
         </header>

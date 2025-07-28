@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
 
 const loginSchema = z.object({
   email: z.string().email('Introduce un email válido.'),
@@ -41,7 +41,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <Link href="/" className="inline-flex items-center gap-2">
-            <Zap className="h-8 w-8 text-primary" />
+            <KavexaLogoIcon className="h-8 w-8 text-primary" />
             <span className="text-2xl font-bold font-headline">Kavexa</span>
           </Link>
         </div>

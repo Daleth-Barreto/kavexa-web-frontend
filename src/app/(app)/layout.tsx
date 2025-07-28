@@ -12,9 +12,9 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { Zap } from 'lucide-react';
 import { AppProvider, useAppContext } from '@/contexts/app-context';
 import { useRouter } from 'next/navigation';
+import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
 
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
@@ -31,7 +31,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex flex-col min-h-screen items-center justify-center bg-background text-foreground">
         <div className="flex items-center gap-4 text-2xl font-headline font-semibold animate-pulse">
-            <Zap className="h-8 w-8 text-primary" />
+            <KavexaLogoIcon className="h-8 w-8 text-primary" />
             <span>Kavexa</span>
         </div>
         <p className="mt-4 text-muted-foreground">Cargando tus datos...</p>
@@ -45,7 +45,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
         <SidebarHeader className="p-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Zap className="h-5 w-5 text-primary-foreground" />
+              <KavexaLogoIcon className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg text-sidebar-foreground font-headline">Kavexa</span>
           </div>

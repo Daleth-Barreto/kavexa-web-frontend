@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { ALL_MODULES } from '@/lib/data';
 import { AppProvider, useAppContext } from '@/contexts/app-context';
 import type { ModuleKey } from '@/lib/types';
+import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
 
 function WelcomePageContent() {
   const router = useRouter();
@@ -37,7 +38,7 @@ function WelcomePageContent() {
       <div className="w-full max-w-2xl">
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2">
-            <Zap className="h-8 w-8 text-primary" />
+            <KavexaLogoIcon className="h-8 w-8 text-primary" />
             <span className="text-2xl font-bold font-headline">Kavexa</span>
           </div>
         </div>
