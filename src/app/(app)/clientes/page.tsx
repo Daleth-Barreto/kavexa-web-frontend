@@ -86,8 +86,8 @@ export default function ClientesPage() {
   return (
     <PageWrapper>
       <PageHeader
-        title="Clientes"
-        description="Administra tu base de clientes y su estado."
+        title="Clientes y Miembros"
+        description="Administra tu base de clientes o el estado de las membresías de tu negocio."
       >
         <Button onClick={handleAddClick}>
           <PlusCircle className="mr-2 h-4 w-4" />
@@ -101,6 +101,7 @@ export default function ClientesPage() {
                     placeholder="Buscar por nombre o email..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    className="md:max-w-sm"
                 />
             </div>
           {filteredClients.length > 0 ? (
@@ -109,7 +110,7 @@ export default function ClientesPage() {
                 <TableRow>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Contacto</TableHead>
-                  <TableHead>Última Compra</TableHead>
+                  <TableHead>Último Pago/Compra</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right w-[50px]">Acciones</TableHead>
                 </TableRow>
