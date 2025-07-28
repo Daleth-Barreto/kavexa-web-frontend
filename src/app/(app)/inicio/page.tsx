@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { PageWrapper } from '@/components/kavexa/page-wrapper';
 import { PageHeader } from '@/components/kavexa/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle, HelpCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle, MessageSquareQuote } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,8 @@ export default function InicioPage() {
   const [isTransactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [isProductSheetOpen, setProductSheetOpen] = useState(false);
   const { formatCurrency } = useCurrency();
+  
+  const GOOGLE_FORM_URL = "https://forms.gle/your-survey-link-here"; // <-- Reemplaza con tu enlace
 
   const summary = useMemo(() => {
     const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
@@ -58,10 +61,18 @@ export default function InicioPage() {
   }, [transactions]);
 
   const recentActivity = useMemo(() => {
-    const newAlerts = alerts.filter(a => a.status === 'new').slice(0, 3);
+    const surveyAlert = { 
+      id: 'survey-alert', 
+      message: '¡Ayúdanos a mejorar! Danos tu opinión.',
+      date: new Date().toISOString().split('T')[0],
+      activityType: 'survey' as const
+    };
+
+    const newAlerts = alerts.filter(a => a.status === 'new').slice(0, 2);
     const lowStockItems = inventory.filter(i => i.stock < i.lowStockThreshold).slice(0, 2);
     
     const activity = [
+      surveyAlert,
       ...newAlerts.map(a => ({id: a.id, message: a.message, date: a.date, activityType: 'alert' as const})),
       ...lowStockItems.map(i => ({id: i.id, message: `Stock bajo para ${i.name}`, date: new Date().toISOString().split('T')[0], activityType: 'inventory' as const})),
     ];
@@ -89,9 +100,11 @@ export default function InicioPage() {
           <div className="flex items-center gap-2">
             <AppTour.Trigger />
             <div className="flex flex-col sm:flex-row gap-2" data-tour-step="4">
-              <Button variant="outline" onClick={() => setProductSheetOpen(true)}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Añadir Producto
+               <Button variant="outline" asChild>
+                <Link href={GOOGLE_FORM_URL} target="_blank">
+                  <MessageSquareQuote className="mr-2 h-4 w-4" />
+                  Danos tu opinión
+                </Link>
               </Button>
               <Button onClick={() => setTransactionSheetOpen(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -186,15 +199,27 @@ export default function InicioPage() {
                       {recentActivity.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell className="font-medium flex items-center gap-2">
-                            {item.activityType === 'alert' ? 
-                              <AlertTriangle className="h-4 w-4 text-yellow-500" /> : 
-                              <Package className="h-4 w-4 text-blue-500" />
+                            {item.activityType === 'alert' ? <AlertTriangle className="h-4 w-4 text-yellow-500" /> : 
+                             item.activityType === 'inventory' ? <Package className="h-4 w-4 text-blue-500" /> :
+                             <MessageSquareQuote className="h-4 w-4 text-green-500" />
                             }
-                            {item.message}
+                            {item.activityType === 'survey' ? (
+                                <Link href={GOOGLE_FORM_URL} target="_blank" className="hover:underline">
+                                    {item.message}
+                                </Link>
+                            ) : (
+                                item.message
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
-                            <Badge variant={item.activityType === 'alert' ? 'destructive' : 'secondary'}>
-                              {item.activityType === 'alert' ? 'Alerta' : 'Inventario'}
+                            <Badge variant={
+                                item.activityType === 'alert' ? 'destructive' : 
+                                item.activityType === 'inventory' ? 'secondary' : 'default'
+                            }>
+                              {
+                                item.activityType === 'alert' ? 'Alerta' :
+                                item.activityType === 'inventory' ? 'Inventario' : 'Opinión'
+                              }
                             </Badge>
                           </TableCell>
                         </TableRow>
