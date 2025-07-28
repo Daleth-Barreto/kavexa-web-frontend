@@ -1,10 +1,12 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Zap } from 'lucide-react';
+import { Zap, MessageSquareQuote } from 'lucide-react';
 import Image from 'next/image';
 
 export default function LandingPage() {
+  const GOOGLE_FORM_URL = "https://forms.gle/your-survey-link-here"; // <-- Reemplaza con tu enlace
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="px-4 lg:px-6 h-14 flex items-center">
@@ -38,6 +40,12 @@ export default function LandingPage() {
                   <Button asChild size="lg" className="w-full sm:w-auto">
                     <Link href="/welcome">
                       Empezar
+                    </Link>
+                  </Button>
+                   <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                    <Link href={GOOGLE_FORM_URL} target="_blank">
+                       <MessageSquareQuote className="mr-2 h-4 w-4" />
+                       Danos tu opinión
                     </Link>
                   </Button>
                 </div>
