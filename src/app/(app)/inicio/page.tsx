@@ -5,8 +5,8 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { PageWrapper } from '@/components/kavexa/page-wrapper';
 import { PageHeader } from '@/components/kavexa/page-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle, MessageSquareQuote } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle, MessageSquareQuote, ArrowRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -61,24 +61,12 @@ export default function InicioPage() {
     }));
   }, [transactions]);
 
-  const recentActivity = useMemo(() => {
-    const surveyAlert = { 
-      id: 'survey-alert', 
-      message: '¡Ayúdanos a mejorar! Danos tu opinión.',
-      date: new Date().toISOString().split('T')[0],
-      activityType: 'survey' as const
-    };
-
-    const newAlerts = alerts.filter(a => a.status === 'new').slice(0, 2);
-    const lowStockItems = inventory.filter(i => i.stock < i.lowStockThreshold).slice(0, 2);
-    
-    const activity = [
-      surveyAlert,
-      ...newAlerts.map(a => ({id: a.id, message: a.message, date: a.date, activityType: 'alert' as const})),
-      ...lowStockItems.map(i => ({id: i.id, message: `Stock bajo para ${i.name}`, date: new Date().toISOString().split('T')[0], activityType: 'inventory' as const})),
-    ];
-    return activity.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
-  }, [alerts, inventory]);
+  const recentAlerts = useMemo(() => {
+    return alerts
+      .filter(a => a.status === 'new')
+      .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5);
+  }, [alerts]);
 
   const handleProductFormSubmit = (data: Omit<InventoryItem, 'id'>) => {
     // Solo creación desde el dashboard
@@ -183,56 +171,39 @@ export default function InicioPage() {
               )}
             </CardContent>
           </Card>
-          <Card data-tour-step="5" className="lg:col-span-3">
+          <Card data-tour-step="5" className="lg:col-span-3 flex flex-col">
             <CardHeader>
-              <CardTitle>Actividad Reciente</CardTitle>
+              <CardTitle>Alertas</CardTitle>
+              <CardDescription>Las notificaciones más recientes generadas por el sistema.</CardDescription>
             </CardHeader>
-            <CardContent>
-              {recentActivity.length > 0 ? (
+            <CardContent className="flex-grow">
+              {recentAlerts.length > 0 ? (
                   <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Descripción</TableHead>
-                        <TableHead className="text-right">Tipo</TableHead>
-                      </TableRow>
-                    </TableHeader>
                     <TableBody>
-                      {recentActivity.map((item) => (
+                      {recentAlerts.map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell className="font-medium flex items-center gap-2">
-                            {item.activityType === 'alert' ? <AlertTriangle className="h-4 w-4 text-yellow-500" /> : 
-                             item.activityType === 'inventory' ? <Package className="h-4 w-4 text-blue-500" /> :
-                             <MessageSquareQuote className="h-4 w-4 text-green-500" />
-                            }
-                            {item.activityType === 'survey' ? (
-                                <Link href={GOOGLE_FORM_URL} target="_blank" className="hover:underline">
-                                    {item.message}
-                                </Link>
-                            ) : (
-                                item.message
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Badge variant={
-                                item.activityType === 'alert' ? 'destructive' : 
-                                item.activityType === 'inventory' ? 'secondary' : 'default'
-                            }>
-                              {
-                                item.activityType === 'alert' ? 'Alerta' :
-                                item.activityType === 'inventory' ? 'Inventario' : 'Opinión'
-                              }
-                            </Badge>
+                          <TableCell className="font-medium flex items-center gap-2 p-2">
+                             <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                            {item.message}
                           </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
               ) : (
-                  <div className="text-center text-muted-foreground py-8">
-                      No hay actividad reciente.
+                  <div className="text-center text-muted-foreground py-8 flex flex-col items-center justify-center h-full">
+                      <Bell className="h-10 w-10 mb-4 text-muted-foreground/50"/>
+                      <p>No tienes alertas nuevas.</p>
                   </div>
               )}
             </CardContent>
+            <CardFooter>
+                <Button asChild variant="outline" className="w-full">
+                    <Link href="/alertas">
+                        Ver todas las alertas <ArrowRight className="ml-2 h-4 w-4"/>
+                    </Link>
+                </Button>
+            </CardFooter>
           </Card>
         </div>
 
