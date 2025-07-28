@@ -58,42 +58,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="mx-auto flex items-center justify-center aspect-[3/2] overflow-hidden rounded-xl sm:w-full lg:order-last">
-                 <svg
-                  width="100%"
-                  height="100%"
-                  viewBox="0 0 600 400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="rounded-xl object-cover"
-                >
-                  <defs>
-                    <linearGradient id="glow" x1="50%" y1="50%" x2="50%" y2="100%">
-                      <stop offset="0%" style={{stopColor: 'hsl(var(--primary))', stopOpacity: 0.1}} />
-                      <stop offset="100%" style={{stopColor: 'hsl(var(--background))', stopOpacity: 0}} />
-                    </linearGradient>
-                  </defs>
-                  
-                  <rect width="600" height="400" rx="12" fill="hsl(var(--background))" />
-
-                  {/* Base Shapes */}
-                  <g opacity="0.8">
-                    {/* Abstract bar chart */}
-                    <rect x="100" y="150" width="40" height="150" rx="8" fill="hsl(var(--primary))" />
-                    <rect x="160" y="100" width="40" height="200" rx="8" fill="hsl(var(--primary))" />
-                    <rect x="220" y="180" width="40" height="120" rx="8" fill="hsl(var(--primary))" />
-
-                    {/* Abstract pie chart / circle */}
-                    <circle cx="420" cy="200" r="100" fill="hsl(var(--background))" stroke="hsl(var(--accent))" strokeWidth="12"/>
-                    <path d="M 420 200 L 420 100 A 100 100 0 0 1 506.6 150 Z" fill="hsl(var(--accent))" />
-
-                    {/* Decorative elements */}
-                    <circle cx="150" cy="80" r="15" fill="hsl(var(--accent))"/>
-                    <rect x="350" y="80" width="120" height="20" rx="5" fill="hsl(var(--muted))" />
-                    <rect x="350" y="110" width="80" height="20" rx="5" fill="hsl(var(--muted))" />
-                  </g>
-
-                  {/* Glow effect at the bottom */}
-                  <rect x="0" y="200" width="600" height="200" fill="url(#glow)" />
-                </svg>
+                 <KavexaLogoIcon className="w-full h-full text-primary" />
               </div>
             </div>
           </div>
