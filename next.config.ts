@@ -19,10 +19,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  devIndicators: false,
   experimental: {
     allowedDevOrigins: [
         "*.cloudworkstations.dev",
-        "*.firebase.studio"
+        "*.firebase.studio",
+        "*.vercel.app",
     ]
   }
 };
