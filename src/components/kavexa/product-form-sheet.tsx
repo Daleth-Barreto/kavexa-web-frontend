@@ -31,6 +31,7 @@ const productSchema = z.object({
   stock: z.coerce.number().int('El stock debe ser un número entero.').nonnegative('El stock no puede ser negativo.'),
   lowStockThreshold: z.coerce.number().int('El umbral debe ser un número entero.').nonnegative('El umbral no puede ser negativo.'),
   price: z.coerce.number().positive('El precio debe ser un número positivo.'),
+  imageUrl: z.string().url('Debe ser una URL válida.').optional().or(z.literal('')),
 });
 
 type ProductFormValues = Omit<InventoryItem, 'id'>;
@@ -58,6 +59,7 @@ export function ProductFormSheet({ open, onOpenChange, onSubmit, defaultValues }
         stock: 0,
         lowStockThreshold: 10,
         price: 0,
+        imageUrl: '',
       });
     }
   }, [defaultValues, form, open]);
@@ -131,6 +133,19 @@ export function ProductFormSheet({ open, onOpenChange, onSubmit, defaultValues }
                   <FormLabel>Umbral de stock bajo</FormLabel>
                   <FormControl>
                     <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL de la Imagen (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://ejemplo.com/imagen.png" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

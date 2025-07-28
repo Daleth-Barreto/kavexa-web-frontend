@@ -18,6 +18,7 @@ export type InventoryItem = {
   stock: number;
   lowStockThreshold: number;
   price: number;
+  imageUrl?: string;
 };
 
 export type Alert = {

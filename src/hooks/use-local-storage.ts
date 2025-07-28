@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -18,7 +19,8 @@ function isMockData<T>(data: T, initial: T): boolean {
       "alert-4",
       "alert-5",
     ];
-    return data.some((alert: any) => MOCK_ALERT_IDS.includes(alert.id));
+    // This type assertion is safe because we are checking for array properties before.
+    return (data as any[]).some((alert: any) => MOCK_ALERT_IDS.includes(alert.id));
   }
   return false;
 }
@@ -32,13 +34,18 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     let value: T;
     try {
       const item = window.localStorage.getItem(key);
-      const parsedItem = item ? JSON.parse(item) : initialValue;
-      
-      if (isMockData(parsedItem, initialValue)) {
-        value = initialValue;
-        window.localStorage.removeItem(key); // Clean up mock data from storage
+      // Ensure item is not null and not an empty string before parsing
+      if (item && item !== 'undefined' && item !== 'null') {
+        const parsedItem = JSON.parse(item);
+        
+        if (isMockData(parsedItem, initialValue)) {
+          value = initialValue;
+          window.localStorage.removeItem(key); // Clean up mock data from storage
+        } else {
+          value = parsedItem;
+        }
       } else {
-        value = parsedItem;
+        value = initialValue;
       }
 
     } catch (error) {

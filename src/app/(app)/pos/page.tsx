@@ -3,16 +3,17 @@
 import { useState, useMemo } from 'react';
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PlusCircle, MinusCircle, XCircle, ShoppingCart, DollarSign } from 'lucide-react';
+import { PlusCircle, MinusCircle, XCircle, ShoppingCart, DollarSign, PackagePlus } from 'lucide-react';
 import { useAppContext, useCurrency } from "@/contexts/app-context";
 import { toast } from '@/hooks/use-toast';
 import type { InventoryItem, Client } from '@/lib/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface CartItem extends InventoryItem {
     quantity: number;
@@ -24,10 +25,15 @@ export default function POSPage() {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedClientId, setSelectedClientId] = useState<string>('none');
+    const [activeTab, setActiveTab] = useState('products');
 
     const filteredInventory = useMemo(() => {
         return inventory.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()) && item.stock > 0);
     }, [inventory, searchTerm]);
+    
+    const cartItemCount = useMemo(() => {
+        return cart.reduce((total, item) => total + item.quantity, 0);
+    }, [cart]);
 
     const addToCart = (item: InventoryItem) => {
         setCart(prevCart => {
@@ -44,6 +50,7 @@ export default function POSPage() {
             }
             return [...prevCart, { ...item, quantity: 1 }];
         });
+        toast({ title: "Añadido al carrito", description: `${item.name} se ha añadido a la venta.`});
     };
 
     const updateCartQuantity = (itemId: string, newQuantity: number) => {
@@ -64,10 +71,6 @@ export default function POSPage() {
                 item.id === itemId ? { ...item, quantity: newQuantity } : item
             );
         });
-    };
-
-    const removeFromCart = (itemId: string) => {
-        setCart(prevCart => prevCart.filter(item => item.id !== itemId));
     };
 
     const cartTotal = useMemo(() => {
@@ -99,117 +102,134 @@ export default function POSPage() {
 
         setCart([]);
         setSelectedClientId('none');
+        setActiveTab('products');
     };
 
     return (
-        <PageWrapper>
+        <PageWrapper className="flex flex-col h-[calc(100vh-theme(spacing.14))] md:h-auto">
             <PageHeader
                 title="Punto de Venta"
                 description="Realiza ventas rápidas seleccionando productos de tu inventario."
             />
-            <div className="grid md:grid-cols-2 gap-8">
-                {/* Product Selection */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Productos Disponibles</CardTitle>
-                        <div className="mt-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow flex flex-col">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="products">Productos</TabsTrigger>
+                    <TabsTrigger value="cart">
+                        Carrito 
+                        {cartItemCount > 0 && 
+                            <span className="ml-2 bg-primary text-primary-foreground h-5 w-5 rounded-full text-xs flex items-center justify-center">{cartItemCount}</span>
+                        }
+                    </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="products" className="flex-grow mt-4">
+                    <Card className="h-full flex flex-col">
+                        <CardHeader>
                             <Input
                                 placeholder="Buscar producto..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <ScrollArea className="h-[450px]">
-                            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
-                                {filteredInventory.length > 0 ? filteredInventory.map(item => (
-                                    <Card key={item.id} className="flex flex-col cursor-pointer hover:border-primary" onClick={() => addToCart(item)}>
-                                        <CardHeader className="p-4 flex-grow">
-                                            <CardTitle className="text-base">{item.name}</CardTitle>
-                                        </CardHeader>
-                                        <CardFooter className="p-4 pt-0 flex justify-between items-center text-sm">
-                                            <span className="font-semibold text-primary">{formatCurrency(item.price)}</span>
-                                            <span className="text-muted-foreground">Stock: {item.stock}</span>
-                                        </CardFooter>
-                                    </Card>
-                                )) : (
-                                    <p className="text-muted-foreground col-span-full text-center">No hay productos que coincidan con la búsqueda.</p>
-                                )}
-                            </div>
-                        </ScrollArea>
-                    </CardContent>
-                </Card>
+                        </CardHeader>
+                        <CardContent className="flex-grow p-4">
+                            <ScrollArea className="h-[450px]">
+                                <div className="space-y-4">
+                                    {filteredInventory.length > 0 ? filteredInventory.map(item => (
+                                        <div key={item.id} className="flex items-center gap-4 p-2 rounded-lg border">
+                                            <Image
+                                              src={item.imageUrl || `https://placehold.co/80x80.png`}
+                                              alt={item.name}
+                                              width={60}
+                                              height={60}
+                                              className="rounded-md object-cover aspect-square"
+                                              data-ai-hint="product photo"
+                                            />
+                                            <div className="flex-grow">
+                                                <p className="font-semibold">{item.name}</p>
+                                                <p className="text-sm text-muted-foreground">{formatCurrency(item.price)}</p>
+                                                <p className="text-xs text-muted-foreground">Stock: {item.stock}</p>
+                                            </div>
+                                            <Button size="icon" variant="outline" onClick={() => addToCart(item)}>
+                                                <PackagePlus className="h-5 w-5" />
+                                            </Button>
+                                        </div>
+                                    )) : (
+                                        <div className="text-center text-muted-foreground py-8">
+                                            <p>No hay productos disponibles.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </ScrollArea>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
 
-                {/* Cart */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                           <ShoppingCart className="h-6 w-6" /> Carrito de Compra
-                        </CardTitle>
-                        <CardDescription>
-                            Revisa los productos antes de finalizar la venta.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                       <ScrollArea className="h-[350px]">
-                          {cart.length > 0 ? (
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Producto</TableHead>
-                                  <TableHead className="text-center">Cant.</TableHead>
-                                  <TableHead className="text-right">Total</TableHead>
-                                  <TableHead className="w-[20px]"></TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {cart.map(item => (
-                                  <TableRow key={item.id}>
-                                    <TableCell className="font-medium">{item.name}</TableCell>
-                                    <TableCell className="text-center">
-                                      <div className="flex items-center justify-center gap-2">
-                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateCartQuantity(item.id, item.quantity - 1)}><MinusCircle className="h-4 w-4" /></Button>
-                                        <span>{item.quantity}</span>
-                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => updateCartQuantity(item.id, item.quantity + 1)}><PlusCircle className="h-4 w-4" /></Button>
-                                      </div>
-                                    </TableCell>
-                                    <TableCell className="text-right">{formatCurrency(item.price * item.quantity)}</TableCell>
-                                    <TableCell>
-                                        <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeFromCart(item.id)}><XCircle className="h-4 w-4"/></Button>
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          ) : (
-                            <div className="text-center text-muted-foreground h-[350px] flex items-center justify-center">
-                                El carrito está vacío.
-                            </div>
-                          )}
-                       </ScrollArea>
-                    </CardContent>
-                    <CardFooter className="flex flex-col gap-4">
-                         <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Asociar cliente (opcional)" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="none">Cliente Genérico</SelectItem>
-                                {clients.map(client => (
-                                    <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <div className="w-full flex justify-between items-center text-lg font-bold">
-                            <span>Total:</span>
-                            <span>{formatCurrency(cartTotal)}</span>
-                        </div>
-                        <Button className="w-full" size="lg" onClick={handleCheckout} disabled={cart.length === 0}>
-                            <DollarSign className="mr-2 h-5 w-5" /> Finalizar Venta
-                        </Button>
-                    </CardFooter>
-                </Card>
+                <TabsContent value="cart" className="flex-grow mt-4">
+                    <Card className="h-full flex flex-col">
+                        <CardHeader>
+                            <CardTitle>Resumen de la Venta</CardTitle>
+                        </CardHeader>
+                         <CardContent className="flex-grow p-4">
+                             <ScrollArea className="h-[450px]">
+                                {cart.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {cart.map(item => (
+                                            <div key={item.id} className="flex items-center gap-4 p-2 rounded-lg border">
+                                                <Image 
+                                                    src={item.imageUrl || `https://placehold.co/80x80.png`}
+                                                    alt={item.name}
+                                                    width={60}
+                                                    height={60}
+                                                    className="rounded-md object-cover aspect-square"
+                                                    data-ai-hint="product photo"
+                                                />
+                                                <div className="flex-grow">
+                                                    <p className="font-semibold">{item.name}</p>
+                                                    <p className="text-sm text-primary">{formatCurrency(item.price * item.quantity)}</p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateCartQuantity(item.id, item.quantity - 1)}><MinusCircle className="h-5 w-5" /></Button>
+                                                        <span className="w-4 text-center">{item.quantity}</span>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateCartQuantity(item.id, item.quantity + 1)}><PlusCircle className="h-5 w-5" /></Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-muted-foreground flex flex-col items-center justify-center h-full">
+                                        <ShoppingCart className="h-12 w-12 mb-4 text-muted-foreground/50"/>
+                                        <p>El carrito está vacío.</p>
+                                        <p className="text-sm">Añade productos para empezar una venta.</p>
+                                        <Button variant="link" onClick={() => setActiveTab('products')}>Ver productos</Button>
+                                    </div>
+                                )}
+                             </ScrollArea>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+            
+            <div className="mt-auto pt-4 border-t bg-background sticky bottom-0">
+                <div className="space-y-4">
+                    <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Asociar cliente (opcional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">Cliente Genérico</SelectItem>
+                            {clients.map(client => (
+                                <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <div className="flex justify-between items-center text-xl font-bold">
+                        <span>Total:</span>
+                        <span>{formatCurrency(cartTotal)}</span>
+                    </div>
+                    <Button className="w-full" size="lg" onClick={handleCheckout} disabled={cart.length === 0}>
+                        <DollarSign className="mr-2 h-5 w-5" /> Finalizar Venta
+                    </Button>
+                </div>
             </div>
         </PageWrapper>
     );
