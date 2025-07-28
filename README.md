@@ -4,7 +4,7 @@ Bienvenido al repositorio de Kavexa. Este documento sirve como una guía técnic
 
 ## 1. Visión General del Proyecto
 
-Kavexa es una Aplicación Web Progresiva (PWA) modular construida con un enfoque **"local-first"**. Su objetivo es proporcionar a las pequeñas y medianas empresas (PYMES) un conjunto de herramientas para gestionar sus operaciones diarias, desde las finanzas hasta el inventario y los clientes. La aplicación es 100% funcional sin conexión a internet.
+Kavexa es una Aplicación Web Progresiva (PWA) modular construida con un enfoque **"local-first"**. Su objetivo es proporcionar a las pequeñas y medianas empresas (PYMES) un conjunto de herramientas para gestionar sus operaciones diarias, desde las finanzas hasta el inventario, clientes y proveedores. La aplicación es 100% funcional sin conexión a internet.
 
 ## 2. Stack Tecnológico
 
