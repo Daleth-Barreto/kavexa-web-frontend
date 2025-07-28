@@ -7,11 +7,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles, Megaphone, PlusCircle } from "lucide-react";
+import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles, Megaphone, PlusCircle, History } from "lucide-react";
 import { useAppContext, useCurrency } from "@/contexts/app-context";
 import type { Alert } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { AddAlertSheet } from '@/components/kavexa/add-alert-sheet';
+import { addDays, addWeeks, addMonths } from 'date-fns';
 
 const statusVariant: Record<Alert['status'], 'destructive' | 'secondary' | 'default'> = {
   new: 'destructive',
@@ -33,6 +34,13 @@ const alertIcons = {
   custom: <Megaphone className="h-4 w-4 text-gray-500" />
 }
 
+const recurrenceText: Record<NonNullable<Alert['recurrence']>, string> = {
+    none: 'No se repite',
+    daily: 'Diariamente',
+    weekly: 'Semanalmente',
+    monthly: 'Mensualmente'
+}
+
 export default function AlertasPage() {
   const { alerts, setAlerts, addTransaction, subscriptions, setSubscriptions } = useAppContext();
   const { toast } = useToast();
@@ -40,9 +48,23 @@ export default function AlertasPage() {
   const [isSheetOpen, setSheetOpen] = useState(false);
 
   const handleStatusChange = (id: string, status: 'ignored' | 'resolved') => {
-    setAlerts(currentAlerts => currentAlerts.map(alert => 
-      alert.id === id ? { ...alert, status } : alert
-    ));
+    setAlerts(currentAlerts => currentAlerts.map(alert => {
+      if (alert.id !== id) return alert;
+
+      if (status === 'resolved' && alert.recurrence && alert.recurrence !== 'none') {
+        const today = new Date();
+        let nextRecurrenceDate: string | undefined;
+        switch(alert.recurrence) {
+            case 'daily': nextRecurrenceDate = addDays(today, 1).toISOString(); break;
+            case 'weekly': nextRecurrenceDate = addWeeks(today, 1).toISOString(); break;
+            case 'monthly': nextRecurrenceDate = addMonths(today, 1).toISOString(); break;
+        }
+        return { ...alert, status, nextRecurrenceDate };
+      }
+      
+      return { ...alert, status, nextRecurrenceDate: undefined };
+
+    }));
   };
 
   const handlePaySubscription = (alert: Alert) => {
@@ -74,12 +96,12 @@ export default function AlertasPage() {
   return (
     <PageWrapper>
       <PageHeader
-        title="Alertas y Análisis"
+        title="Alertas y Recordatorios"
         description="Gestiona las alertas generadas por el sistema y añade tus propios recordatorios."
       >
         <Button onClick={() => setSheetOpen(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            Añadir Alerta
+            Añadir Recordatorio
         </Button>
       </PageHeader>
       <Card>
@@ -89,19 +111,29 @@ export default function AlertasPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Mensaje</TableHead>
-                  <TableHead>Fecha</TableHead>
+                  <TableHead className="hidden md:table-cell">Recurrencia</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {alerts.map((alert) => (
-                  <TableRow key={alert.id}>
-                    <TableCell className="font-medium flex items-center gap-2">
-                      {alertIcons[alert.type as keyof typeof alertIcons] || <ShieldAlert className="h-4 w-4" />}
-                      {alert.message}
+                {alerts.sort((a,b) => (b.status === 'new' ? 1 : -1) - (a.status === 'new' ? 1: -1) || new Date(b.date).getTime() - new Date(a.date).getTime()).map((alert) => (
+                  <TableRow key={alert.id} className={alert.status === 'new' ? 'bg-primary/5' : ''}>
+                    <TableCell className="font-medium">
+                        <div className='flex items-center gap-2'>
+                             {alertIcons[alert.type as keyof typeof alertIcons] || <ShieldAlert className="h-4 w-4" />}
+                            <span>{alert.message}</span>
+                        </div>
+                        <div className='text-xs text-muted-foreground pl-6'>{new Date(alert.date).toLocaleDateString('es-ES')}</div>
                     </TableCell>
-                    <TableCell>{new Date(alert.date).toLocaleDateString('es-ES')}</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                        {alert.recurrence && alert.recurrence !== 'none' && (
+                            <div className='flex items-center gap-2 text-muted-foreground text-sm'>
+                                <History className='h-4 w-4'/>
+                                {recurrenceText[alert.recurrence]}
+                            </div>
+                        )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant={statusVariant[alert.status]}>{statusText[alert.status]}</Badge>
                     </TableCell>

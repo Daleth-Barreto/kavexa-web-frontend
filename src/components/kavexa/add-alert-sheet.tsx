@@ -24,10 +24,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAppContext } from '@/contexts/app-context';
+import type { Alert } from '@/lib/types';
+
 
 const alertSchema = z.object({
   message: z.string().min(1, 'El mensaje es requerido.').max(100, 'El mensaje no puede tener más de 100 caracteres.'),
+  recurrence: z.enum(['none', 'daily', 'weekly', 'monthly']).optional().default('none'),
 });
 
 type AlertFormValues = z.infer<typeof alertSchema>;
@@ -43,7 +47,8 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
   const form = useForm<AlertFormValues>({
     resolver: zodResolver(alertSchema),
     defaultValues: {
-        message: ''
+        message: '',
+        recurrence: 'none',
     }
   });
 
@@ -55,7 +60,7 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
 
 
   function handleFormSubmit(data: AlertFormValues) {
-    addAlert({ message: data.message });
+    addAlert({ message: data.message, recurrence: data.recurrence as Alert['recurrence'] });
     onOpenChange(false);
   }
 
@@ -63,9 +68,9 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Añadir Nueva Alerta</SheetTitle>
+          <SheetTitle>Añadir Nuevo Recordatorio</SheetTitle>
           <SheetDescription>
-            Crea un recordatorio o una nota rápida que aparecerá en tu lista de alertas.
+            Crea un recordatorio o una nota rápida. Puedes hacer que se repita con la frecuencia que necesites.
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -87,11 +92,34 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
                 </FormItem>
               )}
             />
+            <FormField
+                control={form.control}
+                name="recurrence"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Repetir</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecciona una frecuencia" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="none">Nunca</SelectItem>
+                            <SelectItem value="daily">Diariamente</SelectItem>
+                            <SelectItem value="weekly">Semanalmente</SelectItem>
+                            <SelectItem value="monthly">Mensualmente</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}
+             />
             <SheetFooter className="pt-4">
                 <SheetClose asChild>
                     <Button type="button" variant="outline">Cancelar</Button>
                 </SheetClose>
-              <Button type="submit">Guardar Alerta</Button>
+              <Button type="submit">Guardar Recordatorio</Button>
             </SheetFooter>
           </form>
         </Form>

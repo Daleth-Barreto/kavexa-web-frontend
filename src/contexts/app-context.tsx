@@ -7,7 +7,7 @@ import { Transaction, InventoryItem, Alert, AppConfig, Subscription, Client, Pro
 import { mockTransactions, mockInventory, mockAlerts, mockSubscriptions, mockClients, mockProviders, getDefaultModuleConfig } from '@/lib/data';
 import { calculateZScore, Z_SCORE_THRESHOLD } from '@/lib/math-utils';
 import { useToast } from '@/hooks/use-toast';
-import { isSameMonth, isSameYear } from 'date-fns';
+import { isSameMonth, isSameYear, addDays, addMonths, addWeeks } from 'date-fns';
 import { useRouter } from 'next/navigation';
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -70,17 +70,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [isDataLoaded]);
 
-  // Subscription alerts check
+  // Alert checks
   useEffect(() => {
     if (!isDataLoaded || !config.enabledModules?.alertas) return;
     
     const today = new Date();
+    today.setHours(0,0,0,0);
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
     const currentDate = today.getDate();
 
+    let alertsHaveChanged = false;
+    
+    // --- Subscription alerts ---
     const dueSubscriptions: Alert[] = [];
-
     subscriptions.forEach(sub => {
       const isAlreadyPaid = sub.lastPaidMonth === currentMonth && sub.lastPaidYear === currentYear;
       const isAlertExisting = alerts.some(a => a.type === 'subscription_due' && a.relatedId === sub.id && a.status === 'new' && isSameMonth(new Date(a.date), today) && isSameYear(new Date(a.date), today));
@@ -99,12 +102,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     if (dueSubscriptions.length > 0) {
       setAlerts(prev => [...dueSubscriptions, ...prev]);
-        toast({
-            title: 'Suscripciones Pendientes',
-            description: `Tienes ${dueSubscriptions.length} pago(s) de suscripción pendiente(s) este mes.`,
-            variant: 'destructive',
-        });
+      alertsHaveChanged = true;
+      toast({
+          title: 'Suscripciones Pendientes',
+          description: `Tienes ${dueSubscriptions.length} pago(s) de suscripción pendiente(s) este mes.`,
+          variant: 'destructive',
+      });
     }
+
+    // --- Recurring custom alerts ---
+    const updatedAlerts = alerts.map(alert => {
+        if (alert.type === 'custom' && alert.recurrence && alert.recurrence !== 'none' && alert.status === 'resolved' && alert.nextRecurrenceDate) {
+            const nextDate = new Date(alert.nextRecurrenceDate);
+            nextDate.setHours(0,0,0,0);
+
+            if (today >= nextDate) {
+                alertsHaveChanged = true;
+                return {
+                    ...alert,
+                    status: 'new' as const,
+                    date: new Date().toISOString().split('T')[0]
+                }
+            }
+        }
+        return alert;
+    });
+
+    if(alertsHaveChanged) {
+        setAlerts(updatedAlerts);
+    }
+
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDataLoaded, subscriptions, config.enabledModules?.alertas]);
@@ -150,12 +177,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [inventory, alerts, setAlerts, toast, config.enabledModules.alertas]);
 
     const addAlert = useCallback((data: Omit<Alert, 'id' | 'date' | 'status' | 'type'>) => {
+        const today = new Date();
+        let nextRecurrenceDate: string | undefined = undefined;
+
+        if (data.recurrence && data.recurrence !== 'none') {
+            switch(data.recurrence) {
+                case 'daily': nextRecurrenceDate = addDays(today, 1).toISOString(); break;
+                case 'weekly': nextRecurrenceDate = addWeeks(today, 1).toISOString(); break;
+                case 'monthly': nextRecurrenceDate = addMonths(today, 1).toISOString(); break;
+            }
+        }
+
         const newAlert: Alert = {
             id: `alert-custom-${Date.now()}`,
             type: 'custom',
             status: 'new',
-            date: new Date().toISOString().split('T')[0],
-            ...data
+            date: today.toISOString().split('T')[0],
+            message: data.message,
+            recurrence: data.recurrence,
+            nextRecurrenceDate,
         };
         setAlerts(prev => [newAlert, ...prev]);
         toast({

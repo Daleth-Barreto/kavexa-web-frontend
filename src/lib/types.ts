@@ -28,6 +28,8 @@ export type Alert = {
   date: string;
   status: 'new' | 'ignored' | 'resolved';
   relatedId?: string;
+  recurrence?: 'none' | 'daily' | 'weekly' | 'monthly';
+  nextRecurrenceDate?: string;
 };
 
 export type Provider = {
