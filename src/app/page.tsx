@@ -57,9 +57,14 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <div className="mx-auto flex items-center justify-center aspect-[3/2] overflow-hidden rounded-xl sm:w-full lg:order-last">
-                 <KavexaLogoIcon className="w-full h-full text-primary" />
-              </div>
+              <Image
+                src="https://placehold.co/600x400.png"
+                width={600}
+                height={400}
+                alt="Kavexa Dashboard"
+                data-ai-hint="dashboard analytics"
+                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
+              />
             </div>
           </div>
         </section>
