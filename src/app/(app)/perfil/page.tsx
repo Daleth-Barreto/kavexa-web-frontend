@@ -1,6 +1,6 @@
 
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,9 +40,36 @@ export default function PerfilPage() {
 
   const [isAlertOpen, setAlertOpen] = useState(false);
   const [deleteConfirmationInput, setDeleteConfirmationInput] = useState('');
+  const [notificationPermission, setNotificationPermission] = useState('default');
   
   const transactionFileInputRef = useRef<HTMLInputElement>(null);
   const inventoryFileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      setNotificationPermission(Notification.permission);
+    }
+  }, []);
+
+  const handleNotificationToggle = async (checked: boolean) => {
+    if (!('Notification' in window)) {
+      toast({ title: 'No Soportado', description: 'Tu navegador no soporta notificaciones push.', variant: 'destructive' });
+      return;
+    }
+    if (checked) {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+      if (permission === 'granted') {
+        new Notification('¡Notificaciones Activadas!', { body: 'Ahora recibirás alertas de Kavexa.' });
+      } else {
+        toast({ title: 'Permiso Denegado', description: 'No se podrán enviar notificaciones.' });
+      }
+    } else {
+      // Cannot programmatically revoke permission. User must do it in browser settings.
+      toast({ title: 'Info', description: 'Para desactivar, gestiona los permisos en la configuración de tu navegador.' });
+    }
+  };
+
 
   const handleExportCSV = () => {
     const dataToExport: {filename: string, data: any[]}[] = [
@@ -158,8 +185,8 @@ export default function PerfilPage() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Apariencia</CardTitle>
-                    <CardDescription>Personaliza la apariencia de la aplicación.</CardDescription>
+                    <CardTitle>Apariencia y Notificaciones</CardTitle>
+                    <CardDescription>Personaliza la apariencia y las notificaciones de la aplicación.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -168,6 +195,15 @@ export default function PerfilPage() {
                             id="dark-mode"
                             checked={theme === 'dark'}
                             onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                        />
+                    </div>
+                     <div className="flex items-center justify-between">
+                        <Label htmlFor="notifications">Notificaciones Push</Label>
+                        <Switch
+                            id="notifications"
+                            checked={notificationPermission === 'granted'}
+                            onCheckedChange={handleNotificationToggle}
+                            disabled={notificationPermission === 'denied'}
                         />
                     </div>
                     <div className="space-y-2">

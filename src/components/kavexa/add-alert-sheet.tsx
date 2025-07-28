@@ -32,7 +32,7 @@ import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Input } from '../ui/input';
 
@@ -48,11 +48,13 @@ type AlertFormValues = z.infer<typeof alertSchema>;
 type AddAlertSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultValues?: Alert | null;
 };
 
-export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
-  const { addAlert } = useAppContext();
-  
+export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertSheetProps) {
+  const { addAlert, editAlert } = useAppContext();
+  const isEditing = !!defaultValues;
+
   const form = useForm<AlertFormValues>({
     resolver: zodResolver(alertSchema),
     defaultValues: {
@@ -64,15 +66,25 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
   });
 
   useEffect(() => {
-    if (!open) {
-      form.reset({
-        message: '',
-        recurrence: 'none',
-        date: new Date(),
-        time: format(new Date(), 'HH:mm'),
-      });
+    if (open) {
+      if (isEditing && defaultValues) {
+        const alertDate = new Date(defaultValues.date);
+        form.reset({
+          message: defaultValues.message,
+          recurrence: defaultValues.recurrence || 'none',
+          date: alertDate,
+          time: format(alertDate, 'HH:mm'),
+        });
+      } else {
+        form.reset({
+          message: '',
+          recurrence: 'none',
+          date: new Date(),
+          time: format(new Date(), 'HH:mm'),
+        });
+      }
     }
-  }, [open, form]);
+  }, [open, defaultValues, isEditing, form]);
 
 
   function handleFormSubmit(data: AlertFormValues) {
@@ -82,13 +94,23 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
         combinedDate.setHours(hours, minutes, 0, 0);
     }
     
-    const alertData: Omit<Alert, 'id' | 'status' | 'type'> = {
+    if(isEditing && defaultValues) {
+      const editedAlert: Alert = {
+        ...defaultValues,
         message: data.message,
-        recurrence: data.recurrence as Alert['recurrence'],
         date: combinedDate.toISOString(),
-    };
-
-    addAlert(alertData);
+        recurrence: data.recurrence as Alert['recurrence'],
+      }
+      editAlert(editedAlert);
+    } else {
+      const alertData: Omit<Alert, 'id' | 'status' | 'type'> = {
+          message: data.message,
+          recurrence: data.recurrence as Alert['recurrence'],
+          date: combinedDate.toISOString(),
+      };
+      addAlert(alertData);
+    }
+    
     onOpenChange(false);
   }
 
@@ -96,9 +118,9 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Añadir Nuevo Recordatorio</SheetTitle>
+          <SheetTitle>{isEditing ? 'Editar Recordatorio' : 'Añadir Nuevo Recordatorio'}</SheetTitle>
           <SheetDescription>
-            Crea un recordatorio o una nota rápida. Puedes hacer que se repita con la frecuencia que necesites.
+            {isEditing ? 'Modifica los detalles de tu recordatorio.' : 'Crea un recordatorio. Puedes hacer que se repita con la frecuencia que necesites.'}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -202,7 +224,7 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
                 <SheetClose asChild>
                     <Button type="button" variant="outline">Cancelar</Button>
                 </SheetClose>
-              <Button type="submit">Guardar Recordatorio</Button>
+              <Button type="submit">Guardar</Button>
             </SheetFooter>
           </form>
         </Form>

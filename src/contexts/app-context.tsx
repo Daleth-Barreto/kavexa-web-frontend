@@ -12,6 +12,12 @@ import { useRouter } from 'next/navigation';
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
+const sendNotification = (title: string, options: NotificationOptions) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, options);
+    }
+};
+
 interface AppContextType {
   transactions: Transaction[];
   setTransactions: (value: Transaction[] | ((val: Transaction[]) => Transaction[])) => void;
@@ -20,6 +26,8 @@ interface AppContextType {
   alerts: Alert[];
   setAlerts: (value: Alert[] | ((val: Alert[]) => Alert[])) => void;
   addAlert: (alert: Omit<Alert, 'id' | 'status' | 'type'>) => void;
+  editAlert: (alert: Alert) => void;
+  deleteAlert: (alertId: string) => void;
   subscriptions: Subscription[];
   setSubscriptions: (value: Subscription[] | ((val: Subscription[]) => Subscription[])) => void;
   clients: Client[];
@@ -100,13 +108,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
 
     if (dueSubscriptions.length > 0) {
-      setAlerts(prev => [...dueSubscriptions, ...prev]);
-      alertsHaveChanged = true;
-      toast({
-          title: 'Suscripciones Pendientes',
-          description: `Tienes ${dueSubscriptions.length} pago(s) de suscripción pendiente(s) este mes.`,
-          variant: 'destructive',
-      });
+        const newAlerts = [...dueSubscriptions, ...alerts];
+        setAlerts(newAlerts);
+        alertsHaveChanged = true;
+
+        const message = `Tienes ${dueSubscriptions.length} pago(s) de suscripción pendiente(s) este mes.`;
+        toast({
+            title: 'Suscripciones Pendientes',
+            description: message,
+            variant: 'destructive',
+        });
+        sendNotification('Suscripciones Pendientes', { body: message });
     }
 
     // --- Recurring custom alerts ---
@@ -116,11 +128,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
             
             if (now >= nextDate) {
                 alertsHaveChanged = true;
-                return {
+                const newAlertData = {
                     ...alert,
                     status: 'new' as const,
                     date: new Date().toISOString()
-                }
+                };
+                sendNotification('Recordatorio', { body: newAlertData.message });
+                return newAlertData;
             }
         }
         return alert;
@@ -167,10 +181,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         };
 
         setAlerts(prev => [newAlert, ...prev]);
+        const message = `Hemos identificado el día de mayor venta para ${product.name}.`;
         toast({
             title: 'Oportunidad de Venta',
-            description: `Hemos identificado el día de mayor venta para ${product.name}.`,
+            description: message,
         });
+        sendNotification('Oportunidad de Venta', { body: message });
       }
   }, [inventory, alerts, setAlerts, toast, config.enabledModules.alertas]);
 
@@ -201,6 +217,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
             description: 'Se ha añadido una nueva alerta a tu lista.',
         });
     }, [setAlerts, toast]);
+
+    const editAlert = useCallback((updatedAlert: Alert) => {
+      setAlerts(prev => prev.map(a => a.id === updatedAlert.id ? updatedAlert : a));
+      toast({
+          title: 'Recordatorio Actualizado',
+          description: `Se ha guardado "${updatedAlert.message}".`,
+      });
+    }, [setAlerts, toast]);
+
+    const deleteAlert = useCallback((alertId: string) => {
+        setAlerts(prev => prev.filter(a => a.id !== alertId));
+    }, [setAlerts]);
 
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
@@ -235,20 +263,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (expenseAmounts.length > 5 && config.enabledModules.alertas) {
         const zScore = calculateZScore(newTransaction.amount, expenseAmounts);
         if (Math.abs(zScore) > Z_SCORE_THRESHOLD) {
-          const newAlert: Alert = {
-            id: `alert-${Date.now()}`,
-            type: 'unusual_expense',
-            message: `Egreso inusual detectado: ${newTransaction.description} por $${newTransaction.amount.toFixed(2)}`,
-            date: new Date().toISOString(),
-            status: 'new',
-            relatedId: newTransaction.id,
-          };
-          setAlerts(prev => [newAlert, ...prev]);
-           toast({
-            title: 'Alerta generada',
-            description: `Se detectó un egreso inusualmente alto.`,
-            variant: 'destructive'
-          });
+            const message = `Egreso inusual detectado: ${newTransaction.description} por $${newTransaction.amount.toFixed(2)}`;
+            const newAlert: Alert = {
+                id: `alert-${Date.now()}`,
+                type: 'unusual_expense',
+                message,
+                date: new Date().toISOString(),
+                status: 'new',
+                relatedId: newTransaction.id,
+            };
+            setAlerts(prev => [newAlert, ...prev]);
+            toast({
+                title: 'Alerta generada',
+                description: `Se detectó un egreso inusualmente alto.`,
+                variant: 'destructive'
+            });
+            sendNotification('Alerta de Egreso Inusual', { body: message });
         }
       }
     }
@@ -263,6 +293,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                     const newStock = item.stock - quantitySold;
                     
                     if (newStock <= item.lowStockThreshold && item.stock > item.lowStockThreshold && config.enabledModules.alertas) {
+                        const message = `El producto "${item.name}" tiene pocas unidades (${newStock}).`;
                          const newAlert: Alert = {
                             id: `alert-stock-${Date.now()}`,
                             type: 'low_stock',
@@ -274,8 +305,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
                         setAlerts(prev => [newAlert, ...prev]);
                         toast({
                             title: 'Alerta de Inventario',
-                            description: `El producto "${item.name}" tiene pocas unidades.`,
+                            description: message,
                         });
+                        sendNotification('Alerta de Stock Bajo', { body: message });
                     }
                     return { ...item, stock: newStock };
                 }
@@ -329,6 +361,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     alerts,
     setAlerts,
     addAlert,
+    editAlert,
+    deleteAlert,
     subscriptions,
     setSubscriptions,
     clients,
@@ -348,7 +382,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }), [
     transactions, setTransactions,
     inventory, setInventory,
-    alerts, setAlerts, addAlert,
+    alerts, setAlerts, addAlert, editAlert, deleteAlert,
     subscriptions, setSubscriptions,
     clients, setClients,
     providers, setProviders,

@@ -7,12 +7,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles, Megaphone, PlusCircle, History, Clock } from "lucide-react";
-import { useAppContext, useCurrency } from "@/contexts/app-context";
+import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles, Megaphone, PlusCircle, History, Clock, MoreVertical, Edit } from "lucide-react";
+import { useAppContext } from "@/contexts/app-context";
 import type { Alert } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { AddAlertSheet } from '@/components/kavexa/add-alert-sheet';
 import { addDays, addWeeks, addMonths } from 'date-fns';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const statusVariant: Record<Alert['status'], 'destructive' | 'secondary' | 'default'> = {
   new: 'destructive',
@@ -42,10 +45,15 @@ const recurrenceText: Record<NonNullable<Alert['recurrence']>, string> = {
 }
 
 export default function AlertasPage() {
-  const { alerts, setAlerts, addTransaction, subscriptions, setSubscriptions } = useAppContext();
+  const { alerts, setAlerts, addTransaction, subscriptions, setSubscriptions, deleteAlert } = useAppContext();
   const { toast } = useToast();
-  const { formatCurrency } = useCurrency();
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
+  const [isDeleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [alertToDelete, setAlertToDelete] = useState<Alert | null>(null);
+
+  const sortedAlerts = alerts.sort((a,b) => (b.status === 'new' ? 1 : -1) - (a.status === 'new' ? 1: -1) || new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const handleStatusChange = (id: string, status: 'ignored' | 'resolved') => {
     setAlerts(currentAlerts => currentAlerts.map(alert => {
@@ -97,12 +105,54 @@ export default function AlertasPage() {
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
     const datePart = date.toLocaleDateString('es-ES');
-    // Check if the time is midnight, if so, don't show it
     if(date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0) {
         return datePart;
     }
     const timePart = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
     return `${datePart} - ${timePart}`;
+  }
+
+  const handleSelectRow = (id: string) => {
+    setSelectedRows(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    const newSelectedRows: Record<string, boolean> = {};
+    if (checked) {
+      sortedAlerts.forEach(alert => {
+        newSelectedRows[alert.id] = true;
+      });
+    }
+    setSelectedRows(newSelectedRows);
+  };
+
+  const numSelected = Object.values(selectedRows).filter(Boolean).length;
+  const isAllSelected = numSelected > 0 && numSelected === sortedAlerts.length;
+
+  const handleEditAlert = (alert: Alert) => {
+    setSelectedAlert(alert);
+    setSheetOpen(true);
+  }
+
+  const handleDeleteAlert = (alert: Alert) => {
+    setAlertToDelete(alert);
+    setDeleteAlertOpen(true);
+  }
+
+  const confirmDeleteAlert = () => {
+    if (alertToDelete) {
+      deleteAlert(alertToDelete.id);
+      toast({ title: 'Alerta eliminada'});
+    }
+    setAlertToDelete(null);
+    setDeleteAlertOpen(false);
+  }
+  
+  const handleDeleteSelected = () => {
+    const idsToDelete = Object.keys(selectedRows).filter(id => selectedRows[id]);
+    idsToDelete.forEach(id => deleteAlert(id));
+    setSelectedRows({});
+    toast({ title: `${idsToDelete.length} alerta(s) eliminada(s)`});
   }
 
   return (
@@ -111,17 +161,32 @@ export default function AlertasPage() {
         title="Alertas y Recordatorios"
         description="Gestiona las alertas generadas por el sistema y añade tus propios recordatorios."
       >
-        <Button onClick={() => setSheetOpen(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Añadir Recordatorio
-        </Button>
+        <div className="flex items-center gap-2">
+            {numSelected > 0 && (
+                <Button variant="destructive" onClick={handleDeleteSelected}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar ({numSelected})
+                </Button>
+            )}
+            <Button onClick={() => { setSelectedAlert(null); setSheetOpen(true); }}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Añadir Recordatorio
+            </Button>
+        </div>
       </PageHeader>
       <Card>
         <CardContent className="pt-6">
-          {alerts.length > 0 ? (
+          {sortedAlerts.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                     <Checkbox
+                        checked={isAllSelected}
+                        onCheckedChange={handleSelectAll}
+                        aria-label="Seleccionar todo"
+                    />
+                  </TableHead>
                   <TableHead>Mensaje</TableHead>
                   <TableHead className="hidden md:table-cell">Recurrencia</TableHead>
                   <TableHead>Estado</TableHead>
@@ -129,8 +194,15 @@ export default function AlertasPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {alerts.sort((a,b) => (b.status === 'new' ? 1 : -1) - (a.status === 'new' ? 1: -1) || new Date(b.date).getTime() - new Date(a.date).getTime()).map((alert) => (
-                  <TableRow key={alert.id} className={alert.status === 'new' ? 'bg-primary/5' : ''}>
+                {sortedAlerts.map((alert) => (
+                  <TableRow key={alert.id} data-state={selectedRows[alert.id] ? 'selected' : ''}>
+                    <TableCell>
+                        <Checkbox
+                            checked={selectedRows[alert.id] || false}
+                            onCheckedChange={() => handleSelectRow(alert.id)}
+                            aria-label={`Seleccionar alerta ${alert.id}`}
+                        />
+                    </TableCell>
                     <TableCell className="font-medium">
                         <div className='flex items-center gap-2'>
                              {alertIcons[alert.type as keyof typeof alertIcons] || <ShieldAlert className="h-4 w-4" />}
@@ -169,6 +241,25 @@ export default function AlertasPage() {
                           </Button>
                         </div>
                       )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="ml-2">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                           {alert.type === 'custom' && (
+                             <DropdownMenuItem onClick={() => handleEditAlert(alert)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                           )}
+                           <DropdownMenuItem onClick={() => handleDeleteAlert(alert)} className="text-destructive focus:text-destructive">
+                             <Trash2 className="mr-2 h-4 w-4" />
+                             Eliminar
+                           </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -185,7 +276,22 @@ export default function AlertasPage() {
       <AddAlertSheet 
         open={isSheetOpen}
         onOpenChange={setSheetOpen}
+        defaultValues={selectedAlert}
       />
+      <AlertDialog open={isDeleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente la alerta.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAlertToDelete(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteAlert} variant="destructive">Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageWrapper>
   );
 }
