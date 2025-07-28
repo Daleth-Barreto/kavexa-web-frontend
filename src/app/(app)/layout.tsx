@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { MainNav, SettingsNav } from '@/components/kavexa/nav';
@@ -15,10 +13,17 @@ import {
 } from '@/components/ui/sidebar';
 import { Zap } from 'lucide-react';
 import { AppProvider, useAppContext } from '@/contexts/app-context';
+import { useRouter } from 'next/navigation';
 
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
-  const { isLoaded } = useAppContext();
+  const { isLoaded, config } = useAppContext();
+  const router = useRouter();
+
+  if (isLoaded && !config.onboardingComplete) {
+    router.replace('/welcome');
+    return null;
+  }
 
   if (!isLoaded) {
     return (
@@ -75,4 +80,3 @@ export default function AppLayout({
     </AppProvider>
   );
 }
-

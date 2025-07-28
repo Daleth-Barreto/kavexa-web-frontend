@@ -29,8 +29,21 @@ export type Alert = {
   relatedId?: string;
 };
 
+export type Provider = {
+    id: string;
+    name: string;
+    contact: string;
+    phone: string;
+};
+
+export type ModuleKey = 
+  | 'inicio' | 'movimientos' | 'pos' | 'inventario' | 'clientes' 
+  | 'proveedores' | 'suscripciones' | 'demanda' | 'proyeccion' | 'alertas' | 'reportes';
+
 export type AppConfig = {
     currency: string;
+    onboardingComplete: boolean;
+    enabledModules: Record<ModuleKey, boolean>;
 };
 
 export type Subscription = {

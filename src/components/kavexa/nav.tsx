@@ -13,46 +13,52 @@ import {
   UserCog,
   Repeat,
   ShoppingCart,
-  Users
+  Users,
+  Truck,
 } from 'lucide-react';
-import { useAuth } from '@/contexts/auth-context';
 
 import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
+import { ALL_MODULES } from '@/lib/data';
+import { useAppContext } from '@/contexts/app-context';
 
-const menuItems = [
-  { href: '/inicio', label: 'Inicio', icon: Home },
-  { href: '/movimientos', label: 'Movimientos', icon: ArrowLeftRight },
-  { href: '/pos', label: 'Punto de Venta', icon: ShoppingCart },
-  { href: '/inventario', label: 'Inventario', icon: Archive },
-  { href: '/clientes', label: 'Clientes', icon: Users },
-  { href: '/suscripciones', label: 'Suscripciones', icon: Repeat },
-  { href: '/demanda', label: 'Demanda', icon: LineChart },
-  { href: '/proyeccion', label: 'Proyección', icon: TrendingUp },
-  { href: '/alertas', label: 'Alertas', icon: Bell },
-  { href: '/reportes', label: 'Reportes', icon: FileDown },
-];
+const icons: Record<string, React.ElementType> = {
+    inicio: Home,
+    movimientos: ArrowLeftRight,
+    pos: ShoppingCart,
+    inventario: Archive,
+    clientes: Users,
+    proveedores: Truck,
+    suscripciones: Repeat,
+    demanda: LineChart,
+    proyeccion: TrendingUp,
+    alertas: Bell,
+    reportes: FileDown,
+};
 
 export function MainNav() {
   const pathname = usePathname();
-  const { isAuthenticated } = useAuth();
+  const { config } = useAppContext();
+
+  const enabledModules = ALL_MODULES.filter(module => config.enabledModules[module.id]);
 
   return (
     <SidebarMenu>
-      {menuItems.map((item) => {
+      {enabledModules.map((item) => {
+        const Icon = icons[item.id] || Home;
         return (
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               asChild
               isActive={pathname === item.href}
-              tooltip={item.label}
+              tooltip={item.title}
             >
               <Link href={item.href}>
-                <item.icon />
-                <span>{item.label}</span>
+                <Icon />
+                <span>{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

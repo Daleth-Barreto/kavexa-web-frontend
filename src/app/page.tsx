@@ -26,16 +26,16 @@ export default function LandingPage() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline text-primary">
-                    Transforma la gestión de tu negocio con Kavexa
+                    La herramienta que se adapta a tu negocio
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Tu asistente financiero y de inventario todo en uno. Simplifica tus finanzas, optimiza tu stock y toma decisiones más inteligentes.
+                    Finanzas, inventario, clientes y más. Elige los módulos que necesitas y gestiona tu pyme de forma inteligente y personalizada.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
-                    <Link href="/inicio">
-                      Empezar como invitado
+                    <Link href="/welcome">
+                      Empezar
                     </Link>
                   </Button>
                 </div>
