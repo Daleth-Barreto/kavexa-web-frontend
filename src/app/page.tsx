@@ -51,45 +51,32 @@ export default function LandingPage() {
                   className="rounded-xl object-cover"
                 >
                   <defs>
-                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.1 }} />
-                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 0.1 }} />
+                    <linearGradient id="waveGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.8 }} />
+                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 0.8 }} />
                     </linearGradient>
-                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))' }} />
-                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))' }} />
+                     <linearGradient id="waveGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.4 }} />
+                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 0.4 }} />
                     </linearGradient>
+                     <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="12" />
+                    </filter>
                   </defs>
                   
-                  <rect width="600" height="400" rx="12" fill="hsl(var(--muted))" />
+                  <rect width="600" height="400" rx="12" fill="hsl(var(--background))" />
                   
-                  <g transform="translate(50 50) scale(0.9)">
-                    <rect x="0" y="0" width="500" height="300" rx="8" fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth="2" />
-                    
-                    <path d="M 20 20 L 220 20" stroke="hsl(var(--muted-foreground))" strokeWidth="10" strokeLinecap="round" />
-                    <path d="M 20 40 L 180 40" stroke="hsl(var(--muted-foreground))" strokeWidth="10" strokeLinecap="round" />
-
-                    <rect x="250" y="20" width="230" height="60" rx="4" fill="url(#grad1)" />
-                    
-                    <g transform="translate(340 50) scale(1.5)">
-                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="hsl(var(--primary))" stroke="hsl(var(--primary-foreground))" strokeWidth="0.5" />
-                    </g>
-                    
-                    <g transform="translate(20 80)">
-                      <rect x="0" y="0" width="210" height="200" rx="4" fill="hsl(var(--background))" stroke="hsl(var(--border))" />
-                       <path d="M 10 180 L 40 150 L 70 165 L 100 130 L 130 145 L 160 110 L 190 125" stroke="hsl(var(--primary))" strokeWidth="3" fill="none" />
-                       <circle cx="160" cy="110" r="4" fill="hsl(var(--primary))" />
-                    </g>
-
-                     <g transform="translate(250 100)">
-                      <rect x="0" y="0" width="230" height="180" rx="4" fill="hsl(var(--background))" stroke="hsl(var(--border))" />
-                        <rect x="20" y="20" width="190" height="20" rx="2" fill="hsl(var(--muted))" />
-                        <rect x="20" y="50" width="120" height="20" rx="2" fill="hsl(var(--muted))" />
-                        <rect x="20" y="80" width="190" height="20" rx="2" fill="hsl(var(--muted))" />
-                        <rect x="20" y="110" width="150" height="20" rx="2" fill="hsl(var(--muted))" />
-                         <rect x="20" y="140" width="190" height="20" rx="2" fill="hsl(var(--muted))" />
-                    </g>
+                  <g filter="url(#blur)" opacity="0.6">
+                      <circle cx="200" cy="150" r="150" fill="url(#waveGradient1)" />
+                      <circle cx="450" cy="250" r="180" fill="url(#waveGradient2)" />
+                      <circle cx="300" cy="300" r="120" fill="hsl(var(--primary))" />
                   </g>
+                  
+                  <path d="M0 250 Q 150 150, 300 250 T 600 250" stroke="url(#waveGradient1)" fill="none" strokeWidth="4" strokeLinecap="round" opacity="0.7"/>
+                  <path d="M0 280 Q 150 380, 300 280 T 600 280" stroke="url(#waveGradient2)" fill="none" strokeWidth="4" strokeLinecap="round" opacity="0.7"/>
+                   <g transform="translate(280 180) scale(2)">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="hsl(var(--primary))" stroke="hsl(var(--primary-foreground))" strokeWidth="0.5" opacity="0.9" />
+                   </g>
                 </svg>
               </div>
             </div>
