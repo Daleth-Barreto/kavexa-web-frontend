@@ -16,6 +16,7 @@ import { toast } from '@/hooks/use-toast';
 import Papa from 'papaparse';
 import type { Transaction, InventoryItem, Provider, Client, ModuleKey } from '@/lib/types';
 import { ALL_MODULES } from '@/lib/data';
+import { InstallPwaButton } from '@/components/kavexa/install-pwa-button';
 
 export default function PerfilPage() {
   const { isAuthenticated, login, logout } = useAuth();
@@ -202,18 +203,11 @@ export default function PerfilPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>Autenticación</CardTitle>
-                    <CardDescription>
-                      {isAuthenticated 
-                        ? "Actualmente has iniciado sesión."
-                        : "Estás en una sesión de invitado."
-                      }
-                    </CardDescription>
+                    <CardTitle>Acceso Directo</CardTitle>
+                    <CardDescription>Instala Kavexa en tu dispositivo para un acceso más rápido, como si fuera una aplicación nativa.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button onClick={isAuthenticated ? logout : login}>
-                        {isAuthenticated ? "Cerrar Sesión" : "Iniciar Sesión"}
-                    </Button>
+                   <InstallPwaButton />
                 </CardContent>
             </Card>
         </div>
