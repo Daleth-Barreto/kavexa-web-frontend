@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -7,10 +8,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, ArrowRight } from 'lucide-react';
 import { ALL_MODULES } from '@/lib/data';
-import { useAppContext } from '@/contexts/app-context';
+import { AppProvider, useAppContext } from '@/contexts/app-context';
 import type { ModuleKey } from '@/lib/types';
 
-export default function WelcomePage() {
+function WelcomePageContent() {
   const router = useRouter();
   const { config, setConfig } = useAppContext();
   const [selectedModules, setSelectedModules] = useState<Record<ModuleKey, boolean>>(config.enabledModules);
@@ -73,4 +74,12 @@ export default function WelcomePage() {
       </div>
     </div>
   );
+}
+
+export default function WelcomePage() {
+  return (
+    <AppProvider>
+      <WelcomePageContent />
+    </AppProvider>
+  )
 }
