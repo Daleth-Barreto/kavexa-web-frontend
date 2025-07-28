@@ -51,32 +51,33 @@ export default function LandingPage() {
                   className="rounded-xl object-cover"
                 >
                   <defs>
-                    <linearGradient id="waveGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.8 }} />
-                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 0.8 }} />
+                    <linearGradient id="glow" x1="50%" y1="50%" x2="50%" y2="100%">
+                      <stop offset="0%" style={{stopColor: 'hsl(var(--primary))', stopOpacity: 0.1}} />
+                      <stop offset="100%" style={{stopColor: 'hsl(var(--background))', stopOpacity: 0}} />
                     </linearGradient>
-                     <linearGradient id="waveGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.4 }} />
-                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 0.4 }} />
-                    </linearGradient>
-                     <filter id="blur" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur in="SourceGraphic" stdDeviation="12" />
-                    </filter>
                   </defs>
                   
                   <rect width="600" height="400" rx="12" fill="hsl(var(--background))" />
-                  
-                  <g filter="url(#blur)" opacity="0.6">
-                      <circle cx="200" cy="150" r="150" fill="url(#waveGradient1)" />
-                      <circle cx="450" cy="250" r="180" fill="url(#waveGradient2)" />
-                      <circle cx="300" cy="300" r="120" fill="hsl(var(--primary))" />
+
+                  {/* Base Shapes */}
+                  <g opacity="0.8">
+                    {/* Abstract bar chart */}
+                    <rect x="100" y="150" width="40" height="150" rx="8" fill="hsl(var(--primary))" />
+                    <rect x="160" y="100" width="40" height="200" rx="8" fill="hsl(var(--primary))" />
+                    <rect x="220" y="180" width="40" height="120" rx="8" fill="hsl(var(--primary))" />
+
+                    {/* Abstract pie chart / circle */}
+                    <circle cx="420" cy="200" r="100" fill="hsl(var(--background))" stroke="hsl(var(--accent))" strokeWidth="12"/>
+                    <path d="M 420 200 L 420 100 A 100 100 0 0 1 506.6 150 Z" fill="hsl(var(--accent))" />
+
+                    {/* Decorative elements */}
+                    <circle cx="150" cy="80" r="15" fill="hsl(var(--accent))"/>
+                    <rect x="350" y="80" width="120" height="20" rx="5" fill="hsl(var(--muted))" />
+                    <rect x="350" y="110" width="80" height="20" rx="5" fill="hsl(var(--muted))" />
                   </g>
-                  
-                  <path d="M0 250 Q 150 150, 300 250 T 600 250" stroke="url(#waveGradient1)" fill="none" strokeWidth="4" strokeLinecap="round" opacity="0.7"/>
-                  <path d="M0 280 Q 150 380, 300 280 T 600 280" stroke="url(#waveGradient2)" fill="none" strokeWidth="4" strokeLinecap="round" opacity="0.7"/>
-                   <g transform="translate(280 180) scale(2)">
-                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="hsl(var(--primary))" stroke="hsl(var(--primary-foreground))" strokeWidth="0.5" opacity="0.9" />
-                   </g>
+
+                  {/* Glow effect at the bottom */}
+                  <rect x="0" y="200" width="600" height="200" fill="url(#glow)" />
                 </svg>
               </div>
             </div>
