@@ -1,5 +1,6 @@
-'use client';
 
+'use client';
+import { useEffect } from 'react';
 import { MainNav, SettingsNav } from '@/components/kavexa/nav';
 import { AuthStatus } from '@/components/kavexa/auth-status';
 import {
@@ -20,12 +21,13 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const { isLoaded, config } = useAppContext();
   const router = useRouter();
 
-  if (isLoaded && !config.onboardingComplete) {
-    router.replace('/welcome');
-    return null;
-  }
+  useEffect(() => {
+    if (isLoaded && !config.onboardingComplete) {
+      router.replace('/welcome');
+    }
+  }, [isLoaded, config.onboardingComplete, router]);
 
-  if (!isLoaded) {
+  if (!isLoaded || (isLoaded && !config.onboardingComplete)) {
     return (
       <div className="flex flex-col min-h-screen items-center justify-center bg-background text-foreground">
         <div className="flex items-center gap-4 text-2xl font-headline font-semibold animate-pulse">
