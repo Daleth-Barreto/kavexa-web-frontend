@@ -44,7 +44,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [config, setConfig, isConfigLoaded] = useLocalStorage<AppConfig>('kavexa_config', { currency: 'USD' });
   const { toast } = useToast();
 
-  const isLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isConfigLoaded;
+  const [isAppLoading, setIsAppLoading] = useState(true);
+
+  const isDataLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isConfigLoaded;
+
+  useEffect(() => {
+    if (isDataLoaded) {
+      // Simulate a minimum loading time for better UX
+      const timer = setTimeout(() => {
+        setIsAppLoading(false);
+      }, 500); // Minimum 500ms loading screen
+
+      return () => clearTimeout(timer);
+    }
+  }, [isDataLoaded]);
+
 
   useEffect(() => {
     // This effect runs once on load to clean up any persisted mock data from localStorage
@@ -175,7 +189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setAlerts,
     config,
     setConfig,
-    isLoaded,
+    isLoaded: !isAppLoading,
     addTransaction,
     editTransaction,
     deleteTransaction,
@@ -187,7 +201,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     inventory, setInventory,
     alerts, setAlerts,
     config, setConfig,
-    isLoaded, addTransaction, editTransaction, deleteTransaction, clearAllData, setCurrency
+    isAppLoading, addTransaction, editTransaction, deleteTransaction, clearAllData, setCurrency
   ]);
 
   return (
