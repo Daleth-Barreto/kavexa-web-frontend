@@ -16,7 +16,7 @@ export default function LandingPage() {
             <Link href="/login">Iniciar Sesión</Link>
           </Button>
           <Button asChild>
-            <Link href="/register">Registrarse</Link>
+            <Link href="/welcome">Registrarse</Link>
           </Button>
         </nav>
       </header>
@@ -41,14 +41,59 @@ export default function LandingPage() {
                   </Button>
                 </div>
               </div>
-              <img
-                src="https://placehold.co/600x400.png"
-                width="600"
-                height="400"
-                alt="Hero"
-                data-ai-hint="dashboard graph"
-                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-              />
+              <div className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last">
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 600 400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="rounded-xl"
+                  aria-label="Hero Illustration"
+                >
+                  <defs>
+                    <linearGradient id="hero-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: 'hsl(var(--primary) / 0.1)' }} />
+                      <stop offset="100%" style={{ stopColor: 'hsl(var(--accent) / 0.1)' }} />
+                    </linearGradient>
+                    <filter id="hero-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                       <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                       <feOffset dx="2" dy="4" result="offsetblur"/>
+                       <feComponentTransfer>
+                         <feFuncA type="linear" slope="0.2"/>
+                       </feComponentTransfer>
+                       <feMerge> 
+                         <feMergeNode/>
+                         <feMergeNode in="SourceGraphic"/> 
+                       </feMerge>
+                    </filter>
+                  </defs>
+                  
+                  <rect width="600" height="400" fill="url(#hero-gradient)" />
+                  
+                  <g filter="url(#hero-shadow)">
+                    {/* Main dashboard card */}
+                    <rect x="50" y="50" width="500" height="300" rx="12" fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth="1.5" />
+                    
+                    {/* Header */}
+                    <rect x="70" y="70" width="120" height="20" rx="4" fill="hsl(var(--muted))" />
+                    <rect x="450" y="75" width="80" height="10" rx="5" fill="hsl(var(--muted))" />
+
+                    {/* Left Panel with Line Chart */}
+                    <rect x="70" y="110" width="230" height="220" rx="8" fill="hsl(var(--background))" />
+                    <path d="M 85 280 C 120 220, 150 180, 185 200 S 240 250, 280 230" stroke="hsl(var(--primary))" strokeWidth="3" fill="none" strokeLinecap="round" />
+                    <circle cx="85" cy="280" r="4" fill="hsl(var(--primary))" />
+                    <circle cx="185" cy="200" r="4" fill="hsl(var(--primary))" />
+                    <circle cx="280" cy="230" r="4" fill="hsl(var(--primary))" />
+
+                    {/* Right Panel with Bar Chart */}
+                    <rect x="320" y="110" width="210" height="220" rx="8" fill="hsl(var(--background))" />
+                    <rect x="340" y="250" width="30" height="60" rx="4" fill="hsl(var(--accent) / 0.8)" />
+                    <rect x="380" y="220" width="30" height="90" rx="4" fill="hsl(var(--accent))" />
+                    <rect x="420" y="270" width="30" height="40" rx="4" fill="hsl(var(--accent) / 0.7)" />
+                    <rect x="460" y="240" width="30" height="70" rx="4" fill="hsl(var(--accent) / 0.9)" />
+                  </g>
+                </svg>
+              </div>
             </div>
           </div>
         </section>
