@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAppContext } from "@/contexts/app-context";
 import { calculateLinearRegression } from '@/lib/math-utils';
-import { TrendingDown } from 'lucide-react';
+import { TrendingDown, CalendarDays } from 'lucide-react';
 import type { InventoryItem, Transaction } from '@/lib/types';
 
 // Función para asociar transacciones a productos del inventario
@@ -28,6 +28,8 @@ const getSalesDataPerProduct = (transactions: Transaction[], inventory: Inventor
   return sales;
 };
 
+const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
 export default function DemandaPage() {
   const { inventory, transactions } = useAppContext();
 
@@ -39,22 +41,31 @@ export default function DemandaPage() {
     return inventory.map(item => {
       const itemSales = salesData[item.id];
       if (!itemSales || itemSales.length < 2) {
-        return { ...item, trend: 0, salesCount: itemSales?.length || 0 }; // No hay suficientes datos para tendencia
+        return { ...item, trend: 0, salesCount: itemSales?.length || 0, strongestDay: 'N/A' }; // No hay suficientes datos para tendencia
       }
 
-      // Convertimos las fechas a valores numéricos (días desde la primera venta)
+      // --- Cálculo de tendencia (regresión lineal) ---
       const firstSaleDate = itemSales.reduce((earliest, current) => current.date < earliest ? current.date : earliest, new Date()).getTime();
       const timeSeries = itemSales.map(sale => ({
         x: (sale.date.getTime() - firstSaleDate) / (1000 * 60 * 60 * 24), // días
         y: sale.quantity
       }));
-      
       const regression = calculateLinearRegression(timeSeries);
+
+      // --- Cálculo del día más fuerte ---
+      const salesPerDay = new Array(7).fill(0); // Domingo = 0, Sábado = 6
+      itemSales.forEach(sale => {
+        const dayOfWeek = sale.date.getDay();
+        salesPerDay[dayOfWeek] += sale.quantity;
+      });
+      const maxSales = Math.max(...salesPerDay);
+      const strongestDayIndex = salesPerDay.indexOf(maxSales);
 
       return {
         ...item,
         trend: regression.slope,
         salesCount: itemSales.length,
+        strongestDay: dayNames[strongestDayIndex],
       };
     }).filter(item => item.salesCount > 1); // Solo mostrar productos con al menos 2 ventas
   
@@ -66,7 +77,7 @@ export default function DemandaPage() {
     <PageWrapper>
       <PageHeader
         title="Análisis de Demanda"
-        description="Analiza la rotación de tus productos e identifica aquellos con poco movimiento usando regresión lineal."
+        description="Analiza la rotación de tus productos e identifica aquellos con poco movimiento y sus días de mayor venta."
       />
        <Card>
         <CardHeader>
@@ -83,6 +94,7 @@ export default function DemandaPage() {
                   <TableHead>Producto</TableHead>
                   <TableHead>Stock Actual</TableHead>
                   <TableHead className='text-center'>Tendencia (Ventas/Día)</TableHead>
+                  <TableHead className='text-center'>Día Fuerte</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -96,6 +108,12 @@ export default function DemandaPage() {
                          {item.trend.toFixed(4)}
                        </span>
                     </TableCell> 
+                    <TableCell className='text-center'>
+                      <span className="flex items-center justify-center gap-2 text-muted-foreground">
+                        <CalendarDays size={16} />
+                        {item.strongestDay}
+                      </span>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
