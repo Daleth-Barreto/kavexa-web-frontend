@@ -34,11 +34,13 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Input } from '../ui/input';
 
 const alertSchema = z.object({
   message: z.string().min(1, 'El mensaje es requerido.').max(100, 'El mensaje no puede tener más de 100 caracteres.'),
   recurrence: z.enum(['none', 'daily', 'weekly', 'monthly']).optional().default('none'),
-  date: z.date().optional(),
+  date: z.date(),
+  time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Formato de hora no válido.').optional(),
 });
 
 type AlertFormValues = z.infer<typeof alertSchema>;
@@ -57,6 +59,7 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
         message: '',
         recurrence: 'none',
         date: new Date(),
+        time: format(new Date(), 'HH:mm'),
     }
   });
 
@@ -66,16 +69,23 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
         message: '',
         recurrence: 'none',
         date: new Date(),
+        time: format(new Date(), 'HH:mm'),
       });
     }
   }, [open, form]);
 
 
   function handleFormSubmit(data: AlertFormValues) {
-    const alertData: Omit<Alert, 'id' | 'status' | 'type'> & { date: string } = {
+    const combinedDate = new Date(data.date);
+    if (data.time) {
+        const [hours, minutes] = data.time.split(':').map(Number);
+        combinedDate.setHours(hours, minutes, 0, 0);
+    }
+    
+    const alertData: Omit<Alert, 'id' | 'status' | 'type'> = {
         message: data.message,
         recurrence: data.recurrence as Alert['recurrence'],
-        date: format(data.date || new Date(), 'yyyy-MM-dd')
+        date: combinedDate.toISOString(),
     };
 
     addAlert(alertData);
@@ -110,48 +120,61 @@ export function AddAlertSheet({ open, onOpenChange }: AddAlertSheetProps) {
                 </FormItem>
               )}
             />
-            <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                    <FormLabel>Fecha del Recordatorio</FormLabel>
-                    <Popover>
-                        <PopoverTrigger asChild>
+            <div className="flex gap-4">
+                <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col flex-1">
+                        <FormLabel>Fecha</FormLabel>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                )}
+                                >
+                                {field.value ? (
+                                    format(field.value, "PPP", { locale: es })
+                                ) : (
+                                    <span>Elige una fecha</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                            </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                                initialFocus
+                            />
+                            </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="time"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col flex-1">
+                        <FormLabel>Hora</FormLabel>
                         <FormControl>
-                            <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                            )}
-                            >
-                            {field.value ? (
-                                format(field.value, "PPP", { locale: es })
-                            ) : (
-                                <span>Elige una fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
+                            <Input type="time" {...field} />
                         </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
-                            initialFocus
-                        />
-                        </PopoverContent>
-                    </Popover>
-                    <FormDescription>
-                        El día que se activará el recordatorio.
-                    </FormDescription>
-                    <FormMessage />
-                    </FormItem>
-                )}
-             />
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </div>
+            
             <FormField
                 control={form.control}
                 name="recurrence"

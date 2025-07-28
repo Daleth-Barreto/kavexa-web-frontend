@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles, Megaphone, PlusCircle, History } from "lucide-react";
+import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles, Megaphone, PlusCircle, History, Clock } from "lucide-react";
 import { useAppContext, useCurrency } from "@/contexts/app-context";
 import type { Alert } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -52,12 +52,13 @@ export default function AlertasPage() {
       if (alert.id !== id) return alert;
 
       if (status === 'resolved' && alert.recurrence && alert.recurrence !== 'none') {
-        const today = new Date();
+        const startDate = new Date(alert.date);
         let nextRecurrenceDate: string | undefined;
+
         switch(alert.recurrence) {
-            case 'daily': nextRecurrenceDate = addDays(today, 1).toISOString(); break;
-            case 'weekly': nextRecurrenceDate = addWeeks(today, 1).toISOString(); break;
-            case 'monthly': nextRecurrenceDate = addMonths(today, 1).toISOString(); break;
+            case 'daily': nextRecurrenceDate = addDays(startDate, 1).toISOString(); break;
+            case 'weekly': nextRecurrenceDate = addWeeks(startDate, 1).toISOString(); break;
+            case 'monthly': nextRecurrenceDate = addMonths(startDate, 1).toISOString(); break;
         }
         return { ...alert, status, nextRecurrenceDate };
       }
@@ -93,6 +94,17 @@ export default function AlertasPage() {
     toast({ title: 'Suscripción Pagada', description: `Se registró el pago de ${subscription.name}`});
   }
   
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const datePart = date.toLocaleDateString('es-ES');
+    // Check if the time is midnight, if so, don't show it
+    if(date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0) {
+        return datePart;
+    }
+    const timePart = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    return `${datePart} - ${timePart}`;
+  }
+
   return (
     <PageWrapper>
       <PageHeader
@@ -124,7 +136,10 @@ export default function AlertasPage() {
                              {alertIcons[alert.type as keyof typeof alertIcons] || <ShieldAlert className="h-4 w-4" />}
                             <span>{alert.message}</span>
                         </div>
-                        <div className='text-xs text-muted-foreground pl-6'>{new Date(alert.date).toLocaleDateString('es-ES')}</div>
+                        <div className='text-xs text-muted-foreground pl-6 flex items-center gap-1.5 mt-1'>
+                            <Clock className="h-3 w-3" />
+                            {formatDate(alert.date)}
+                        </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                         {alert.recurrence && alert.recurrence !== 'none' && (

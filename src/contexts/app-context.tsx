@@ -19,7 +19,7 @@ interface AppContextType {
   setInventory: (value: InventoryItem[] | ((val: InventoryItem[]) => InventoryItem[])) => void;
   alerts: Alert[];
   setAlerts: (value: Alert[] | ((val: Alert[]) => Alert[])) => void;
-  addAlert: (alert: Omit<Alert, 'id' | 'status' | 'type'> & { date: string }) => void;
+  addAlert: (alert: Omit<Alert, 'id' | 'status' | 'type'>) => void;
   subscriptions: Subscription[];
   setSubscriptions: (value: Subscription[] | ((val: Subscription[]) => Subscription[])) => void;
   clients: Client[];
@@ -74,11 +74,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isDataLoaded || !config.enabledModules?.alertas) return;
     
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
-    const currentDate = today.getDate();
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const currentDate = now.getDate();
 
     let alertsHaveChanged = false;
     
@@ -86,14 +85,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const dueSubscriptions: Alert[] = [];
     subscriptions.forEach(sub => {
       const isAlreadyPaid = sub.lastPaidMonth === currentMonth && sub.lastPaidYear === currentYear;
-      const isAlertExisting = alerts.some(a => a.type === 'subscription_due' && a.relatedId === sub.id && a.status === 'new' && isSameMonth(new Date(a.date), today) && isSameYear(new Date(a.date), today));
+      const isAlertExisting = alerts.some(a => a.type === 'subscription_due' && a.relatedId === sub.id && a.status === 'new' && isSameMonth(new Date(a.date), now) && isSameYear(new Date(a.date), now));
 
       if (currentDate >= sub.paymentDay && !isAlreadyPaid && !isAlertExisting) {
         dueSubscriptions.push({
           id: `alert-sub-${sub.id}-${currentYear}-${currentMonth}`,
           type: 'subscription_due',
           message: `Suscripción pendiente: ${sub.name}`,
-          date: new Date().toISOString().split('T')[0],
+          date: new Date().toISOString(),
           status: 'new',
           relatedId: sub.id,
         });
@@ -114,14 +113,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const updatedAlerts = alerts.map(alert => {
         if (alert.type === 'custom' && alert.recurrence && alert.recurrence !== 'none' && alert.status === 'resolved' && alert.nextRecurrenceDate) {
             const nextDate = new Date(alert.nextRecurrenceDate);
-            nextDate.setHours(0,0,0,0);
-
-            if (today >= nextDate) {
+            
+            if (now >= nextDate) {
                 alertsHaveChanged = true;
                 return {
                     ...alert,
                     status: 'new' as const,
-                    date: new Date().toISOString().split('T')[0]
+                    date: new Date().toISOString()
                 }
             }
         }
@@ -163,7 +161,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             id: `alert-opportunity-${productId}`,
             type: 'selling_opportunity',
             message: `El día fuerte para "${product.name}" es el ${strongestDay}. ¡Aprovéchalo!`,
-            date: new Date().toISOString().split('T')[0],
+            date: new Date().toISOString(),
             status: 'new',
             relatedId: productId,
         };
@@ -176,7 +174,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
   }, [inventory, alerts, setAlerts, toast, config.enabledModules.alertas]);
 
-    const addAlert = useCallback((data: Omit<Alert, 'id' | 'status' | 'type'> & { date: string }) => {
+    const addAlert = useCallback((data: Omit<Alert, 'id' | 'status' | 'type'>) => {
         const startDate = new Date(data.date);
         let nextRecurrenceDate: string | undefined = undefined;
 
@@ -241,7 +239,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             id: `alert-${Date.now()}`,
             type: 'unusual_expense',
             message: `Egreso inusual detectado: ${newTransaction.description} por $${newTransaction.amount.toFixed(2)}`,
-            date: new Date().toISOString().split('T')[0],
+            date: new Date().toISOString(),
             status: 'new',
             relatedId: newTransaction.id,
           };
@@ -269,7 +267,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                             id: `alert-stock-${Date.now()}`,
                             type: 'low_stock',
                             message: `Nivel de stock bajo para ${item.name}`,
-                            date: new Date().toISOString().split('T')[0],
+                            date: new Date().toISOString(),
                             status: 'new',
                             relatedId: item.id,
                         };
