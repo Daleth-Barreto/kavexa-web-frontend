@@ -62,8 +62,9 @@ export default function InicioPage() {
   }, [transactions]);
 
   const recentAlerts = useMemo(() => {
+    const now = new Date();
     return alerts
-      .filter(a => a.status === 'new')
+      .filter(a => a.status === 'new' && new Date(a.date) <= now)
       .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 5);
   }, [alerts]);
