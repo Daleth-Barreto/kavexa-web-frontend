@@ -149,5 +149,4 @@ A continuación se detalla el propósito de cada módulo y los componentes clave
 4.  Abre [http://localhost:9002](http://localhost:9002) en tu navegador para ver la aplicación.
 
 ---
-
-Esperamos que esta guía te sea de gran ayuda. ¡Feliz codificación!
+¡Feliz codificación!
