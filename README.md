@@ -19,19 +19,21 @@ La aplicación está construida con un stack moderno y enfocado en la productivi
 - **Gestión de Formularios:** [React Hook Form](https://react-hook-form.com/)
 - **Validación de Esquemas:** [Zod](https://zod.dev/)
 - **Iconos:** [Lucide React](https://lucide.dev/)
+- **PWA:** [@ducanh2912/next-pwa](https://www.npmjs.com/package/@ducanh2912/next-pwa) para la funcionalidad offline.
 
 ## 3. Arquitectura y Conceptos Clave
 
 Entender estos conceptos es fundamental para trabajar en Kavexa.
 
-### 3.1. Enfoque "Local-First"
+### 3.1. Enfoque "Local-First" y Offline (PWA)
 
 Esta es la característica más importante de la arquitectura. **Todos los datos del usuario se almacenan en el `localStorage` del navegador.**
 
 - **¿Cómo funciona?** A través del hook `useLocalStorage` (`src/hooks/use-local-storage.ts`). Este hook actúa como el `useState` de React, pero sincroniza automáticamente el estado con el `localStorage`.
+- **Funcionalidad Offline:** Kavexa es una PWA. Utiliza un *Service Worker* (configurado a través de `next-pwa`) para cachear todos los recursos de la aplicación (páginas, scripts, estilos). Esto permite que la aplicación se cargue y funcione perfectamente sin conexión a internet después de la primera visita.
 - **Ventajas:**
   - **Velocidad Extrema:** No hay esperas de red. La lectura y escritura de datos es instantánea.
-  - **Funcionalidad Offline:** La aplicación funciona perfectamente sin conexión.
+  - **Funcionalidad Offline Completa:** La aplicación funciona perfectamente sin conexión.
   - **Privacidad:** Los datos del negocio no salen del dispositivo del usuario.
 
 ### 3.2. Gestión de Estado Global: `AppContext`
