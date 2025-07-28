@@ -176,8 +176,7 @@ export default function MovimientosPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Descripción</TableHead>
-                    <TableHead>Categoría</TableHead>
-                    <TableHead>Fecha</TableHead>
+                    <TableHead className="hidden sm:table-cell">Categoría</TableHead>
                     <TableHead className="text-right">Monto</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
@@ -185,11 +184,15 @@ export default function MovimientosPage() {
                 <TableBody>
                   {filteredTransactions.map((transaction) => (
                     <TableRow key={transaction.id}>
-                      <TableCell className="font-medium">{transaction.description}</TableCell>
                       <TableCell>
+                        <div className="font-medium">{transaction.description}</div>
+                        <div className="text-xs text-muted-foreground sm:hidden">
+                            {new Date(transaction.date).toLocaleDateString('es-ES')} &middot; {transaction.category}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         <Badge variant="outline">{transaction.category}</Badge>
                       </TableCell>
-                      <TableCell>{new Date(transaction.date).toLocaleDateString('es-ES')}</TableCell>
                       <TableCell className={`text-right font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                         {transaction.type === 'income' ? '+' : '-'}
                         {formatCurrency(transaction.amount)}
