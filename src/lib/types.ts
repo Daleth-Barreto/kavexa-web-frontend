@@ -22,7 +22,7 @@ export type InventoryItem = {
 
 export type Alert = {
   id:string;
-  type: 'low_stock' | 'unusual_expense' | 'subscription_due';
+  type: 'low_stock' | 'unusual_expense' | 'subscription_due' | 'selling_opportunity';
   message: string;
   date: string;
   status: 'new' | 'ignored' | 'resolved';

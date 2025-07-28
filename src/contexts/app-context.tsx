@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { isSameMonth, isSameYear } from 'date-fns';
 import { useRouter } from 'next/navigation';
 
+const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
 interface AppContextType {
   transactions: Transaction[];
   setTransactions: (value: Transaction[] | ((val: Transaction[]) => Transaction[])) => void;
@@ -105,6 +107,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDataLoaded, subscriptions, config.enabledModules?.alertas]);
 
+  const checkForSellingOpportunity = useCallback((productId: string, currentTransactions: Transaction[]) => {
+      const product = inventory.find(p => p.id === productId);
+      if (!product || !config.enabledModules.alertas) return;
+
+      const productSales = currentTransactions.filter(t => t.type === 'income' && t.productId === productId);
+      
+      const MIN_SALES_FOR_ANALYSIS = 5;
+      if (productSales.length < MIN_SALES_FOR_ANALYSIS) return;
+
+      const alertExists = alerts.some(a => a.type === 'selling_opportunity' && a.relatedId === productId);
+      if (alertExists) return;
+
+      const salesPerDay = new Array(7).fill(0); // Domingo = 0, Sábado = 6
+      productSales.forEach(sale => {
+          const dayOfWeek = new Date(sale.date).getDay();
+          salesPerDay[dayOfWeek] += sale.quantity || 1;
+      });
+
+      const maxSales = Math.max(...salesPerDay);
+      if(maxSales > 0){
+        const strongestDayIndex = salesPerDay.indexOf(maxSales);
+        const strongestDay = dayNames[strongestDayIndex];
+        
+        const newAlert: Alert = {
+            id: `alert-opportunity-${productId}`,
+            type: 'selling_opportunity',
+            message: `El día fuerte para "${product.name}" es el ${strongestDay}. ¡Aprovéchalo!`,
+            date: new Date().toISOString().split('T')[0],
+            status: 'new',
+            relatedId: productId,
+        };
+
+        setAlerts(prev => [newAlert, ...prev]);
+        toast({
+            title: 'Oportunidad de Venta',
+            description: `Hemos identificado el día de mayor venta para ${product.name}.`,
+        });
+      }
+  }, [inventory, alerts, setAlerts, toast, config.enabledModules.alertas]);
+
 
   const addTransaction = useCallback((data: Omit<Transaction, 'id' | 'date'> & { date?: string }) => {
     const newTransaction: Transaction = {
@@ -185,9 +227,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 return item;
             });
         });
+
+        checkForSellingOpportunity(productId, updatedTransactions);
     }
 
-  }, [transactions, setTransactions, setAlerts, setInventory, setClients, toast, config.enabledModules]);
+  }, [transactions, setTransactions, setAlerts, setInventory, setClients, toast, config.enabledModules, checkForSellingOpportunity]);
 
   const editTransaction = useCallback((updatedTransaction: Transaction) => {
     setTransactions(prev => prev.map(t => t.id === updatedTransaction.id ? updatedTransaction : t));

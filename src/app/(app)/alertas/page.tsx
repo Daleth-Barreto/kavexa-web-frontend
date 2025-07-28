@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Trash2, ShieldAlert, Repeat, DollarSign } from "lucide-react";
+import { Check, Trash2, ShieldAlert, Repeat, DollarSign, Sparkles } from "lucide-react";
 import { useAppContext, useCurrency } from "@/contexts/app-context";
 import type { Alert, Subscription } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +27,7 @@ const alertIcons = {
   unusual_expense: <ShieldAlert className="h-4 w-4 text-yellow-500" />,
   low_stock: <ShieldAlert className="h-4 w-4 text-orange-500" />,
   subscription_due: <Repeat className="h-4 w-4 text-blue-500" />,
+  selling_opportunity: <Sparkles className="h-4 w-4 text-purple-500" />,
 }
 
 export default function AlertasPage() {
