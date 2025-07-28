@@ -132,8 +132,8 @@ A continuación se detalla el propósito de cada módulo y los componentes clave
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [URL_DEL_REPOSITORIO]
-    cd [NOMBRE_DEL_DIRECTORIO]
+    git clone https://github.com/Daleth-Barreto/kavexa-web-frontend.git
+    cd kavexa-web-frontend
     ```
 
 2.  **Instalar dependencias:**
