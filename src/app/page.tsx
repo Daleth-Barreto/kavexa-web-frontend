@@ -44,7 +44,7 @@ export default function LandingPage() {
               </div>
               <div className="mx-auto flex items-center justify-center aspect-[3/2] overflow-hidden rounded-xl sm:w-full lg:order-last">
                  <Image
-                  src="/hero-image.jpg"
+                  src="/hero-image.png"
                   width={600}
                   height={400}
                   alt="Gestión de negocio con Kavexa"
@@ -69,3 +69,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
