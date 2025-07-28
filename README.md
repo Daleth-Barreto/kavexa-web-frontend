@@ -1,56 +1,132 @@
-# Kavexa - Asistente Inteligente para Negocios
+# Kavexa - Documentación para Desarrolladores
 
-Kavexa es una aplicación web progresiva (PWA) diseñada para ser el centro de control definitivo para pequeñas y medianas empresas (PYMES). Construida con un enfoque "local-first", toda la información se almacena directamente en tu navegador, garantizando una experiencia de usuario increíblemente rápida y la capacidad de funcionar completamente sin conexión a internet.
+Bienvenido al repositorio de Kavexa. Este documento sirve como una guía técnica para los desarrolladores que trabajan en el proyecto. Está diseñado para ser claro y conciso, especialmente para programadores de nivel junior.
 
-La aplicación es modular, permitiendo a cada usuario personalizar la interfaz para adaptarla perfectamente a las necesidades específicas de su negocio, ya sea un gimnasio, una cafetería, una tienda minorista o un proveedor de servicios.
+## 1. Visión General del Proyecto
 
-![Kavexa Dashboard](https://placehold.co/800x400.png)
-*La imagen de arriba es un marcador de posición. Reemplazar con una captura de pantalla real del dashboard.*
+Kavexa es una Aplicación Web Progresiva (PWA) modular construida con un enfoque **"local-first"**. Su objetivo es proporcionar a las pequeñas y medianas empresas (PYMES) un conjunto de herramientas para gestionar sus operaciones diarias, desde las finanzas hasta el inventario y los clientes. La aplicación es 100% funcional sin conexión a internet.
 
-## ✨ Características Principales
+## 2. Stack Tecnológico
 
-Kavexa está compuesto por una suite de módulos integrados que puedes activar o desactivar según lo necesites:
+La aplicación está construida con un stack moderno y enfocado en la productividad y el rendimiento.
 
-- **🏠 Inicio:** Un dashboard centralizado que ofrece un resumen visual de la salud financiera y operativa de tu negocio, incluyendo ingresos, egresos, balance y actividad reciente.
-- **💸 Movimientos:** Un registro detallado de todas las transacciones financieras (ingresos y egresos), con potentes filtros por mes y año.
-- **🛒 Punto de Venta (POS):** Una interfaz de ventas rápida y eficiente. Selecciona productos de tu inventario, añádelos a un carrito y registra la venta en segundos.
-- **📦 Inventario:** Gestiona tus productos, controla los niveles de stock y precios. Recibe alertas automáticas cuando el stock esté bajo.
-- **👥 Clientes:** Administra tu base de clientes o miembros. Ideal para negocios basados en membresías como gimnasios o estudios.
-- **🚚 Proveedores:** Mantén un registro organizado de la información de contacto de tus proveedores.
-- **🔁 Suscripciones:** Lleva un control de tus pagos recurrentes (alquiler, servicios, software) y recibe alertas antes de la fecha de vencimiento para que nunca se te pase un pago.
-- **📈 Análisis de Demanda:** Identifica productos con baja rotación utilizando un análisis de regresión lineal sobre tus datos de ventas.
-- **📊 Proyección Financiera:** Anticipa el flujo de caja futuro de tu negocio con una proyección a 90 días basada en una media móvil de tu actividad reciente.
-- **🔔 Alertas Inteligentes:** Un sistema proactivo que te notifica sobre gastos inusuales, niveles bajos de stock y pagos de suscripciones pendientes.
-- **📄 Reportes:** Una sección preparada para generar y descargar informes detallados de tu actividad.
-
-## 🚀 Stack Tecnológico
-
-Kavexa está construido con un conjunto de tecnologías modernas, enfocadas en el rendimiento y la experiencia del desarrollador:
-
-- **Framework:** [Next.js](https://nextjs.org/) (con App Router)
+- **Framework:** [Next.js](https://nextjs.org/) (usando el App Router)
 - **Lenguaje:** [TypeScript](https://www.typescriptlang.org/)
-- **UI:** [React](https://reactjs.org/)
+- **Librería de UI:** [React](https://reactjs.org/)
 - **Estilos:** [Tailwind CSS](https://tailwindcss.com/)
-- **Componentes UI:** [Shadcn/UI](https://ui.shadcn.com/) - Una colección de componentes accesibles y personalizables.
+- **Componentes UI:** [Shadcn/UI](https://ui.shadcn.com/) - Una colección de componentes reusables, accesibles y personalizables.
 - **Gráficos:** [Recharts](https://recharts.org/)
 - **Gestión de Formularios:** [React Hook Form](https://react-hook-form.com/)
 - **Validación de Esquemas:** [Zod](https://zod.dev/)
 - **Iconos:** [Lucide React](https://lucide.dev/)
 
-## 🏛️ Arquitectura y Conceptos Clave
+## 3. Arquitectura y Conceptos Clave
 
-- **Enfoque Local-First:** La característica principal de Kavexa es que todos los datos (transacciones, inventario, etc.) se guardan en el `localStorage` del navegador del usuario. Esto ofrece varias ventajas:
-  - **Velocidad Extrema:** No hay esperas de red para cargar o guardar datos.
-  - **Funcionalidad Offline:** La aplicación es 100% funcional sin conexión a internet.
-  - **Privacidad:** Los datos del usuario nunca salen de su dispositivo.
+Entender estos conceptos es fundamental para trabajar en Kavexa.
 
-- **Gestión de Estado Centralizada:** El estado global de la aplicación es manejado a través del Context API de React. El archivo `src/contexts/app-context.tsx` es el "cerebro" de la aplicación, donde se define y se provee toda la lógica de negocio y los datos a los componentes.
+### 3.1. Enfoque "Local-First"
 
-- **Diseño Modular:** La aplicación permite a los usuarios elegir qué módulos desean usar a través de una pantalla de bienvenida y la página de configuración. El menú de navegación y las rutas disponibles se adaptan dinámicamente a la selección del usuario.
+Esta es la característica más importante de la arquitectura. **Todos los datos del usuario se almacenan en el `localStorage` del navegador.**
 
-## 🏁 Cómo Empezar
+- **¿Cómo funciona?** A través del hook `useLocalStorage` (`src/hooks/use-local-storage.ts`). Este hook actúa como el `useState` de React, pero sincroniza automáticamente el estado con el `localStorage`.
+- **Ventajas:**
+  - **Velocidad Extrema:** No hay esperas de red. La lectura y escritura de datos es instantánea.
+  - **Funcionalidad Offline:** La aplicación funciona perfectamente sin conexión.
+  - **Privacidad:** Los datos del negocio no salen del dispositivo del usuario.
 
-Para ejecutar este proyecto en un entorno de desarrollo local, sigue estos pasos:
+### 3.2. Gestión de Estado Global: `AppContext`
+
+El archivo `src/contexts/app-context.tsx` es el **cerebro de la aplicación**.
+
+- **¿Qué es?** Es un Contexto de React que provee a toda la aplicación de los datos y las funciones necesarias para operar.
+- **¿Qué contiene?**
+  - **Estados:** Los arrays de `transactions`, `inventory`, `clients`, `providers`, etc., que se obtienen del `useLocalStorage`.
+  - **Configuración:** El estado `config`, que almacena la moneda, las preferencias de módulos y si el onboarding se completó.
+  - **Funciones de Lógica de Negocio:** Contiene funciones cruciales como `addTransaction`, `editTransaction`, `clearAllData`, etc. Estas funciones no solo actualizan el estado, sino que también contienen la lógica de negocio (ej. actualizar el stock al hacer una venta, generar una alerta por un gasto inusual).
+
+**Para usarlo en un componente:** Simplemente importa el hook `useAppContext` y úsalo para acceder a cualquier dato o función que necesites.
+
+```tsx
+// Ejemplo de uso
+import { useAppContext } from '@/contexts/app-context';
+
+function MyComponent() {
+  const { transactions, addTransaction } = useAppContext();
+  // ...
+}
+```
+
+### 3.3. Diseño Modular
+
+Kavexa no es una aplicación monolítica. El usuario puede elegir qué módulos usar.
+
+- **Selección de Módulos:** La página `/welcome` permite al usuario seleccionar los módulos que necesita. Esta configuración se guarda en `config.enabledModules`.
+- **Menú Dinámico:** El componente de navegación `src/components/kavexa/nav.tsx` lee esta configuración y renderiza dinámicamente solo los enlaces a los módulos activados.
+- **Rutas Protegidas:** El layout principal `src/app/(app)/layout.tsx` verifica si el `onboardingComplete` es `true`. Si no, redirige al usuario a la página `/welcome`.
+
+## 4. Estructura de Archivos
+
+La estructura del proyecto sigue las convenciones de Next.js App Router.
+
+```
+src
+├── app/
+│   ├── (app)/                # Rutas que usan el layout principal de la app
+│   │   ├── layout.tsx        # Layout con la barra lateral y cabecera
+│   │   ├── inicio/
+│   │   ├── movimientos/
+│   │   └── ... (todas las páginas de los módulos)
+│   ├── welcome/              # Página de bienvenida y selección de módulos
+│   ├── login/
+│   ├── globals.css           # Estilos globales y variables de CSS para el tema
+│   └── layout.tsx            # Layout raíz de la aplicación
+├── components/
+│   ├── kavexa/               # Componentes de UI específicos de la aplicación
+│   └── ui/                   # Componentes genéricos de Shadcn/UI
+├── contexts/
+│   ├── app-context.tsx       # El "cerebro" de la app
+│   └── auth-context.tsx      # Maneja el estado de autenticación (futuro)
+├── hooks/
+│   └── use-local-storage.ts  # Hook para interactuar con localStorage
+├── lib/
+│   ├── data.ts               # Datos iniciales/mock y configuración de módulos
+│   ├── types.ts              # Definiciones de tipos de TypeScript (muy importante)
+│   └── utils.ts              # Funciones de utilidad (ej. cn para clases de Tailwind)
+└── ...
+```
+
+## 5. Guía de Módulos
+
+A continuación se detalla el propósito de cada módulo y los componentes clave asociados.
+
+- **`inicio`**: Dashboard principal. Muestra resúmenes financieros (`summary`) y gráficos (`chartData`) calculados en `useMemo` para optimizar el rendimiento. También muestra `Actividad Reciente`, que es una combinación de las últimas alertas y notificaciones de inventario.
+
+- **`movimientos`**: Gestiona todas las transacciones. Usa `useMemo` para filtrar las transacciones por mes, año y término de búsqueda. El gráfico de pastel `egressByCategory` muestra la distribución de gastos.
+  - **Componente Clave:** `AddTransactionSheet`, un formulario complejo con lógica condicional para manejar diferentes tipos de ingresos y egresos.
+
+- **`pos` (Punto de Venta)**: Una interfaz rápida para ventas. Mantiene un estado local (`cart`) para el carrito de compras. Al finalizar la venta (`handleCheckout`), llama a la función `addTransaction` del `AppContext` para registrar cada item como una transacción de ingreso y actualizar el inventario.
+
+- **`inventario`**: CRUD (Crear, Leer, Actualizar, Borrar) para los productos. Muestra una insignia (`Badge`) de color rojo si el `stock` es menor que el `lowStockThreshold`.
+  - **Componente Clave:** `ProductFormSheet`, el formulario para añadir y editar productos.
+
+- **`clientes`**: CRUD para la base de clientes. Pensado también para gestionar membresías (ej. gimnasios). El estado "Activo/Inactivo" y la "Última Compra" ayudan a controlar el estado de los miembros.
+
+- **`proveedores`**: CRUD simple para la información de contacto de los proveedores. Su estructura es muy similar a la del módulo de Clientes.
+
+- **`suscripciones`**: Permite registrar gastos fijos mensuales (egresos).
+  - **Lógica Clave:** En `app-context.tsx`, un `useEffect` se encarga de revisar periódicamente si una suscripción está por vencer y genera una alerta (`subscription_due`) si es necesario.
+
+- **`demanda`**: Identifica productos con tendencia de ventas a la baja.
+  - **Lógica Clave:** Usa la función `calculateLinearRegression` (`src/lib/math-utils.ts`) sobre el historial de ventas de cada producto para calcular la pendiente de la tendencia.
+
+- **`proyeccion`**: Estima el flujo de caja futuro.
+  - **Lógica Clave:** Calcula una media móvil de los ingresos/egresos netos de los últimos 30 días y la proyecta a futuro para estimar el balance.
+
+- **`alertas`**: Muestra las notificaciones generadas por el sistema. Permite al usuario interactuar con ellas (marcar como resuelta, ignorar o pagar una suscripción).
+
+- **`perfil`**: Permite al usuario configurar la aplicación (moneda, tema oscuro/claro, módulos activados). También contiene la lógica para importar/exportar datos en formato CSV y para borrar todos los datos locales.
+
+## 6. Cómo Empezar (Desarrollo Local)
 
 1.  **Clonar el repositorio:**
     ```bash
@@ -70,11 +146,6 @@ Para ejecutar este proyecto en un entorno de desarrollo local, sigue estos pasos
 
 4.  Abre [http://localhost:9002](http://localhost:9002) en tu navegador para ver la aplicación.
 
-## 💡 Futuras Mejoras
+---
 
-Kavexa está construido para ser escalable. Algunas de las futuras mejoras planeadas incluyen:
-
-- **Sincronización en la Nube:** Ofrecer un sistema de cuentas opcional para sincronizar los datos de forma segura entre dispositivos.
-- **Funcionalidades de IA:** Integrar Genkit para ofrecer análisis más profundos, sugerencias proactivas y automatización de tareas.
-- **Exportación a PDF:** Implementar la funcionalidad completa de generación de reportes en formato PDF.
-- **Temas Personalizables:** Permitir al usuario definir sus propios esquemas de colores.
+Esperamos que esta guía te sea de gran ayuda. ¡Feliz codificación!
