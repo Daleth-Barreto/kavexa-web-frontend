@@ -28,26 +28,26 @@ const RainingHeartsCloud = () => {
 
                 @keyframes fall {
                     0% {
-                        transform: translateY(40px) translateX(0) scale(0.3);
+                        transform: translateY(60px) translateX(0) scale(0.3);
                         opacity: 0;
                     }
                     10% {
                         opacity: 1;
                     }
                     25% {
-                         transform: translateY(70px) translateX(5px) scale(0.7);
+                         transform: translateY(90px) translateX(5px) scale(0.7);
                     }
                      50% {
                          transform: translateY(120px) translateX(-5px) scale(0.6);
                     }
                     75% {
-                         transform: translateY(170px) translateX(5px) scale(0.5);
+                         transform: translateY(140px) translateX(5px) scale(0.5);
                     }
                     90% {
                          opacity: 1;
                     }
                     100% {
-                        transform: translateY(220px) translateX(0) scale(0.4);
+                        transform: translateY(160px) translateX(0) scale(0.4);
                         opacity: 0;
                     }
                 }
