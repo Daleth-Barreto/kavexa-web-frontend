@@ -32,6 +32,7 @@ import {
 import { ClientFormSheet } from "@/components/kavexa/client-form-sheet";
 
 const romanticMessages = ["Mi mujer ❤️", "Mi nubecita ☁️", "Mi cacahuatito 🥜"];
+const romanticDates = ["12/06/2004", "11/03/2024"];
 
 export default function ClientesPage() {
   const { clients, setClients } = useAppContext();
@@ -42,6 +43,7 @@ export default function ClientesPage() {
   const [itemToDelete, setItemToDelete] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [specialMessage, setSpecialMessage] = useState(romanticMessages[0]);
+  const [specialDate, setSpecialDate] = useState(romanticDates[0]);
   
   const isSpecialSearch = useMemo(() => {
     const lowerCaseSearch = searchTerm.toLowerCase();
@@ -57,6 +59,7 @@ export default function ClientesPage() {
   useEffect(() => {
     if (isSpecialSearch) {
       setSpecialMessage(romanticMessages[Math.floor(Math.random() * romanticMessages.length)]);
+      setSpecialDate(romanticDates[Math.floor(Math.random() * romanticDates.length)]);
     }
   }, [isSpecialSearch]);
 
@@ -147,7 +150,7 @@ export default function ClientesPage() {
                         María Fernanda Velasco Campos
                     </TableCell>
                     <TableCell>{specialMessage}</TableCell>
-                    <TableCell>12/06/2004</TableCell>
+                    <TableCell>{specialDate}</TableCell>
                     <TableCell>
                         <Badge variant="default" className="bg-pink-500 hover:bg-pink-600">Para Siempre</Badge>
                     </TableCell>
