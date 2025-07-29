@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Edit, PlusCircle, Trash, MoreVertical } from "lucide-react";
+import { Edit, PlusCircle, Trash, MoreVertical, Heart } from "lucide-react";
 import type { Client } from "@/lib/types";
 import { useAppContext } from "@/contexts/app-context";
 import {
@@ -29,6 +30,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ClientFormSheet } from "@/components/kavexa/client-form-sheet";
 
+const romanticMessages = ["Mi mujer ❤️", "Mi nubecita ☁️", "Mi cacahuatito 🥜"];
+
 export default function ClientesPage() {
   const { clients, setClients } = useAppContext();
   const [isSheetOpen, setSheetOpen] = useState(false);
@@ -36,13 +39,26 @@ export default function ClientesPage() {
   const [selectedItem, setSelectedItem] = useState<Client | null>(null);
   const [itemToDelete, setItemToDelete] = useState<Client | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [specialMessage, setSpecialMessage] = useState(romanticMessages[0]);
+  
+  const isSpecialSearch = useMemo(() => {
+    const lowerCaseSearch = searchTerm.toLowerCase();
+    return ['maria fernanda velasco campos', 'mafer', 'mafer<3'].includes(lowerCaseSearch);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (isSpecialSearch) {
+      setSpecialMessage(romanticMessages[Math.floor(Math.random() * romanticMessages.length)]);
+    }
+  }, [isSpecialSearch]);
 
   const filteredClients = useMemo(() => {
+    if (isSpecialSearch) return [];
     return clients.filter(c => 
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.email.toLowerCase().includes(searchTerm.toLowerCase())
+      (c.email && c.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
-  }, [clients, searchTerm]);
+  }, [clients, searchTerm, isSpecialSearch]);
 
   const handleAddClick = () => {
     setSelectedItem(null);
@@ -104,18 +120,32 @@ export default function ClientesPage() {
                     className="md:max-w-sm"
                 />
             </div>
-          {filteredClients.length > 0 ? (
+          {filteredClients.length > 0 || isSpecialSearch ? (
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Contacto</TableHead>
-                  <TableHead>Último Pago/Compra</TableHead>
+                  <TableHead>Fecha Especial</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right w-[50px]">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {isSpecialSearch && (
+                  <TableRow className="bg-primary/5 hover:bg-primary/10">
+                    <TableCell className="font-medium flex items-center gap-2">
+                        <Heart className="text-red-500" />
+                        María Fernanda Velasco Campos
+                    </TableCell>
+                    <TableCell>{specialMessage}</TableCell>
+                    <TableCell>12/06/2004</TableCell>
+                    <TableCell>
+                        <Badge variant="default" className="bg-pink-500 hover:bg-pink-600">Para Siempre</Badge>
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                )}
                 {filteredClients.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
@@ -181,7 +211,7 @@ export default function ClientesPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Continuar</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete} variant="destructive">Continuar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
