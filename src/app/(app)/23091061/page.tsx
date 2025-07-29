@@ -12,7 +12,7 @@ const RainingHeartsCloud = () => {
                 .heart-rain-drop {
                     position: absolute;
                     bottom: 0;
-                    animation: fall linear infinite, sway 2s ease-in-out infinite alternate;
+                    animation: fall 4s linear infinite;
                     opacity: 0;
                     color: hsl(var(--primary));
                 }
@@ -28,28 +28,27 @@ const RainingHeartsCloud = () => {
 
                 @keyframes fall {
                     0% {
-                        transform: translateY(-20px) scale(0.3);
+                        transform: translateY(-20px) translateX(0) scale(0.3);
                         opacity: 0;
                     }
                     10% {
-                        transform: translateY(0px) scale(0.7);
                         opacity: 1;
+                    }
+                    25% {
+                         transform: translateY(30px) translateX(5px) scale(0.7);
+                    }
+                     50% {
+                         transform: translateY(60px) translateX(-5px) scale(0.6);
+                    }
+                    75% {
+                         transform: translateY(90px) translateX(5px) scale(0.5);
                     }
                     90% {
                          opacity: 1;
                     }
                     100% {
-                        transform: translateY(120px) scale(0.5);
+                        transform: translateY(130px) translateX(0) scale(0.4);
                         opacity: 0;
-                    }
-                }
-                
-                @keyframes sway {
-                    from {
-                        transform: translateX(-5px);
-                    }
-                    to {
-                        transform: translateX(5px);
                     }
                 }
             `}</style>
@@ -81,11 +80,11 @@ const RainingHeartsCloud = () => {
                 />
             </svg>
 
-            {[...Array(10)].map((_, i) => {
+            {[...Array(15)].map((_, i) => {
                  const style = {
                     left: `${15 + Math.random() * 70}%`,
-                    animationDuration: `${3 + Math.random() * 2}s, ${2 + Math.random() * 2}s`,
-                    animationDelay: `${Math.random() * 4}s, ${Math.random() * 2}s`
+                    animationDuration: `${3 + Math.random() * 2}s`,
+                    animationDelay: `${Math.random() * 4}s`
                 };
                 return (
                     <div key={i} className="heart-rain-drop" style={style}>
