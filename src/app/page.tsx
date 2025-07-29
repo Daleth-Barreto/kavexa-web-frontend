@@ -3,13 +3,15 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MessageSquareQuote } from 'lucide-react';
 import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
 import { AbstractDashboard } from '@/components/kavexa/abstract-dashboard';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LandingPage() {
   const { toast } = useToast();
+  const GOOGLE_FORM_URL = "https://forms.gle/sYJRQ3rWXpjxjcCZ7";
+
 
   const handleComingSoon = () => {
     toast({
@@ -55,6 +57,12 @@ export default function LandingPage() {
                     Empezar Gratis <ArrowRight className="ml-2"/>
                 </Link>
             </Button>
+             <Button variant="outline" size="lg" asChild>
+                <Link href={GOOGLE_FORM_URL} target="_blank">
+                  <MessageSquareQuote className="mr-2 h-4 w-4" />
+                  Danos tu opinión
+                </Link>
+              </Button>
         </div>
         <div className="w-full max-w-4xl mt-12">
             <AbstractDashboard className="rounded-xl border shadow-lg" />
