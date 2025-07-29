@@ -2,29 +2,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { mockTransactions, mockInventory, mockAlerts } from '@/lib/data';
-
-function isMockData<T>(data: T, initial: T): boolean {
-  if (initial === mockTransactions && Array.isArray(data) && data.length > 0 && data[0]?.id?.startsWith('txn-mock')) {
-    return true;
-  }
-  if (initial === mockInventory && Array.isArray(data) && data.length > 0 && data[0]?.id?.startsWith('item-mock')) {
-    return true;
-  }
-  if (initial === mockAlerts && Array.isArray(data) && data.length > 0 && data[0]?.id?.startsWith('alert-')) {
-     const MOCK_ALERT_IDS = [
-      "alert-1",
-      "alert-2",
-      "alert-3",
-      "alert-4",
-      "alert-5",
-    ];
-    // This type assertion is safe because we are checking for array properties before.
-    return (data as any[]).some((alert: any) => MOCK_ALERT_IDS.includes(alert.id));
-  }
-  return false;
-}
-
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void, boolean] {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
@@ -34,20 +11,11 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     let value: T;
     try {
       const item = window.localStorage.getItem(key);
-      // Ensure item is not null and not an empty string before parsing
       if (item && item !== 'undefined' && item !== 'null') {
-        const parsedItem = JSON.parse(item);
-        
-        if (isMockData(parsedItem, initialValue)) {
-          value = initialValue;
-          window.localStorage.removeItem(key); // Clean up mock data from storage
-        } else {
-          value = parsedItem;
-        }
+        value = JSON.parse(item);
       } else {
         value = initialValue;
       }
-
     } catch (error) {
       console.error(`Error reading localStorage key “${key}”:`, error);
       value = initialValue;
