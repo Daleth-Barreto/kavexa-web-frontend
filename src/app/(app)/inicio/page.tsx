@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { PageWrapper } from '@/components/kavexa/page-wrapper';
 import { PageHeader } from '@/components/kavexa/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { DollarSign, TrendingUp, TrendingDown, Package, AlertTriangle, PlusCircle, MessageSquareQuote, ArrowRight, Bell } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, ShieldAlert, Repeat, Sparkles, Megaphone, PlusCircle, MessageSquareQuote, ArrowRight, Bell } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,13 @@ import { ProductFormSheet } from '@/components/kavexa/product-form-sheet';
 import type { InventoryItem } from '@/lib/types';
 import { AppTour } from '@/components/kavexa/app-tour';
 
+const alertIcons = {
+  unusual_expense: <ShieldAlert className="h-4 w-4 text-yellow-500" />,
+  low_stock: <ShieldAlert className="h-4 w-4 text-orange-500" />,
+  subscription_due: <Repeat className="h-4 w-4 text-blue-500" />,
+  selling_opportunity: <Sparkles className="h-4 w-4 text-purple-500" />,
+  custom: <Megaphone className="h-4 w-4 text-gray-500" />
+}
 
 export default function InicioPage() {
   const { transactions, alerts, inventory, setInventory } = useAppContext();
@@ -184,7 +191,7 @@ export default function InicioPage() {
                       {recentAlerts.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell className="font-medium flex items-center gap-2 p-2">
-                             <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                             {alertIcons[item.type as keyof typeof alertIcons] || <ShieldAlert className="h-4 w-4" />}
                             {item.message}
                           </TableCell>
                         </TableRow>
