@@ -137,7 +137,7 @@ export default function ClientesPage() {
                 <TableRow>
                   <TableHead>Nombre</TableHead>
                   <TableHead>Contacto</TableHead>
-                  <TableHead>Última Compra / Fecha</TableHead>
+                  <TableHead>{isSpecialSearch ? "Fecha Especial" : "Última Compra / Fecha"}</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right w-[50px]">Acciones</TableHead>
                 </TableRow>
