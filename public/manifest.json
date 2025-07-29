@@ -1,60 +1,55 @@
 {
-  
-  "name": "Kavexa - Asistente Financiero",
-  "short_name": "Kavexa",
-  "description": "Asistente de negocios inteligente para finanzas e inventario. Funciona offline.",
-  "start_url": "/inicio",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#1A1A2E",
-  "theme_color": "#1A1A2E",
-  "icons": [
-    {
-      "src": "/kavexa-splash-logo.svg",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Nuevo Movimiento",
-      "short_name": "Movimiento",
-      "description": "Registra un nuevo ingreso o egreso.",
-      "url": "/movimientos",
-      "icons": [{ "src": "/icons/shortcut-movimiento.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Punto de Venta",
-      "short_name": "POS",
-      "description": "Accede a la terminal de punto de venta.",
-      "url": "/pos",
-      "icons": [{ "src": "/icons/shortcut-pos.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Inventario",
-      "short_name": "Inventario",
-      "description": "Revisa tu stock de productos.",
-      "url": "/inventario",
-      "icons": [{ "src": "/icons/shortcut-inventario.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Ver Alertas",
-      "short_name": "Alertas",
-      "description": "Revisa notificaciones y recordatorios.",
-      "url": "/alertas",
-      "icons": [{ "src": "/icons/shortcut-alertas.png", "sizes": "192x192" }]
-    }
-  ]
+    "name": "Kavexa",
+    "short_name": "Kavexa",
+    "description": "Asistente financiero y de inventario para PYMES.",
+    "start_url": "/inicio",
+    "display": "standalone",
+    "background_color": "#24293E",
+    "theme_color": "#A388EE",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/kavexa-splash-logo.svg",
+            "type": "image/svg+xml",
+            "sizes": "any"
+        },
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Nuevo Movimiento",
+            "short_name": "Movimiento",
+            "description": "Registrar un nuevo ingreso o egreso",
+            "url": "/movimientos"
+        },
+        {
+            "name": "Punto de Venta",
+            "short_name": "POS",
+            "description": "Abrir el punto de venta",
+            "url": "/pos"
+        },
+        {
+            "name": "Inventario",
+            "short_name": "Inventario",
+            "description": "Consultar el inventario",
+            "url": "/inventario"
+        },
+        {
+            "name": "Ver Alertas",
+            "short_name": "Alertas",
+            "description": "Revisar notificaciones y recordatorios",
+            "url": "/alertas"
+        }
+    ]
 }
