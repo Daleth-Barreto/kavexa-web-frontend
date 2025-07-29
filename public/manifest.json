@@ -1,63 +1,67 @@
 {
-  "theme_color": "#A085CF",
-  "background_color": "#F0F0F5",
-  "display": "standalone",
-  "scope": "/",
-  "start_url": "/",
-  "name": "Kavexa",
-  "short_name": "Kavexa",
-  "description": "Asistente de Negocios Inteligente para finanzas, inventario y más.",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-256x256.png",
-      "sizes": "256x256",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png"
-    },
-    {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Nuevo Movimiento",
-      "short_name": "Movimiento",
-      "description": "Registrar un nuevo ingreso o egreso",
-      "url": "/movimientos?action=new",
-      "icons": [{ "src": "/shortcut-movimiento.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Punto de Venta",
-      "short_name": "Venta",
-      "description": "Abrir el punto de venta para registrar una venta rápida",
-      "url": "/pos",
-      "icons": [{ "src": "/shortcut-pos.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Inventario",
-      "short_name": "Inventario",
-      "description": "Ver el inventario de productos",
-      "url": "/inventario",
-      "icons": [{ "src": "/shortcut-inventario.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Ver Alertas",
-      "short_name": "Alertas",
-      "description": "Revisar las alertas y notificaciones del sistema",
-      "url": "/alertas",
-      "icons": [{ "src": "/shortcut-alertas.png", "sizes": "192x192" }]
-    }
-  ]
+    "theme_color": "#A085CF",
+    "background_color": "#F0F0F5",
+    "display": "standalone",
+    "orientation": "portrait",
+    "scope": "/",
+    "start_url": "/",
+    "name": "Kavexa",
+    "short_name": "Kavexa",
+    "description": "Asistente financiero y de inventario para PYMES.",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Nuevo Movimiento",
+            "short_name": "Movimiento",
+            "description": "Registra un nuevo ingreso o egreso",
+            "url": "/movimientos",
+            "icons": [{ "src": "/shortcut-movimiento.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Punto de Venta",
+            "short_name": "POS",
+            "description": "Accede al punto de venta para registrar una venta",
+            "url": "/pos",
+            "icons": [{ "src": "/shortcut-pos.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Inventario",
+            "short_name": "Inventario",
+            "description": "Revisa tu inventario",
+            "url": "/inventario",
+            "icons": [{ "src": "/shortcut-inventario.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Ver Alertas",
+            "short_name": "Alertas",
+            "description": "Revisa las alertas pendientes",
+            "url": "/alertas",
+            "icons": [{ "src": "/shortcut-alertas.png", "sizes": "192x192" }]
+        }
+    ]
 }
