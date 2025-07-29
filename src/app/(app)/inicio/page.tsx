@@ -207,7 +207,7 @@ export default function InicioPage() {
               )}
             </CardContent>
             <CardFooter>
-                <Button asChild variant="outline" className="w-full">
+                <Button asChild variant={recentAlerts.length > 0 ? 'outline' : 'ghost'} className="w-full">
                     <Link href="/alertas">
                         Ver todas las alertas <ArrowRight className="ml-2 h-4 w-4"/>
                     </Link>
