@@ -78,73 +78,65 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [isDataLoaded]);
 
-  // Alert checks
-  useEffect(() => {
+  // Centralized alert check logic
+  const checkAlerts = useCallback(() => {
     if (!isDataLoaded || !config.enabledModules?.alertas) return;
-    
+
     const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const currentDate = now.getDate();
-
     let alertsHaveChanged = false;
-    
+
     // --- Subscription alerts ---
-    const dueSubscriptions: Alert[] = [];
-    subscriptions.forEach(sub => {
-      const isAlreadyPaid = sub.lastPaidMonth === currentMonth && sub.lastPaidYear === currentYear;
-      const isAlertExisting = alerts.some(a => a.type === 'subscription_due' && a.relatedId === sub.id && a.status === 'new' && isSameMonth(new Date(a.date), now) && isSameYear(new Date(a.date), now));
+    setAlerts(currentAlerts => {
+      let updatedAlerts = [...currentAlerts];
+      const dueSubscriptions: Alert[] = [];
+      
+      subscriptions.forEach(sub => {
+        const isAlreadyPaid = sub.lastPaidMonth === now.getMonth() && sub.lastPaidYear === now.getFullYear();
+        const isAlertExisting = updatedAlerts.some(a => a.type === 'subscription_due' && a.relatedId === sub.id && a.status === 'new' && isSameMonth(new Date(a.date), now) && isSameYear(new Date(a.date), now));
 
-      if (currentDate >= sub.paymentDay && !isAlreadyPaid && !isAlertExisting) {
-        dueSubscriptions.push({
-          id: `alert-sub-${sub.id}-${currentYear}-${currentMonth}`,
-          type: 'subscription_due',
-          message: `Suscripción pendiente: ${sub.name}`,
-          date: new Date().toISOString(),
-          status: 'new',
-          relatedId: sub.id,
-        });
-      }
-    });
+        if (now.getDate() >= sub.paymentDay && !isAlreadyPaid && !isAlertExisting) {
+          dueSubscriptions.push({
+            id: `alert-sub-${sub.id}-${now.getFullYear()}-${now.getMonth()}`,
+            type: 'subscription_due',
+            message: `Suscripción pendiente: ${sub.name}`,
+            date: new Date().toISOString(),
+            status: 'new',
+            relatedId: sub.id,
+          });
+        }
+      });
 
-    if (dueSubscriptions.length > 0) {
-        const newAlerts = [...dueSubscriptions, ...alerts];
-        setAlerts(newAlerts);
+      if (dueSubscriptions.length > 0) {
+        updatedAlerts = [...dueSubscriptions, ...updatedAlerts];
         alertsHaveChanged = true;
 
         const message = `Tienes ${dueSubscriptions.length} pago(s) de suscripción pendiente(s) este mes.`;
-        toast({
-            title: 'Suscripciones Pendientes',
-            description: message,
-            variant: 'destructive',
-        });
+        toast({ title: 'Suscripciones Pendientes', description: message, variant: 'destructive' });
         sendNotification('Suscripciones Pendientes', { body: message });
-    }
-
-    // --- Recurring custom alerts ---
-    const updatedAlerts = alerts.map(alert => {
+      }
+      
+      // --- Recurring custom alerts ---
+      const finalAlerts = updatedAlerts.map(alert => {
         if (alert.type === 'custom' && alert.recurrence && alert.recurrence !== 'none' && alert.status === 'resolved' && alert.nextRecurrenceDate) {
-            const nextDate = new Date(alert.nextRecurrenceDate);
-            
-            if (now >= nextDate) {
-                alertsHaveChanged = true;
-                const newAlertData = {
-                    ...alert,
-                    status: 'new' as const,
-                    date: new Date().toISOString()
-                };
-                sendNotification('Recordatorio', { body: newAlertData.message });
-                return newAlertData;
-            }
+          const nextDate = new Date(alert.nextRecurrenceDate);
+          
+          if (now >= nextDate) {
+            alertsHaveChanged = true;
+            const newAlertData = { ...alert, status: 'new' as const, date: new Date().toISOString() };
+            sendNotification('Recordatorio', { body: newAlertData.message });
+            return newAlertData;
+          }
         }
         return alert;
+      });
+
+      return alertsHaveChanged ? finalAlerts : currentAlerts;
     });
+  }, [isDataLoaded, subscriptions, config.enabledModules?.alertas, setAlerts, toast]);
 
-    if(alertsHaveChanged) {
-        setAlerts(updatedAlerts);
-    }
-
-
+  // Run alert checks on load and when subscriptions change
+  useEffect(() => {
+    checkAlerts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDataLoaded, subscriptions, config.enabledModules?.alertas]);
 
