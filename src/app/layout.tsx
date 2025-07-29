@@ -38,7 +38,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <link href="/kavexa-splash-logo.svg" rel="apple-touch-startup-image" />
       </head>
       <body
         className={cn(
