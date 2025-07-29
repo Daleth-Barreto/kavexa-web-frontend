@@ -3,16 +3,16 @@
   "background_color": "#F0F0F5",
   "display": "standalone",
   "scope": "/",
-  "start_url": "/inicio",
+  "start_url": "/",
   "name": "Kavexa",
   "short_name": "Kavexa",
-  "description": "Asistente financiero y de inventario para PYMES.",
+  "description": "Asistente de Negocios Inteligente para finanzas, inventario y más.",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "/icon-256x256.png",
@@ -34,50 +34,30 @@
     {
       "name": "Nuevo Movimiento",
       "short_name": "Movimiento",
-      "description": "Registrar un nuevo ingreso o egreso.",
-      "url": "/movimientos",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "description": "Registrar un nuevo ingreso o egreso",
+      "url": "/movimientos?action=new",
+      "icons": [{ "src": "/shortcut-movimiento.png", "sizes": "192x192" }]
     },
     {
       "name": "Punto de Venta",
-      "short_name": "POS",
-      "description": "Acceder al punto de venta para registrar ventas rápidas.",
+      "short_name": "Venta",
+      "description": "Abrir el punto de venta para registrar una venta rápida",
       "url": "/pos",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/shortcut-pos.png", "sizes": "192x192" }]
     },
     {
-      "name": "Ver Inventario",
+      "name": "Inventario",
       "short_name": "Inventario",
-      "description": "Consultar el inventario de productos.",
+      "description": "Ver el inventario de productos",
       "url": "/inventario",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/shortcut-inventario.png", "sizes": "192x192" }]
     },
     {
       "name": "Ver Alertas",
       "short_name": "Alertas",
-      "description": "Revisar las alertas y notificaciones del sistema.",
+      "description": "Revisar las alertas y notificaciones del sistema",
       "url": "/alertas",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/shortcut-alertas.png", "sizes": "192x192" }]
     }
   ]
 }
