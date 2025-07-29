@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,6 +35,7 @@ const romanticMessages = ["Mi mujer ❤️", "Mi nubecita ☁️", "Mi cacahuati
 
 export default function ClientesPage() {
   const { clients, setClients } = useAppContext();
+  const router = useRouter();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isAlertOpen, setAlertOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Client | null>(null);
@@ -45,6 +47,12 @@ export default function ClientesPage() {
     const lowerCaseSearch = searchTerm.toLowerCase();
     return ['maria fernanda velasco campos', 'mafer', 'mafer<3'].includes(lowerCaseSearch);
   }, [searchTerm]);
+
+  useEffect(() => {
+    if (searchTerm === '23091061') {
+      router.push('/23091061');
+    }
+  }, [searchTerm, router]);
 
   useEffect(() => {
     if (isSpecialSearch) {
@@ -114,7 +122,7 @@ export default function ClientesPage() {
         <CardContent className="pt-6">
             <div className="mb-4">
                 <Input 
-                    placeholder="Buscar por nombre o email..."
+                    placeholder="Buscar por nombre, email o código secreto..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="md:max-w-sm"

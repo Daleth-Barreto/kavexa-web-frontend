@@ -11,7 +11,7 @@ const RainingHeartsCloud = () => {
                 }
                 .heart-rain-drop {
                     position: absolute;
-                    top: 0;
+                    top: 70px;
                     animation: fall 4s linear infinite;
                     opacity: 0;
                     color: hsl(var(--primary));
