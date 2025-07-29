@@ -49,7 +49,7 @@ export default function ClientesPage() {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (searchTerm === '23091061') {
+    if (searchTerm === 'mf.23091061') {
       router.push('/23091061');
     }
   }, [searchTerm, router]);
