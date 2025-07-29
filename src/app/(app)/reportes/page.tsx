@@ -1,9 +1,11 @@
+
 'use client';
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const reports = [
     { title: "Reporte Financiero Mensual", description: "Un resumen de todos los ingresos y gastos del último mes." },
@@ -15,6 +17,15 @@ const reports = [
 ];
 
 export default function ReportesPage() {
+  const { toast } = useToast();
+
+  const handleComingSoon = () => {
+    toast({
+        title: "Función no disponible",
+        description: "La generación de reportes en PDF estará disponible próximamente.",
+    });
+  }
+
   return (
     <PageWrapper>
       <PageHeader
@@ -36,7 +47,7 @@ export default function ReportesPage() {
                     <CardDescription>{report.description}</CardDescription>
                 </CardContent>
                 <CardFooter>
-                    <Button className="w-full">
+                    <Button className="w-full" disabled onClick={handleComingSoon}>
                         <Download className="mr-2 h-4 w-4"/>
                         Descargar PDF
                     </Button>

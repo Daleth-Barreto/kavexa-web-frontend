@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -48,7 +49,7 @@ export default function LoginPage() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle>Iniciar Sesión</CardTitle>
-            <CardDescription>Accede a tu cuenta para continuar.</CardDescription>
+            <CardDescription>Esta función estará disponible próximamente.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -60,7 +61,7 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="tu@email.com" {...field} />
+                        <Input type="email" placeholder="tu@email.com" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -73,22 +74,22 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Contraseña</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder="••••••••" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" disabled>
                   Iniciar Sesión
                 </Button>
               </form>
             </Form>
             <div className="mt-4 text-center text-sm">
               ¿No tienes una cuenta?{' '}
-              <Link href="/register" className="underline">
+              <span className="underline text-muted-foreground cursor-not-allowed">
                 Regístrate
-              </Link>
+              </span>
             </div>
           </CardContent>
         </Card>

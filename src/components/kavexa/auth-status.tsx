@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAuth } from '@/contexts/auth-context';
@@ -16,7 +17,6 @@ export function AuthStatus() {
         title: "Función no disponible",
         description: "El sistema de cuentas y guardado en la nube estará disponible próximamente.",
     });
-    router.push('/login');
   }
 
   if (isLoading) {
@@ -30,12 +30,12 @@ export function AuthStatus() {
   return (
     <div className="p-2">
         {isAuthenticated ? (
-            <Button variant="ghost" className="w-full justify-start" onClick={logout}>
+            <Button variant="ghost" className="w-full justify-start" onClick={logout} disabled>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Cerrar Sesión</span>
             </Button>
         ) : (
-            <Button variant="ghost" className="w-full justify-start" onClick={handleLoginClick}>
+            <Button variant="ghost" className="w-full justify-start" onClick={handleLoginClick} disabled>
                 <LogIn className="mr-2 h-4 w-4" />
                 <span>Iniciar Sesión</span>
             </Button>

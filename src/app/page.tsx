@@ -6,8 +6,18 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
 import { AbstractDashboard } from '@/components/kavexa/abstract-dashboard';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LandingPage() {
+  const { toast } = useToast();
+
+  const handleComingSoon = () => {
+    toast({
+        title: "Función no disponible",
+        description: "El sistema de cuentas y guardado en la nube estará disponible próximamente.",
+    });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="px-4 lg:px-6 h-14 flex items-center shrink-0">
@@ -16,11 +26,11 @@ export default function LandingPage() {
           <span className="font-bold text-lg font-headline">Kavexa</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Iniciar Sesión</Link>
+          <Button variant="ghost" onClick={handleComingSoon} disabled>
+            Iniciar Sesión
           </Button>
-          <Button asChild>
-            <Link href="/welcome">Registrarse</Link>
+          <Button onClick={handleComingSoon} disabled>
+            Registrarse
           </Button>
         </nav>
       </header>

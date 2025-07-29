@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -50,7 +51,7 @@ export default function RegisterPage() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle>Crear una Cuenta</CardTitle>
-            <CardDescription>Empieza a gestionar tu negocio de forma inteligente.</CardDescription>
+            <CardDescription>Esta función estará disponible próximamente.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -62,7 +63,7 @@ export default function RegisterPage() {
                     <FormItem>
                       <FormLabel>Nombre</FormLabel>
                       <FormControl>
-                        <Input placeholder="Tu nombre" {...field} />
+                        <Input placeholder="Tu nombre" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -75,7 +76,7 @@ export default function RegisterPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="tu@email.com" {...field} />
+                        <Input type="email" placeholder="tu@email.com" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -88,22 +89,22 @@ export default function RegisterPage() {
                     <FormItem>
                       <FormLabel>Contraseña</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder="••••••••" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" disabled>
                   Crear Cuenta
                 </Button>
               </form>
             </Form>
             <div className="mt-4 text-center text-sm">
               ¿Ya tienes una cuenta?{' '}
-              <Link href="/login" className="underline">
+              <span className="underline text-muted-foreground cursor-not-allowed">
                 Inicia Sesión
-              </Link>
+              </span>
             </div>
           </CardContent>
         </Card>
