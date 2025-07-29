@@ -102,7 +102,7 @@ const RainingHeartsCloud = () => {
 export default function VotumPage() {
     return (
         <PageWrapper>
-            <div className="flex flex-col items-center justify-center h-full min-h-[70vh] text-center gap-8">
+            <div className="flex flex-col items-center justify-center h-full min-h-[70vh] text-center gap-8 pt-20">
                 <RainingHeartsCloud />
                 <blockquote className="text-xl italic text-muted-foreground max-w-lg pt-12">
                     &ldquo;Votum meum est tibi, pro te omnis, in omne tempus, sine fine.&rdquo;
