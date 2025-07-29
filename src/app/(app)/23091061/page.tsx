@@ -11,7 +11,7 @@ const RainingHeartsCloud = () => {
                 }
                 .heart-rain-drop {
                     position: absolute;
-                    bottom: 0;
+                    top: 0;
                     animation: fall 4s linear infinite;
                     opacity: 0;
                     color: hsl(var(--primary));
@@ -28,26 +28,26 @@ const RainingHeartsCloud = () => {
 
                 @keyframes fall {
                     0% {
-                        transform: translateY(-20px) translateX(0) scale(0.3);
+                        transform: translateY(40px) translateX(0) scale(0.3);
                         opacity: 0;
                     }
                     10% {
                         opacity: 1;
                     }
                     25% {
-                         transform: translateY(30px) translateX(5px) scale(0.7);
+                         transform: translateY(70px) translateX(5px) scale(0.7);
                     }
                      50% {
-                         transform: translateY(60px) translateX(-5px) scale(0.6);
+                         transform: translateY(120px) translateX(-5px) scale(0.6);
                     }
                     75% {
-                         transform: translateY(90px) translateX(5px) scale(0.5);
+                         transform: translateY(170px) translateX(5px) scale(0.5);
                     }
                     90% {
                          opacity: 1;
                     }
                     100% {
-                        transform: translateY(130px) translateX(0) scale(0.4);
+                        transform: translateY(220px) translateX(0) scale(0.4);
                         opacity: 0;
                     }
                 }
