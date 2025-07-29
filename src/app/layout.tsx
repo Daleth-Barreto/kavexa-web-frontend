@@ -9,10 +9,15 @@ export const metadata: Metadata = {
   title: 'Kavexa - Asistente Financiero',
   description: 'Plataforma de asistente financiero y de inventario para PYMES.',
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Kavexa",
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#A085CF',
+  themeColor: '#1A1A2E',
 }
 
 export default function RootLayout({
@@ -33,6 +38,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
           rel="stylesheet"
         />
+        <link href="/kavexa-splash-logo.svg" rel="apple-touch-startup-image" />
       </head>
       <body
         className={cn(

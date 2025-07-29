@@ -7,6 +7,12 @@ const withPWA = withPWAInit({
     skipWaiting: true,
     cacheOnFrontEndNav: true,
     disable: process.env.NODE_ENV === "development",
+    // Make sure the manifest is not generated again
+    // We are creating it manually in public/manifest.json
+    // to have more control.
+    dynamicOptions: {
+      manifest: false,
+    },
   });
 
 const nextConfig: NextConfig = {
