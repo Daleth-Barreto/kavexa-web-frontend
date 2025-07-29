@@ -38,9 +38,9 @@ export default function PrivacyPage() {
                     <p>
                         Dado que los datos se almacenan localmente en tu dispositivo, solo tú tienes acceso a ellos. No los utilizamos para ningún propósito, incluyendo análisis, publicidad o venta a terceros. La funcionalidad de la aplicación, como proyecciones y análisis, se realiza completamente en tu dispositivo.
                     </p>
-                     <h3 className="text-xl font-semibold text-foreground">Seguridad</h3>
+                     <h3 className="text-xl font-semibold text-foreground">Seguridad y Notificaciones</h3>
                     <p>
-                        La seguridad de tus datos depende de la seguridad de tu propio dispositivo y navegador. Te recomendamos que utilices las funciones de seguridad de tu dispositivo para proteger tus datos.
+                        La seguridad de tus datos depende de la seguridad de tu propio dispositivo y navegador. La aplicación puede solicitar permiso para enviar notificaciones push a tu dispositivo para alertarte sobre eventos importantes; esta función es opcional y puede ser gestionada desde la configuración de la aplicación y de tu navegador.
                     </p>
                     <h3 className="text-xl font-semibold text-foreground">Futuras Funcionalidades de Cuentas</h3>
                     <p>
