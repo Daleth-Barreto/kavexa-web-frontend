@@ -1,9 +1,1 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="512" height="512" fill="#12121e"/>
-<g transform="translate(128, 128) scale(0.5)">
-<svg width="512" height="512" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4 12L12 2L14.5 10L20 11L12 22L9.5 14Z" stroke="#A388EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</g>
-<text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" font-family="PT Sans, sans-serif" font-size="48" fill="#E0E0E0" font-weight="bold">Kavexa</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#A8A2F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12 l8 -10 l2.5 8 l5.5 1 l-8 11 l-2.5 -8 z" /></svg>
