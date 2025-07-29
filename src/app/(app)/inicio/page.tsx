@@ -194,7 +194,8 @@ export default function InicioPage() {
               ) : (
                   <div className="text-center text-muted-foreground py-8 flex flex-col items-center justify-center h-full">
                       <Bell className="h-10 w-10 mb-4 text-muted-foreground/50"/>
-                      <p>No tienes alertas nuevas.</p>
+                      <p className="font-medium">Todo en orden</p>
+                      <p className="text-sm">No tienes alertas nuevas en este momento.</p>
                   </div>
               )}
             </CardContent>
