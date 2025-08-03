@@ -17,7 +17,7 @@ export const mockInventory: InventoryItem[] = [
 
 const coffeeSales: Transaction[] = [];
 for (let i = 0; i < 20; i++) {
-    const daysAgo = Math.floor(Math.random() * 45) + 1; // Ventas en los últimos 45 días
+    const daysAgo = Math.floor(Math.random() * 30) + 1; // Ventas en los últimos 30 días
     const quantity = Math.floor(Math.random() * 80) + 20; // Vender entre 20 y 100 unidades
     const coffeePrice = mockInventory.find(p => p.id === 'item-1')!.price;
     coffeeSales.push({
