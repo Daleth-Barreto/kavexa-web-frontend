@@ -11,7 +11,8 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     let value: T;
     try {
       const item = window.localStorage.getItem(key);
-      if (item && item !== 'undefined' && item !== 'null') {
+      // If item is null, undefined, or an empty array string, use initialValue.
+      if (item && item !== 'undefined' && item !== 'null' && item !== '[]') {
         value = JSON.parse(item);
       } else {
         value = initialValue;
