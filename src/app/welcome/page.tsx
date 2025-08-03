@@ -11,10 +11,12 @@ import { ALL_MODULES } from '@/lib/data';
 import { AppProvider, useAppContext } from '@/contexts/app-context';
 import type { ModuleKey } from '@/lib/types';
 import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
+import { useI18n } from '@/contexts/i18n-context';
 
 function WelcomePageContent() {
   const router = useRouter();
   const { config, setConfig } = useAppContext();
+  const { t } = useI18n();
   const [selectedModules, setSelectedModules] = useState<Record<ModuleKey, boolean>>(config.enabledModules);
 
   const handleModuleToggle = (moduleId: ModuleKey) => {
@@ -44,8 +46,8 @@ function WelcomePageContent() {
         </div>
         <Card>
           <CardHeader className="text-center">
-            <CardTitle>¡Bienvenido a Kavexa!</CardTitle>
-            <CardDescription>Para empezar, selecciona los módulos que quieres usar. Puedes cambiar esto más tarde.</CardDescription>
+            <CardTitle>{t('welcome.title')}</CardTitle>
+            <CardDescription>{t('welcome.description')}</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {ALL_MODULES.map((module) => (
@@ -60,15 +62,15 @@ function WelcomePageContent() {
                   className="h-5 w-5"
                 />
                 <div>
-                  <label htmlFor={module.id} className="font-semibold text-foreground cursor-pointer">{module.title}</label>
-                  <p className="text-sm text-muted-foreground">{module.description}</p>
+                  <label htmlFor={module.id} className="font-semibold text-foreground cursor-pointer">{t(`nav.${module.id}`)}</label>
+                  <p className="text-sm text-muted-foreground">{t(`modules.${module.id}.description`)}</p>
                 </div>
               </div>
             ))}
           </CardContent>
           <CardFooter>
             <Button className="w-full" size="lg" onClick={handleContinue}>
-                Continuar <ArrowRight className="ml-2 h-4 w-4" />
+                {t('welcome.continue')} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardFooter>
         </Card>

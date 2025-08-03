@@ -346,6 +346,19 @@
     "next": "Siguiente",
     "finish": "Finalizar"
   },
+  "modules": {
+    "inicio": { "description": "Dashboard principal con resúmenes." },
+    "movimientos": { "description": "Registra ingresos y egresos." },
+    "pos": { "description": "Interfaz rápida para ventas." },
+    "inventario": { "description": "Controla tu stock de productos." },
+    "clientes": { "description": "Administra tu base de clientes." },
+    "proveedores": { "description": "Administra tus proveedores." },
+    "suscripciones": { "description": "Pagos y gastos recurrentes." },
+    "demanda": { "description": "Analiza la rotación de productos." },
+    "proyeccion": { "description": "Estima tu flujo de caja futuro." },
+    "alertas": { "description": "Avisos importantes del sistema." },
+    "reportes": { "description": "Genera informes detallados." }
+  },
   "toasts": {
       "error": "Error",
       "success": "Éxito",

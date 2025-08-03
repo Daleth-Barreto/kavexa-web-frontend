@@ -346,6 +346,19 @@
     "next": "Next",
     "finish": "Finish"
   },
+  "modules": {
+    "inicio": { "description": "Main dashboard with summaries." },
+    "movimientos": { "description": "Log income and expenses." },
+    "pos": { "description": "Quick interface for sales." },
+    "inventario": { "description": "Control your product stock." },
+    "clientes": { "description": "Manage your client base." },
+    "proveedores": { "description": "Manage your suppliers." },
+    "suscripciones": { "description": "Recurring payments and expenses." },
+    "demanda": { "description": "Analyze product turnover." },
+    "proyeccion": { "description": "Estimate your future cash flow." },
+    "alertas": { "description": "Important system notices." },
+    "reportes": { "description": "Generate detailed reports." }
+  },
   "toasts": {
       "error": "Error",
       "success": "Success",
