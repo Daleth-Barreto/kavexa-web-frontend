@@ -1,9 +1,11 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/auth-context';
 import { ThemeProvider } from '@/components/kavexa/theme-provider';
+import { I18nProvider } from '@/contexts/i18n-context';
 
 export const metadata: Metadata = {
   title: 'Kavexa - Asistente Financiero',
@@ -50,10 +52,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
+          <I18nProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>

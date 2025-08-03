@@ -1,7 +1,7 @@
 
 'use client';
 import { useEffect } from 'react';
-import { MainNav, SettingsNav } from '@/components/kavexa/nav';
+import { MainNav, SettingsNav, LanguageSwitcher } from '@/components/kavexa/nav';
 import { AuthStatus } from '@/components/kavexa/auth-status';
 import {
   SidebarProvider,
@@ -11,14 +11,17 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { AppProvider, useAppContext } from '@/contexts/app-context';
 import { useRouter } from 'next/navigation';
 import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
+import { useI18n } from '@/contexts/i18n-context';
 
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const { isLoaded, config } = useAppContext();
+  const { t } = useI18n();
   const router = useRouter();
 
   useEffect(() => {
@@ -34,7 +37,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             <KavexaLogoIcon className="h-8 w-8 text-primary" />
             <span>Kavexa</span>
         </div>
-        <p className="mt-4 text-muted-foreground">Cargando tus datos...</p>
+        <p className="mt-4 text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }
@@ -54,6 +57,8 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
           <MainNav />
         </SidebarContent>
         <SidebarFooter>
+          <LanguageSwitcher />
+          <SidebarSeparator />
           <SettingsNav />
           <AuthStatus />
         </SidebarFooter>

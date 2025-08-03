@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { useI18n } from '@/contexts/i18n-context';
 
 // Define the interface for the BeforeInstallPromptEvent
 interface BeforeInstallPromptEvent extends Event {
@@ -17,6 +18,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function InstallPwaButton() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -51,7 +53,7 @@ export function InstallPwaButton() {
   return (
     <Button onClick={handleInstallClick} className="w-full" size="lg" variant="outline">
       <Download className="mr-2 h-4 w-4" />
-      Instalar Aplicación
+      {t('perfil.shortcutCard.install')}
     </Button>
   );
 }

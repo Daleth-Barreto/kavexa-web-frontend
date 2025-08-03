@@ -18,10 +18,12 @@ import Papa from 'papaparse';
 import type { Transaction, InventoryItem, Provider, Client, ModuleKey } from '@/lib/types';
 import { ALL_MODULES } from '@/lib/data';
 import { InstallPwaButton } from '@/components/kavexa/install-pwa-button';
+import { useI18n } from '@/contexts/i18n-context';
 
 export default function PerfilPage() {
   const { isAuthenticated, login, logout } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { t } = useI18n();
   const { 
     currency, 
     setCurrency, 
@@ -53,20 +55,19 @@ export default function PerfilPage() {
 
   const handleNotificationToggle = async (checked: boolean) => {
     if (!('Notification' in window)) {
-      toast({ title: 'No Soportado', description: 'Tu navegador no soporta notificaciones push.', variant: 'destructive' });
+      toast({ title: t('toasts.warning'), description: t('toasts.notificationsNotSupported'), variant: 'destructive' });
       return;
     }
     if (checked) {
       const permission = await Notification.requestPermission();
       setNotificationPermission(permission);
       if (permission === 'granted') {
-        new Notification('¡Notificaciones Activadas!', { body: 'Ahora recibirás alertas de Kavexa.' });
+        new Notification(t('toasts.notificationsGranted'), { body: t('toasts.notificationsGrantedDescription') });
       } else {
-        toast({ title: 'Permiso Denegado', description: 'No se podrán enviar notificaciones.' });
+        toast({ title: t('toasts.warning'), description: t('toasts.notificationsDenied') });
       }
     } else {
-      // Cannot programmatically revoke permission. User must do it in browser settings.
-      toast({ title: 'Info', description: 'Para desactivar, gestiona los permisos en la configuración de tu navegador.' });
+      toast({ title: t('toasts.info'), description: t('toasts.notificationsInfo') });
     }
   };
 
@@ -94,20 +95,20 @@ export default function PerfilPage() {
       }
     });
 
-    toast({ title: "Datos Exportados", description: "Tus archivos CSV se están descargando." });
+    toast({ title: t('toasts.exportSuccess'), description: t('toasts.exportDescription') });
   }
 
   const handleDeleteData = () => {
       clearAllData();
       setAlertOpen(false);
       setDeleteConfirmationInput('');
-      toast({ title: "Datos Eliminados", description: "Toda tu información ha sido borrada.", variant: "destructive" });
+      toast({ title: t('toasts.dataDeleted'), description: t('toasts.dataDeletedDescription'), variant: "destructive" });
   }
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>, type: 'transactions' | 'inventory' | 'clients' | 'providers') => {
     const file = event.target.files?.[0];
     if (!file) {
-      toast({ title: 'Error', description: 'No se seleccionó ningún archivo.', variant: 'destructive' });
+      toast({ title: t('toasts.error'), description: t('toasts.importNoFile'), variant: 'destructive' });
       return;
     }
 
@@ -129,7 +130,7 @@ export default function PerfilPage() {
                 quantity: row.quantity ? parseInt(row.quantity) : undefined
               }));
               setTransactions(prev => [...prev, ...importedTransactions]);
-              toast({ title: "Éxito", description: `${importedTransactions.length} transacciones importadas.` });
+              toast({ title: t('toasts.success'), description: t('toasts.transactionsImported', { count: importedTransactions.length }) });
               break;
             case 'inventory':
               const importedInventory = results.data.map((row: any): InventoryItem => ({
@@ -140,7 +141,7 @@ export default function PerfilPage() {
                 price: parseFloat(row.price) || 0,
               }));
               setInventory(prev => [...prev, ...importedInventory]);
-              toast({ title: "Éxito", description: `${importedInventory.length} productos importados.` });
+              toast({ title: t('toasts.success'), description: t('toasts.inventoryImported', { count: importedInventory.length }) });
               break;
             case 'clients':
               const importedClients = results.data.map((row: any): Client => ({
@@ -151,7 +152,7 @@ export default function PerfilPage() {
                 status: row.status === 'active' ? 'active' : 'inactive',
               }));
               setClients(prev => [...prev, ...importedClients]);
-              toast({ title: "Éxito", description: `${importedClients.length} clientes importados.` });
+              toast({ title: t('toasts.success'), description: t('toasts.clientsImported', { count: importedClients.length }) });
               break;
             case 'providers':
                 const importedProviders = results.data.map((row: any): Provider => ({
@@ -161,15 +162,15 @@ export default function PerfilPage() {
                     phone: row.phone || 'N/A',
                 }));
                 setProviders(prev => [...prev, ...importedProviders]);
-                toast({ title: "Éxito", description: `${importedProviders.length} proveedores importados.` });
+                toast({ title: t('toasts.success'), description: t('toasts.providersImported', { count: importedProviders.length }) });
               break;
           }
         } catch (error) {
-          toast({ title: 'Error de Importación', description: 'El archivo CSV no tiene el formato correcto.', variant: 'destructive'});
+          toast({ title: t('toasts.importError'), description: t('toasts.importErrorDescription'), variant: 'destructive'});
         }
       },
       error: (error: any) => {
-        toast({ title: 'Error al leer el archivo', description: error.message, variant: 'destructive'});
+        toast({ title: t('toasts.importFileError'), description: error.message, variant: 'destructive'});
       }
     });
     if(event.target) event.target.value = '';
@@ -178,19 +179,19 @@ export default function PerfilPage() {
   return (
     <PageWrapper>
       <PageHeader
-        title="Perfil y Configuración"
-        description="Gestiona los detalles de tu negocio, tu cuenta y tus preferencias."
+        title={t('perfil.title')}
+        description={t('perfil.description')}
       />
       <div className="grid gap-6 max-w-4xl lg:grid-cols-2">
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Apariencia y Notificaciones</CardTitle>
-                    <CardDescription>Personaliza la apariencia y las notificaciones de la aplicación.</CardDescription>
+                    <CardTitle>{t('perfil.appearanceCard.title')}</CardTitle>
+                    <CardDescription>{t('perfil.appearanceCard.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <Label htmlFor="dark-mode">Modo Oscuro</Label>
+                        <Label htmlFor="dark-mode">{t('perfil.appearanceCard.darkMode')}</Label>
                         <Switch
                             id="dark-mode"
                             checked={theme === 'dark'}
@@ -198,7 +199,7 @@ export default function PerfilPage() {
                         />
                     </div>
                      <div className="flex items-center justify-between">
-                        <Label htmlFor="notifications">Notificaciones Push</Label>
+                        <Label htmlFor="notifications">{t('perfil.appearanceCard.notifications')}</Label>
                         <Switch
                             id="notifications"
                             checked={notificationPermission === 'granted'}
@@ -207,7 +208,7 @@ export default function PerfilPage() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="currency">Moneda (código ISO)</Label>
+                        <Label htmlFor="currency">{t('perfil.appearanceCard.currency')}</Label>
                         <Input 
                             id="currency" 
                             defaultValue={currency}
@@ -220,18 +221,18 @@ export default function PerfilPage() {
             
             <Card>
                 <CardHeader>
-                    <CardTitle>Gestión de Datos</CardTitle>
-                    <CardDescription>Importa, exporta o elimina todos tus datos.</CardDescription>
+                    <CardTitle>{t('perfil.dataCard.title')}</CardTitle>
+                    <CardDescription>{t('perfil.dataCard.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className='text-sm text-muted-foreground'>Importa transacciones, inventario, clientes o proveedores desde archivos CSV.</p>
+                  <p className='text-sm text-muted-foreground'>{t('perfil.dataCard.importDescription')}</p>
                    <div className="flex flex-col sm:flex-row gap-4">
-                     <Button variant="outline" className="w-full justify-center" onClick={() => transactionFileInputRef.current?.click()}>Importar Transacciones</Button>
-                     <Button variant="outline" className="w-full justify-center" onClick={() => inventoryFileInputRef.current?.click()}>Importar Inventario</Button>
+                     <Button variant="outline" className="w-full justify-center" onClick={() => transactionFileInputRef.current?.click()}>{t('perfil.dataCard.importTransactions')}</Button>
+                     <Button variant="outline" className="w-full justify-center" onClick={() => inventoryFileInputRef.current?.click()}>{t('perfil.dataCard.importInventory')}</Button>
                    </div>
                     <div className="flex flex-col sm:flex-row gap-4">
-                      <Button variant="outline" className="w-full justify-center" onClick={handleExportCSV}>Exportar todo a CSV</Button>
-                      <Button variant="destructive" className="w-full justify-center" onClick={() => setAlertOpen(true)}>Eliminar todos los datos</Button>
+                      <Button variant="outline" className="w-full justify-center" onClick={handleExportCSV}>{t('perfil.dataCard.exportAll')}</Button>
+                      <Button variant="destructive" className="w-full justify-center" onClick={() => setAlertOpen(true)}>{t('perfil.dataCard.deleteAll')}</Button>
                     </div>
                     <input type="file" ref={transactionFileInputRef} className="hidden" accept=".csv" onChange={(e) => handleFileImport(e, 'transactions')} />
                     <input type="file" ref={inventoryFileInputRef} className="hidden" accept=".csv" onChange={(e) => handleFileImport(e, 'inventory')} />
@@ -240,8 +241,8 @@ export default function PerfilPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>Acceso Directo</CardTitle>
-                    <CardDescription>Instala Kavexa en tu dispositivo para un acceso más rápido, como si fuera una aplicación nativa.</CardDescription>
+                    <CardTitle>{t('perfil.shortcutCard.title')}</CardTitle>
+                    <CardDescription>{t('perfil.shortcutCard.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                    <InstallPwaButton />
@@ -251,8 +252,8 @@ export default function PerfilPage() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Módulos</CardTitle>
-                    <CardDescription>Activa o desactiva las secciones de Kavexa según las necesidades de tu negocio.</CardDescription>
+                    <CardTitle>{t('perfil.modulesCard.title')}</CardTitle>
+                    <CardDescription>{t('perfil.modulesCard.description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {ALL_MODULES.map(module => (
@@ -263,7 +264,7 @@ export default function PerfilPage() {
                                 onCheckedChange={(checked) => updateModuleConfig(module.id as ModuleKey, !!checked)}
                             />
                             <label htmlFor={module.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                {module.title}
+                                {t(`nav.${module.id}`)}
                             </label>
                         </div>
                     ))}
@@ -275,26 +276,26 @@ export default function PerfilPage() {
        <AlertDialog open={isAlertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t('perfil.deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Para confirmar, escribe "ELIMINAR" en el campo de abajo.
+              {t('perfil.deleteDialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
             <Input 
               type="text"
-              placeholder='Escribe "ELIMINAR"'
+              placeholder={t('perfil.deleteDialog.placeholder')}
               value={deleteConfirmationInput}
               onChange={(e) => setDeleteConfirmationInput(e.target.value)}
               className="mt-4"
             />
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteConfirmationInput('')}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDeleteConfirmationInput('')}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteData} 
               variant="destructive"
-              disabled={deleteConfirmationInput !== 'ELIMINAR'}
+              disabled={deleteConfirmationInput.toUpperCase() !== 'DELETE' && deleteConfirmationInput.toUpperCase() !== 'ELIMINAR'}
             >
-               Confirmar y Eliminar Permanentemente
+               {t('perfil.deleteDialog.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

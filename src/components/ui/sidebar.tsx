@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -208,7 +209,7 @@ const Sidebar = React.forwardRef<
           >
             {/* Added SheetHeader and SheetTitle to fix accessibility error */}
             <SheetHeader className="sr-only">
-              <SheetTitle>Menú de Navegación</SheetTitle>
+              <SheetTitle>Navigation Menu</SheetTitle>
             </SheetHeader>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
@@ -377,7 +378,7 @@ const SidebarFooter = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("mt-auto flex flex-col gap-2 p-2", className)}
       {...props}
     />
   )

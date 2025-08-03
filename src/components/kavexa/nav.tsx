@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -15,6 +16,7 @@ import {
   ShoppingCart,
   Users,
   Truck,
+  Languages,
 } from 'lucide-react';
 
 import {
@@ -24,6 +26,8 @@ import {
 } from '@/components/ui/sidebar';
 import { ALL_MODULES } from '@/lib/data';
 import { useAppContext } from '@/contexts/app-context';
+import { useI18n } from '@/contexts/i18n-context';
+import { Button } from '../ui/button';
 
 const icons: Record<string, React.ElementType> = {
     inicio: Home,
@@ -42,6 +46,7 @@ const icons: Record<string, React.ElementType> = {
 export function MainNav() {
   const pathname = usePathname();
   const { config } = useAppContext();
+  const { t } = useI18n();
 
   const enabledModules = ALL_MODULES.filter(module => config.enabledModules[module.id]);
 
@@ -49,16 +54,17 @@ export function MainNav() {
     <SidebarMenu>
       {enabledModules.map((item) => {
         const Icon = icons[item.id] || Home;
+        const title = t(`nav.${item.id}`);
         return (
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               asChild
               isActive={pathname === item.href}
-              tooltip={item.title}
+              tooltip={title}
             >
               <Link href={item.href}>
                 <Icon />
-                <span>{item.title}</span>
+                <span>{title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -70,7 +76,8 @@ export function MainNav() {
 
 export function SettingsNav() {
     const pathname = usePathname();
-    const item = { href: '/perfil', label: 'Perfil y Configuración', icon: UserCog };
+    const { t } = useI18n();
+    const item = { href: '/perfil', label: t('nav.perfil'), icon: UserCog };
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -88,3 +95,20 @@ export function SettingsNav() {
         </SidebarMenu>
     )
 }
+
+export function LanguageSwitcher() {
+    const { locale, toggleLocale } = useI18n();
+  
+    return (
+      <div className="px-2">
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          onClick={toggleLocale}
+        >
+          <Languages className="mr-2 h-4 w-4" />
+          <span>{locale === 'es' ? 'English' : 'Español'}</span>
+        </Button>
+      </div>
+    );
+  }

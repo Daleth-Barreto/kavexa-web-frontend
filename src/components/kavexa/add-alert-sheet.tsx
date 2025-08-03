@@ -35,6 +35,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format, parse } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Input } from '../ui/input';
+import { useI18n } from '@/contexts/i18n-context';
 
 const alertSchema = z.object({
   message: z.string().min(1, 'El mensaje es requerido.').max(100, 'El mensaje no puede tener más de 100 caracteres.'),
@@ -53,6 +54,7 @@ type AddAlertSheetProps = {
 
 export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertSheetProps) {
   const { addAlert, editAlert } = useAppContext();
+  const { t } = useI18n();
   const isEditing = !!defaultValues;
 
   const form = useForm<AlertFormValues>({
@@ -118,9 +120,9 @@ export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertShe
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>{isEditing ? 'Editar Recordatorio' : 'Añadir Nuevo Recordatorio'}</SheetTitle>
+          <SheetTitle>{isEditing ? t('addAlertSheet.editTitle') : t('addAlertSheet.addTitle')}</SheetTitle>
           <SheetDescription>
-            {isEditing ? 'Modifica los detalles de tu recordatorio.' : 'Crea un recordatorio. Puedes hacer que se repita con la frecuencia que necesites.'}
+            {isEditing ? t('addAlertSheet.editDescription') : t('addAlertSheet.addDescription')}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -130,10 +132,10 @@ export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertShe
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mensaje del recordatorio</FormLabel>
+                  <FormLabel>{t('addAlertSheet.messageLabel')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Ej: Llamar al proveedor de café antes de las 5pm."
+                      placeholder={t('addAlertSheet.messagePlaceholder')}
                       className="resize-none"
                       {...field}
                     />
@@ -148,7 +150,7 @@ export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertShe
                     name="date"
                     render={({ field }) => (
                         <FormItem className="flex flex-col flex-1">
-                        <FormLabel>Fecha</FormLabel>
+                        <FormLabel>{t('addAlertSheet.dateLabel')}</FormLabel>
                         <Popover>
                             <PopoverTrigger asChild>
                             <FormControl>
@@ -162,7 +164,7 @@ export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertShe
                                 {field.value ? (
                                     format(field.value, "PPP", { locale: es })
                                 ) : (
-                                    <span>Elige una fecha</span>
+                                    <span>{t('addAlertSheet.pickDate')}</span>
                                 )}
                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
@@ -187,7 +189,7 @@ export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertShe
                     name="time"
                     render={({ field }) => (
                         <FormItem className="flex flex-col flex-1">
-                        <FormLabel>Hora</FormLabel>
+                        <FormLabel>{t('addAlertSheet.timeLabel')}</FormLabel>
                         <FormControl>
                             <Input type="time" {...field} />
                         </FormControl>
@@ -202,18 +204,18 @@ export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertShe
                 name="recurrence"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Repetir</FormLabel>
+                    <FormLabel>{t('addAlertSheet.recurrenceLabel')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Selecciona una frecuencia" />
+                            <SelectValue placeholder={t('addAlertSheet.recurrencePlaceholder')} />
                         </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="none">Nunca</SelectItem>
-                            <SelectItem value="daily">Diariamente</SelectItem>
-                            <SelectItem value="weekly">Semanalmente</SelectItem>
-                            <SelectItem value="monthly">Mensualmente</SelectItem>
+                            <SelectItem value="none">{t('addAlertSheet.never')}</SelectItem>
+                            <SelectItem value="daily">{t('addAlertSheet.daily')}</SelectItem>
+                            <SelectItem value="weekly">{t('addAlertSheet.weekly')}</SelectItem>
+                            <SelectItem value="monthly">{t('addAlertSheet.monthly')}</SelectItem>
                         </SelectContent>
                     </Select>
                     <FormMessage />
@@ -222,9 +224,9 @@ export function AddAlertSheet({ open, onOpenChange, defaultValues }: AddAlertShe
              />
             <SheetFooter className="pt-4">
                 <SheetClose asChild>
-                    <Button type="button" variant="outline">Cancelar</Button>
+                    <Button type="button" variant="outline">{t('common.cancel')}</Button>
                 </SheetClose>
-              <Button type="submit">Guardar</Button>
+              <Button type="submit">{t('common.save')}</Button>
             </SheetFooter>
           </form>
         </Form>

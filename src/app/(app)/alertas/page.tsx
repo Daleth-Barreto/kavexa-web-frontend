@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
@@ -15,17 +16,12 @@ import { addDays, addWeeks, addMonths } from 'date-fns';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useI18n } from '@/contexts/i18n-context';
 
 const statusVariant: Record<Alert['status'], 'destructive' | 'secondary' | 'default'> = {
   new: 'destructive',
   ignored: 'secondary',
   resolved: 'default',
-};
-
-const statusText: Record<Alert['status'], string> = {
-  new: 'Nueva',
-  ignored: 'Ignorada',
-  resolved: 'Resuelta',
 };
 
 const alertIcons = {
@@ -36,15 +32,9 @@ const alertIcons = {
   custom: <Megaphone className="h-4 w-4 text-gray-500" />
 }
 
-const recurrenceText: Record<NonNullable<Alert['recurrence']>, string> = {
-    none: 'No se repite',
-    daily: 'Diariamente',
-    weekly: 'Semanalmente',
-    monthly: 'Mensualmente'
-}
-
 export default function AlertasPage() {
   const { alerts, setAlerts, addTransaction, subscriptions, setSubscriptions, deleteAlert } = useAppContext();
+  const { t } = useI18n();
   const { toast } = useToast();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
@@ -78,7 +68,7 @@ export default function AlertasPage() {
   const handlePaySubscription = (alert: Alert) => {
     const subscription = subscriptions.find(s => s.id === alert.relatedId);
     if (!subscription) {
-      toast({ title: 'Error', description: 'Suscripción no encontrada', variant: 'destructive'});
+      toast({ title: t('toasts.error'), description: t('toasts.subscriptionNotFound'), variant: 'destructive'});
       return;
     }
 
@@ -98,7 +88,7 @@ export default function AlertasPage() {
     } : s));
 
     handleStatusChange(alert.id, 'resolved');
-    toast({ title: 'Suscripción Pagada', description: `Se registró el pago de ${subscription.name}`});
+    toast({ title: t('toasts.subscriptionPaid'), description: t('toasts.subscriptionPaidDescription', { name: subscription.name })});
   }
   
   const formatDate = (isoString: string) => {
@@ -141,7 +131,7 @@ export default function AlertasPage() {
   const confirmDeleteAlert = () => {
     if (alertToDelete) {
       deleteAlert(alertToDelete.id);
-      toast({ title: 'Alerta eliminada'});
+      toast({ title: t('toasts.alertDeleted')});
     }
     setAlertToDelete(null);
     setDeleteAlertOpen(false);
@@ -151,25 +141,25 @@ export default function AlertasPage() {
     const idsToDelete = Object.keys(selectedRows).filter(id => selectedRows[id]);
     idsToDelete.forEach(id => deleteAlert(id));
     setSelectedRows({});
-    toast({ title: `${idsToDelete.length} alerta(s) eliminada(s)`});
+    toast({ title: t('toasts.alertsDeleted', { count: idsToDelete.length })});
   }
 
   return (
     <PageWrapper>
       <PageHeader
-        title="Alertas y Recordatorios"
-        description="Gestiona las alertas generadas por el sistema y añade tus propios recordatorios."
+        title={t('alertas.title')}
+        description={t('alertas.description')}
       >
         <div className="flex items-center gap-2">
             {numSelected > 0 && (
                 <Button variant="destructive" onClick={handleDeleteSelected}>
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Eliminar ({numSelected})
+                    {t('alertas.deleteSelected', { count: numSelected })}
                 </Button>
             )}
             <Button onClick={() => { setSelectedAlert(null); setSheetOpen(true); }}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Añadir Recordatorio
+                {t('alertas.addReminder')}
             </Button>
         </div>
       </PageHeader>
@@ -183,13 +173,13 @@ export default function AlertasPage() {
                      <Checkbox
                         checked={isAllSelected}
                         onCheckedChange={handleSelectAll}
-                        aria-label="Seleccionar todo"
+                        aria-label={t('common.selectAll')}
                     />
                   </TableHead>
-                  <TableHead>Mensaje</TableHead>
-                  <TableHead className="hidden md:table-cell">Recurrencia</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead>{t('alertas.table.message')}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t('alertas.table.recurrence')}</TableHead>
+                  <TableHead>{t('alertas.table.status')}</TableHead>
+                  <TableHead className="text-right">{t('common.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -199,7 +189,7 @@ export default function AlertasPage() {
                         <Checkbox
                             checked={selectedRows[alert.id] || false}
                             onCheckedChange={() => handleSelectRow(alert.id)}
-                            aria-label={`Seleccionar alerta ${alert.id}`}
+                            aria-label={`Select alert ${alert.id}`}
                         />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -216,27 +206,27 @@ export default function AlertasPage() {
                         {alert.recurrence && alert.recurrence !== 'none' && (
                             <div className='flex items-center gap-2 text-muted-foreground text-sm'>
                                 <History className='h-4 w-4'/>
-                                {recurrenceText[alert.recurrence]}
+                                {t(`alertas.recurrence${alert.recurrence.charAt(0).toUpperCase() + alert.recurrence.slice(1)}`)}
                             </div>
                         )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={statusVariant[alert.status]}>{statusText[alert.status]}</Badge>
+                      <Badge variant={statusVariant[alert.status]}>{t(`alertas.status${alert.status.charAt(0).toUpperCase() + alert.status.slice(1)}`)}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       {alert.status === 'new' && (
                         <div className="flex gap-2 justify-end">
                           {alert.type === 'subscription_due' ? (
                             <Button variant="outline" size="sm" onClick={() => handlePaySubscription(alert)}>
-                              <DollarSign className="mr-2 h-4 w-4"/> Pagar
+                              <DollarSign className="mr-2 h-4 w-4"/> {t('alertas.pay')}
                             </Button>
                           ) : (
                             <Button variant="outline" size="sm" onClick={() => handleStatusChange(alert.id, 'resolved')}>
-                              <Check className="mr-2 h-4 w-4"/> Resolver
+                              <Check className="mr-2 h-4 w-4"/> {t('alertas.resolve')}
                             </Button>
                           )}
                           <Button variant="ghost" size="sm" onClick={() => handleStatusChange(alert.id, 'ignored')}>
-                            <Trash2 className="mr-2 h-4 w-4" /> Ignorar
+                            <Trash2 className="mr-2 h-4 w-4" /> {t('alertas.ignore')}
                           </Button>
                         </div>
                       )}
@@ -250,12 +240,12 @@ export default function AlertasPage() {
                            {alert.type === 'custom' && (
                              <DropdownMenuItem onClick={() => handleEditAlert(alert)}>
                                 <Edit className="mr-2 h-4 w-4" />
-                                Editar
+                                {t('common.edit')}
                               </DropdownMenuItem>
                            )}
                            <DropdownMenuItem onClick={() => handleDeleteAlert(alert)} className="text-destructive focus:text-destructive">
                              <Trash2 className="mr-2 h-4 w-4" />
-                             Eliminar
+                             {t('common.delete')}
                            </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -266,7 +256,7 @@ export default function AlertasPage() {
             </Table>
           ) : (
             <div className="text-center text-muted-foreground py-8">
-              No hay alertas para mostrar. El sistema te notificará aquí si detecta alguna anomalía.
+              {t('alertas.noAlerts')}
             </div>
           )}
         </CardContent>
@@ -280,14 +270,14 @@ export default function AlertasPage() {
       <AlertDialog open={isDeleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t('alertas.deleteAlertTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminará permanentemente la alerta.
+              {t('alertas.deleteAlertDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setAlertToDelete(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteAlert} variant="destructive">Confirmar</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setAlertToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteAlert} variant="destructive">{t('common.confirm')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
