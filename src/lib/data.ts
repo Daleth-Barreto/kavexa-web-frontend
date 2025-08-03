@@ -8,7 +8,7 @@ const today = new Date();
 const getDate = (daysAgo: number) => format(subDays(today, daysAgo), 'yyyy-MM-dd');
 
 export const mockInventory: InventoryItem[] = [
-    { id: 'item-1', name: 'Café en Grano 250g', stock: 5000, lowStockThreshold: 100, price: 12.50 },
+    { id: 'item-1', name: 'Café en Grano 250g', stock: 50000, lowStockThreshold: 100, price: 12.50 },
     { id: 'item-2', name: 'Leche de Almendras 1L', stock: 250, lowStockThreshold: 50, price: 3.50 },
     { id: 'item-3', name: 'Taza de Cerámica', stock: 150, lowStockThreshold: 20, price: 15.00 },
     { id: 'item-4', name: 'Croissant de Mantequilla', stock: 330, lowStockThreshold: 50, price: 2.75 },
@@ -16,9 +16,15 @@ export const mockInventory: InventoryItem[] = [
 ];
 
 const coffeeSales: Transaction[] = [];
-for (let i = 0; i < 20; i++) {
-    const daysAgo = Math.floor(Math.random() * 30) + 1; // Ventas en los últimos 30 días
-    const quantity = Math.floor(Math.random() * 80) + 20; // Vender entre 20 y 100 unidades
+for (let i = 29; i >= 0; i--) { // Iterar desde hace 29 días hasta hoy
+    const daysAgo = i;
+    // La cantidad aumenta a medida que nos acercamos al presente (i se acerca a 0)
+    // Empieza en ~30 unidades y termina en ~150
+    const baseQuantity = 30;
+    const growthFactor = (29 - i) * 4; // Crecimiento lineal
+    const randomVariation = Math.floor(Math.random() * 10);
+    const quantity = baseQuantity + growthFactor + randomVariation;
+
     const coffeePrice = mockInventory.find(p => p.id === 'item-1')!.price;
     coffeeSales.push({
         id: `txn-coffee-${i}`,
@@ -32,6 +38,7 @@ for (let i = 0; i < 20; i++) {
         clientId: `client-${(i % 3) + 1}`
     });
 }
+
 
 export const mockTransactions: Transaction[] = [
     // --- Ventas de Café en Grano (Más fuerte los Lunes - simulado) ---
