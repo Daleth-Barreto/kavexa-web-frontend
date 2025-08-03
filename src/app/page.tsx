@@ -39,16 +39,16 @@ export default function LandingPage() {
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4">
         <div className="space-y-4 max-w-3xl w-full">
             <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                Tu Asistente de Negocios Inteligente
+                Tu Asistente Inteligente de Negocios y Finanzas Personales
             </div>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline text-primary">
-            Inteligencia para tu negocio.
+            Inteligencia para tus finanzas.
           </h1>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
              Simple, personal y offline.
           </h2>
           <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-            Desde finanzas hasta inventario, Kavexa se adapta a ti. Elige tus módulos y empieza a gestionar tu pyme de forma más inteligente. Todos tus datos se quedan en tu dispositivo, garantizando velocidad y privacidad.
+            Desde tus finanzas personales hasta el inventario de tu pyme, Kavexa se adapta a ti. Elige tus módulos y empieza a gestionar todo de forma más inteligente. Tus datos se quedan en tu dispositivo, garantizando velocidad y privacidad.
           </p>
         </div>
         <div className="flex flex-col gap-4 min-[400px]:flex-row mt-8">
