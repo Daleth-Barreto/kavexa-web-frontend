@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -78,14 +79,24 @@ export default function MovimientosPage() {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
   
-  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth()).toString());
-
-  const { years, months } = useMemo(() => {
+  const { years, months, initialYear, initialMonth } = useMemo(() => {
     const years = [...new Set(transactions.map(t => getYear(new Date(t.date))))].sort((a,b) => b-a);
     const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    return { years: years.map(String), months };
+    
+    let initialYear = new Date().getFullYear().toString();
+    let initialMonth = new Date().getMonth().toString();
+
+    if (transactions.length > 0) {
+        const mostRecentTransactionDate = new Date(Math.max(...transactions.map(t => new Date(t.date).getTime())));
+        initialYear = getYear(mostRecentTransactionDate).toString();
+        initialMonth = getMonth(mostRecentTransactionDate).toString();
+    }
+    
+    return { years: years.map(String), months, initialYear, initialMonth };
   }, [transactions]);
+  
+  const [selectedYear, setSelectedYear] = useState<string>(initialYear);
+  const [selectedMonth, setSelectedMonth] = useState<string>(initialMonth);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(t => {
@@ -152,7 +163,7 @@ export default function MovimientosPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full sm:w-auto flex-grow"
               />
-               <Select value={selectedYear} onValuechange={setSelectedYear}>
+               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger className="w-full sm:w-[120px]">
                   <SelectValue placeholder="Año" />
                 </SelectTrigger>
