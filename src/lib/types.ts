@@ -1,4 +1,5 @@
 
+
 export type Transaction = {
   id: string;
   date: string;
@@ -39,9 +40,17 @@ export type Provider = {
     phone: string;
 };
 
+export type Project = {
+  id: string;
+  name: string;
+  clientId: string;
+  status: 'active' | 'completed' | 'on_hold';
+  deadline?: string;
+};
+
 export type ModuleKey = 
   | 'inicio' | 'movimientos' | 'pos' | 'inventario' | 'clientes' 
-  | 'proveedores' | 'suscripciones' | 'demanda' | 'proyeccion' | 'alertas' | 'reportes';
+  | 'proveedores' | 'suscripciones' | 'demanda' | 'proyeccion' | 'alertas' | 'reportes' | 'proyectos';
 
 export type AppConfig = {
     currency: string;

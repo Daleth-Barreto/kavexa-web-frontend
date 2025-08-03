@@ -17,6 +17,7 @@ import {
   Users,
   Truck,
   Languages,
+  Briefcase,
 } from 'lucide-react';
 
 import {
@@ -42,6 +43,7 @@ const icons: Record<string, React.ElementType> = {
     proyeccion: TrendingUp,
     alertas: Bell,
     reportes: FileDown,
+    proyectos: Briefcase,
 };
 
 export function MainNav() {

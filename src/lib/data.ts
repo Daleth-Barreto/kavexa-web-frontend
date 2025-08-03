@@ -1,5 +1,6 @@
 
-import type { Transaction, InventoryItem, Alert, Subscription, Client, Provider, ModuleKey } from './types';
+
+import type { Transaction, InventoryItem, Alert, Subscription, Client, Provider, ModuleKey, Project } from './types';
 import { subDays, format } from 'date-fns';
 
 const today = new Date();
@@ -8,8 +9,6 @@ const today = new Date();
 const getDate = (daysAgo: number) => format(subDays(today, daysAgo), 'yyyy-MM-dd');
 
 export const mockInventory: InventoryItem[] = [];
-
-const coffeeSales: Transaction[] = [];
 
 export const mockTransactions: Transaction[] = [];
 
@@ -21,6 +20,8 @@ export const mockClients: Client[] = [];
 
 export const mockProviders: Provider[] = [];
 
+export const mockProjects: Project[] = [];
+
 
 export const ALL_MODULES: { id: ModuleKey, title: string, description: string, href: string }[] = [
     { id: 'inicio', title: 'Inicio', description: 'Dashboard principal con resúmenes.', href: '/inicio' },
@@ -29,6 +30,7 @@ export const ALL_MODULES: { id: ModuleKey, title: string, description: string, h
     { id: 'inventario', title: 'Inventario', description: 'Controla tu stock de productos.', href: '/inventario' },
     { id: 'clientes', title: 'Clientes', description: 'Administra tu base de clientes.', href: '/clientes' },
     { id: 'proveedores', title: 'Proveedores', description: 'Administra tus proveedores.', href: '/proveedores' },
+    { id: 'proyectos', title: 'Proyectos', description: 'Gestiona proyectos y tareas.', href: '/proyectos' },
     { id: 'suscripciones', title: 'Suscripciones', description: 'Pagos y gastos recurrentes.', href: '/suscripciones' },
     { id: 'demanda', title: 'Análisis de Demanda', description: 'Analiza la rotación de productos.', href: '/demanda' },
     { id: 'proyeccion', title: 'Proyección Financiera', description: 'Estima tu flujo de caja futuro.', href: '/proyeccion' },
@@ -43,5 +45,3 @@ export const getDefaultModuleConfig = (): Record<ModuleKey, boolean> => {
     });
     return config;
 };
-
-    

@@ -3,8 +3,8 @@
 
 import React, { createContext, useContext, ReactNode, useMemo, useCallback, useEffect, useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { Transaction, InventoryItem, Alert, AppConfig, Subscription, Client, Provider, ModuleKey } from '@/lib/types';
-import { mockTransactions, mockInventory, mockAlerts, mockSubscriptions, mockClients, mockProviders, getDefaultModuleConfig } from '@/lib/data';
+import { Transaction, InventoryItem, Alert, AppConfig, Subscription, Client, Provider, ModuleKey, Project } from '@/lib/types';
+import { mockTransactions, mockInventory, mockAlerts, mockSubscriptions, mockClients, mockProviders, getDefaultModuleConfig, mockProjects } from '@/lib/data';
 import { calculateZScore, Z_SCORE_THRESHOLD } from '@/lib/math-utils';
 import { useToast } from '@/hooks/use-toast';
 import { isSameMonth, isSameYear, addDays, addMonths, addWeeks } from 'date-fns';
@@ -34,6 +34,8 @@ interface AppContextType {
   setClients: (value: Client[] | ((val: Client[]) => Client[])) => void;
   providers: Provider[];
   setProviders: (value: Provider[] | ((val: Provider[]) => Provider[])) => void;
+  projects: Project[];
+  setProjects: (value: Project[] | ((val: Project[]) => Project[])) => void;
   
   config: AppConfig;
   setConfig: (value: AppConfig | ((val: AppConfig) => AppConfig)) => void;
@@ -58,6 +60,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [subscriptions, setSubscriptions, isSubscriptionsLoaded] = useLocalStorage<Subscription[]>('kavexa_subscriptions', mockSubscriptions);
   const [clients, setClients, isClientsLoaded] = useLocalStorage<Client[]>('kavexa_clients', mockClients);
   const [providers, setProviders, isProvidersLoaded] = useLocalStorage<Provider[]>('kavexa_providers', mockProviders);
+  const [projects, setProjects, isProjectsLoaded] = useLocalStorage<Project[]>('kavexa_projects', mockProjects);
   const [config, setConfig, isConfigLoaded] = useLocalStorage<AppConfig>('kavexa_config', { 
     currency: 'USD',
     onboardingComplete: false,
@@ -67,7 +70,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const [isAppLoading, setIsAppLoading] = useState(true);
 
-  const isDataLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isConfigLoaded && isSubscriptionsLoaded && isClientsLoaded && isProvidersLoaded;
+  const isDataLoaded = isTransactionsLoaded && isInventoryLoaded && isAlertsLoaded && isConfigLoaded && isSubscriptionsLoaded && isClientsLoaded && isProvidersLoaded && isProjectsLoaded;
 
   useEffect(() => {
     if (isDataLoaded) {
@@ -327,9 +330,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSubscriptions([]);
     setClients([]);
     setProviders([]);
+    setProjects([]);
     setConfig(prev => ({...prev, onboardingComplete: false, enabledModules: getDefaultModuleConfig() }));
     router.push('/welcome');
-  }, [setTransactions, setInventory, setAlerts, setSubscriptions, setClients, setProviders, setConfig, router]);
+  }, [setTransactions, setInventory, setAlerts, setSubscriptions, setClients, setProviders, setProjects, setConfig, router]);
 
   const setCurrency = useCallback((currency: string) => {
     setConfig(prev => ({ ...prev, currency }));
@@ -361,6 +365,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setClients,
     providers,
     setProviders,
+    projects,
+    setProjects,
     config,
     setConfig,
     updateModuleConfig,
@@ -378,6 +384,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     subscriptions, setSubscriptions,
     clients, setClients,
     providers, setProviders,
+    projects, setProjects,
     config, setConfig, updateModuleConfig,
     isAppLoading, addTransaction, editTransaction, deleteTransaction, clearAllData, setCurrency
   ]);

@@ -33,6 +33,7 @@
     "inventario": "Inventario",
     "clientes": "Clientes",
     "proveedores": "Proveedores",
+    "proyectos": "Proyectos",
     "suscripciones": "Suscripciones",
     "demanda": "Análisis de Demanda",
     "proyeccion": "Proyección Financiera",
@@ -41,6 +42,20 @@
     "perfil": "Perfil y Configuración",
     "login": "Iniciar Sesión",
     "logout": "Cerrar Sesión"
+  },
+  "modules": {
+    "inicio": { "description": "Dashboard principal con resúmenes." },
+    "movimientos": { "description": "Registra ingresos y egresos." },
+    "pos": { "description": "Interfaz rápida para ventas." },
+    "inventario": { "description": "Controla tu stock de productos." },
+    "clientes": { "description": "Administra tu base de clientes." },
+    "proveedores": { "description": "Administra tus proveedores." },
+    "proyectos": { "description": "Gestiona proyectos y tareas." },
+    "suscripciones": { "description": "Pagos y gastos recurrentes." },
+    "demanda": { "description": "Analiza la rotación de productos." },
+    "proyeccion": { "description": "Estima tu flujo de caja futuro." },
+    "alertas": { "description": "Avisos importantes del sistema." },
+    "reportes": { "description": "Genera informes detallados." }
   },
   "inicio": {
     "title": "Inicio",
@@ -345,19 +360,6 @@
     "step7": "¡Listo! Ya conoces lo básico. Explora las demás secciones para descubrir más herramientas.",
     "next": "Siguiente",
     "finish": "Finalizar"
-  },
-  "modules": {
-    "inicio": { "description": "Dashboard principal con resúmenes." },
-    "movimientos": { "description": "Registra ingresos y egresos." },
-    "pos": { "description": "Interfaz rápida para ventas." },
-    "inventario": { "description": "Controla tu stock de productos." },
-    "clientes": { "description": "Administra tu base de clientes." },
-    "proveedores": { "description": "Administra tus proveedores." },
-    "suscripciones": { "description": "Pagos y gastos recurrentes." },
-    "demanda": { "description": "Analiza la rotación de productos." },
-    "proyeccion": { "description": "Estima tu flujo de caja futuro." },
-    "alertas": { "description": "Avisos importantes del sistema." },
-    "reportes": { "description": "Genera informes detallados." }
   },
   "toasts": {
       "error": "Error",
