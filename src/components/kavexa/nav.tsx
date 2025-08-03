@@ -28,6 +28,7 @@ import { ALL_MODULES } from '@/lib/data';
 import { useAppContext } from '@/contexts/app-context';
 import { useI18n } from '@/contexts/i18n-context';
 import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 
 const icons: Record<string, React.ElementType> = {
     inicio: Home,
@@ -112,3 +113,23 @@ export function LanguageSwitcher() {
       </div>
     );
   }
+
+export function HeaderLanguageSwitcher() {
+    const { locale, toggleLocale, t } = useI18n();
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={toggleLocale}>
+                    <Languages className="h-5 w-5" />
+                    <span className="sr-only">
+                        {locale === 'es' ? 'Change to English' : 'Cambiar a Español'}
+                    </span>
+                </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+                <p>{locale === 'es' ? 'Change to English' : 'Cambiar a Español'}</p>
+            </TooltipContent>
+        </Tooltip>
+    )
+}

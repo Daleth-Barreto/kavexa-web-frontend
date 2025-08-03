@@ -9,6 +9,8 @@ import { AbstractDashboard } from '@/components/kavexa/abstract-dashboard';
 import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/contexts/i18n-context';
 import { ThemeToggleButton } from '@/components/kavexa/theme-toggle-button';
+import { HeaderLanguageSwitcher } from '@/components/kavexa/nav';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 export default function LandingPage() {
   const { toast } = useToast();
@@ -30,7 +32,10 @@ export default function LandingPage() {
           <span className="font-bold text-lg font-headline">Kavexa</span>
         </Link>
         <nav className="ml-auto flex items-center gap-2 sm:gap-4">
-          <ThemeToggleButton />
+          <TooltipProvider>
+            <HeaderLanguageSwitcher />
+            <ThemeToggleButton />
+          </TooltipProvider>
           <Button variant="ghost" onClick={handleComingSoon} disabled>
             {t('landing.login')}
           </Button>
