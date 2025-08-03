@@ -72,10 +72,7 @@ export default function LandingPage() {
         <p className="text-xs text-muted-foreground">&copy; 2025 Kavexa. Todos los derechos reservados.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="/terms" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Términos de Servicio
-          </Link>
-          <Link href="/privacy" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Privacidad
+            Términos y Privacidad
           </Link>
         </nav>
       </footer>
