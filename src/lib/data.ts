@@ -8,12 +8,30 @@ const today = new Date();
 const getDate = (daysAgo: number) => format(subDays(today, daysAgo), 'yyyy-MM-dd');
 
 export const mockInventory: InventoryItem[] = [
-    { id: 'item-1', name: 'Café en Grano 250g', stock: 42, lowStockThreshold: 10, price: 12.50 },
-    { id: 'item-2', name: 'Leche de Almendras 1L', stock: 25, lowStockThreshold: 5, price: 3.50 },
-    { id: 'item-3', name: 'Taza de Cerámica', stock: 15, lowStockThreshold: 5, price: 15.00 },
-    { id: 'item-4', name: 'Croissant de Mantequilla', stock: 33, lowStockThreshold: 10, price: 2.75 },
-    { id: 'item-5', name: 'Bolsa de Tela Reutilizable', stock: 50, lowStockThreshold: 15, price: 8.00 },
+    { id: 'item-1', name: 'Café en Grano 250g', stock: 5000, lowStockThreshold: 100, price: 12.50 },
+    { id: 'item-2', name: 'Leche de Almendras 1L', stock: 250, lowStockThreshold: 50, price: 3.50 },
+    { id: 'item-3', name: 'Taza de Cerámica', stock: 150, lowStockThreshold: 20, price: 15.00 },
+    { id: 'item-4', name: 'Croissant de Mantequilla', stock: 330, lowStockThreshold: 50, price: 2.75 },
+    { id: 'item-5', name: 'Bolsa de Tela Reutilizable', stock: 500, lowStockThreshold: 50, price: 8.00 },
 ];
+
+const coffeeSales: Transaction[] = [];
+for (let i = 0; i < 20; i++) {
+    const daysAgo = Math.floor(Math.random() * 45) + 1; // Ventas en los últimos 45 días
+    const quantity = Math.floor(Math.random() * 80) + 20; // Vender entre 20 y 100 unidades
+    const coffeePrice = mockInventory.find(p => p.id === 'item-1')!.price;
+    coffeeSales.push({
+        id: `txn-coffee-${i}`,
+        date: getDate(daysAgo),
+        description: `Venta Corporativa: Café en Grano 250g (x${quantity})`,
+        amount: coffeePrice * quantity,
+        type: 'income',
+        category: 'Ventas Corporativas',
+        productId: 'item-1',
+        quantity: quantity,
+        clientId: `client-${(i % 3) + 1}`
+    });
+}
 
 export const mockTransactions: Transaction[] = [
     // --- Ventas de Café en Grano (Más fuerte los Lunes - simulado) ---
@@ -42,6 +60,8 @@ export const mockTransactions: Transaction[] = [
     { id: 'txn-21', date: getDate(20), description: 'Material de oficina', amount: 25.00, type: 'egress', category: 'Oficina' },
     { id: 'txn-22', date: getDate(25), description: 'Reparación de cafetera', amount: 120.00, type: 'egress', category: 'Mantenimiento' },
     { id: 'txn-23', date: getDate(30), description: 'Pago de nómina', amount: 1200.00, type: 'egress', category: 'Nómina' },
+    // AÑADIR LAS VENTAS MASIVAS DE CAFÉ
+    ...coffeeSales,
 ];
 
 export const mockAlerts: Alert[] = [];
