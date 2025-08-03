@@ -22,7 +22,7 @@ export function AbstractDashboard({ className }: { className?: string }) {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
           }
-           @keyframes pop-in {
+          @keyframes pop-in {
             from { opacity: 0; transform: scale(0); }
             to { opacity: 1; transform: scale(1); }
           }
@@ -30,11 +30,23 @@ export function AbstractDashboard({ className }: { className?: string }) {
             from { transform: scaleY(0); }
             to { transform: scaleY(1); }
           }
+          @keyframes flow {
+            from { stroke-dashoffset: 100; }
+            to { stroke-dashoffset: -100; }
+          }
+           @keyframes pulse-dot {
+            0%, 100% { r: 3; opacity: 1; }
+            50% { r: 5; opacity: 0.7; }
+          }
 
           .draw-chart-line {
             stroke-dasharray: 1000;
             stroke-dashoffset: 1000;
-            animation: draw 2.5s ease-out 0.5s forwards;
+            animation: draw 2.5s ease-out forwards;
+          }
+          .flow-chart-line {
+             stroke-dasharray: 5 5;
+             animation: flow 10s linear infinite;
           }
           .draw-chart-line-2 {
             stroke-dasharray: 1000;
@@ -47,7 +59,7 @@ export function AbstractDashboard({ className }: { className?: string }) {
           }
           .chart-point {
             opacity: 0;
-            animation: pop-in 0.5s ease-out forwards;
+            animation: pop-in 0.5s ease-out 3s forwards, pulse-dot 3s ease-in-out 3.5s infinite;
           }
           .bar {
             transform-origin: bottom;
@@ -74,14 +86,16 @@ export function AbstractDashboard({ className }: { className?: string }) {
         
         {/* Lines and fills */}
         <path className="draw-chart-line" d="M 0 130 C 40 110, 80 60, 120 70 S 200 120, 240 100 S 320 40, 360 50" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" />
+        <path className="flow-chart-line" d="M 0 130 C 40 110, 80 60, 120 70 S 200 120, 240 100 S 320 40, 360 50" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" />
+
         <path d="M 0 150 L 0 130 C 40 110, 80 60, 120 70 S 200 120, 240 100 S 320 40, 360 50 L 360 150 Z" fill="hsl(var(--primary))" fillOpacity="0.1" />
         
         <path className="draw-chart-line-2" d="M 0 140 C 30 150, 70 110, 110 120 S 190 170, 230 150 S 310 90, 360 100" fill="none" stroke="hsl(var(--accent))" strokeWidth="2" />
         <path d="M 0 150 L 0 140 C 30 150, 70 110, 110 120 S 190 170, 230 150 S 310 90, 360 100 L 360 150 Z" fill="hsl(var(--accent))" fillOpacity="0.1" />
 
         {/* End points */}
-        <circle className="chart-point" cx="360" cy="50" r="3" fill="hsl(var(--primary))" style={{ animationDelay: '3s' }} />
-        <circle className="chart-point" cx="360" cy="100" r="3" fill="hsl(var(--accent))" style={{ animationDelay: '3.5s' }}/>
+        <circle className="chart-point" cx="360" cy="50" r="3" fill="hsl(var(--primary))" />
+        <circle className="chart-point" cx="360" cy="100" r="3" fill="hsl(var(--accent))" style={{ animationDelay: '3.5s, 4s' }}/>
       </g>
       
       {/* Side cards */}
