@@ -335,6 +335,17 @@
       "register": "Sign Up",
       "terms": "Terms & Privacy"
   },
+  "tour": {
+    "step1": "Welcome to Kavexa! Let's take a quick tour of the main features.",
+    "step2": "Use this menu to navigate through the different sections of the app.",
+    "step3": "Here's a quick overview of your finances: income, expenses, and total balance.",
+    "step4": "This chart gives you a visual comparison of your income and expenses over time.",
+    "step5": "From here you can add new products to your inventory or record financial transactions.",
+    "step6": "Stay up to date with important alerts and recent activities in your business.",
+    "step7": "All set! You know the basics now. Explore the other sections to discover more tools.",
+    "next": "Next",
+    "finish": "Finish"
+  },
   "toasts": {
       "error": "Error",
       "success": "Success",

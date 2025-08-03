@@ -5,38 +5,7 @@ import { TourProvider, useTour, type StepType } from '@reactour/tour';
 import { Popover as TourPopover } from '@reactour/popover';
 import { Button } from '../ui/button';
 import { HelpCircle } from 'lucide-react';
-import { useTheme } from 'next-themes';
-
-const steps: StepType[] = [
-  {
-    selector: 'body',
-    content: '¡Bienvenido a Kavexa! Te mostraremos rápidamente las funciones principales.',
-  },
-  {
-    selector: '[data-tour-step="1"]',
-    content: 'Usa este menú para navegar por las diferentes secciones de la aplicación.',
-  },
-  {
-    selector: '[data-tour-step="2"]',
-    content: 'Aquí tienes un resumen rápido de tus finanzas: ingresos, egresos y el balance total.',
-  },
-  {
-    selector: '[data-tour-step="3"]',
-    content: 'Este gráfico te muestra una comparación visual de tus ingresos y egresos a lo largo del tiempo.',
-  },
-  {
-    selector: '[data-tour-step="4"]',
-    content: 'Desde aquí puedes añadir nuevos productos a tu inventario o registrar transacciones financieras.',
-  },
-  {
-    selector: '[data-tour-step="5"]',
-    content: 'Mantente al día con las alertas importantes y las actividades recientes de tu negocio.',
-  },
-  {
-    selector: 'body',
-    content: '¡Listo! Ya conoces lo básico. Explora las demás secciones para descubrir más herramientas.',
-  },
-];
+import { useI18n } from '@/contexts/i18n-context';
 
 function TourTrigger() {
   const { setIsOpen } = useTour();
@@ -49,7 +18,38 @@ function TourTrigger() {
 }
 
 function AppTour({ children }: { children: React.ReactNode }) {
-  const { theme } = useTheme();
+  const { t } = useI18n();
+
+  const steps: StepType[] = [
+    {
+      selector: 'body',
+      content: t('tour.step1'),
+    },
+    {
+      selector: '[data-tour-step="1"]',
+      content: t('tour.step2'),
+    },
+    {
+      selector: '[data-tour-step="2"]',
+      content: t('tour.step3'),
+    },
+    {
+      selector: '[data-tour-step="3"]',
+      content: t('tour.step4'),
+    },
+    {
+      selector: '[data-tour-step="4"]',
+      content: t('tour.step5'),
+    },
+    {
+      selector: '[data-tour-step="5"]',
+      content: t('tour.step6'),
+    },
+    {
+      selector: 'body',
+      content: t('tour.step7'),
+    },
+  ];
 
   return (
     <TourProvider 
@@ -65,7 +65,7 @@ function AppTour({ children }: { children: React.ReactNode }) {
                     {children}
                     <div className="flex justify-end">
                     <Button onClick={() => isLastStep ? setIsOpen(false) : props.nextStep()}>
-                        {isLastStep ? 'Finalizar' : 'Siguiente'}
+                        {isLastStep ? t('tour.finish') : t('tour.next')}
                     </Button>
                     </div>
                 </div>
@@ -91,7 +91,7 @@ function AppTour({ children }: { children: React.ReactNode }) {
             }),
             close: (base) => ({
               ...base,
-              color: theme === 'dark' ? '#fff' : '#000',
+              color: 'hsl(var(--foreground))',
               '&:hover': {
                 color: 'hsl(var(--primary))',
               }

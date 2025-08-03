@@ -16,6 +16,10 @@ import { AddTransactionSheet } from '@/components/kavexa/add-transaction-sheet';
 import { ProductFormSheet } from '@/components/kavexa/product-form-sheet';
 import type { InventoryItem } from '@/lib/types';
 import { AppTour } from '@/components/kavexa/app-tour';
+import { useI18n } from '@/contexts/i18n-context';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { HeaderLanguageSwitcher } from '@/components/kavexa/nav';
+import { ThemeToggleButton } from '@/components/kavexa/theme-toggle-button';
 
 const alertIcons = {
   unusual_expense: <ShieldAlert className="h-4 w-4 text-yellow-500" />,
@@ -27,6 +31,7 @@ const alertIcons = {
 
 export default function InicioPage() {
   const { transactions, alerts, inventory, setInventory } = useAppContext();
+  const { t } = useI18n();
   const [isTransactionSheetOpen, setTransactionSheetOpen] = useState(false);
   const [isProductSheetOpen, setProductSheetOpen] = useState(false);
   const { formatCurrency } = useCurrency();
@@ -77,7 +82,6 @@ export default function InicioPage() {
   }, [alerts]);
 
   const handleProductFormSubmit = (data: Omit<InventoryItem, 'id'>) => {
-    // Solo creación desde el dashboard
     const newItem: InventoryItem = {
       id: `item-${Date.now()}`,
       ...data
@@ -91,21 +95,25 @@ export default function InicioPage() {
     <AppTour>
       <PageWrapper>
         <PageHeader
-          title="Inicio"
-          description="Un resumen de la salud financiera y operativa de tu negocio."
+          title={t('inicio.title')}
+          description={t('inicio.description')}
         >
           <div className="flex items-center gap-2">
+            <TooltipProvider>
+              <HeaderLanguageSwitcher />
+              <ThemeToggleButton />
+            </TooltipProvider>
             <AppTour.Trigger />
             <div className="flex flex-col sm:flex-row gap-2" data-tour-step="4">
                <Button variant="outline" asChild>
                 <Link href={GOOGLE_FORM_URL} target="_blank">
                   <MessageSquareQuote className="mr-2 h-4 w-4" />
-                  Danos tu opinión
+                  {t('common.giveFeedback')}
                 </Link>
               </Button>
               <Button onClick={() => setTransactionSheetOpen(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Registrar Movimiento
+                {t('inicio.addTransaction')}
               </Button>
             </div>
           </div>
@@ -113,32 +121,32 @@ export default function InicioPage() {
         <div data-tour-step="2" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('inicio.totalIncome')}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground text-green-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(summary.totalIncome)}</div>
-              <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
+              <p className="text-xs text-muted-foreground">{t('inicio.totalIncomeDesc')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Egresos Totales</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('inicio.totalEgress')}</CardTitle>
               <TrendingDown className="h-4 w-4 text-muted-foreground text-red-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(summary.totalEgress)}</div>
-              <p className="text-xs text-muted-foreground">Calculado de todos los movimientos</p>
+              <p className="text-xs text-muted-foreground">{t('inicio.totalEgressDesc')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Balance Actual</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('inicio.currentBalance')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(summary.balance)}</div>
-              <p className="text-xs text-muted-foreground">Balance total calculado</p>
+              <p className="text-xs text-muted-foreground">{t('inicio.currentBalanceDesc')}</p>
             </CardContent>
           </Card>
         </div>
@@ -146,7 +154,7 @@ export default function InicioPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-8">
           <Card data-tour-step="3" className="lg:col-span-4">
             <CardHeader>
-              <CardTitle>Ingresos vs. Egresos</CardTitle>
+              <CardTitle>{t('inicio.incomeVsEgress')}</CardTitle>
             </CardHeader>
             <CardContent className="pl-2">
               {transactions.length > 0 ? (
@@ -174,15 +182,15 @@ export default function InicioPage() {
                 </ResponsiveContainer>
               ) : (
                 <div className="text-center text-muted-foreground h-[350px] flex items-center justify-center">
-                  No hay transacciones para mostrar un gráfico.
+                  {t('inicio.noTransactionsChart')}
                 </div>
               )}
             </CardContent>
           </Card>
           <Card data-tour-step="5" className="lg:col-span-3 flex flex-col">
             <CardHeader>
-              <CardTitle>Alertas</CardTitle>
-              <CardDescription>Las notificaciones más recientes generadas por el sistema.</CardDescription>
+              <CardTitle>{t('inicio.alerts')}</CardTitle>
+              <CardDescription>{t('inicio.alertsDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
               {recentAlerts.length > 0 ? (
@@ -201,15 +209,15 @@ export default function InicioPage() {
               ) : (
                   <div className="text-center text-muted-foreground py-8 flex flex-col items-center justify-center h-full">
                       <Bell className="h-10 w-10 mb-4 text-muted-foreground/50"/>
-                      <p className="font-medium">Todo en orden</p>
-                      <p className="text-sm">No tienes alertas nuevas en este momento.</p>
+                      <p className="font-medium">{t('inicio.allInOrder')}</p>
+                      <p className="text-sm">{t('inicio.noNewAlerts')}</p>
                   </div>
               )}
             </CardContent>
             <CardFooter>
                 <Button asChild variant={recentAlerts.length > 0 ? 'outline' : 'ghost'} className="w-full">
                     <Link href="/alertas">
-                        Ver todas las alertas <ArrowRight className="ml-2 h-4 w-4"/>
+                        {t('inicio.viewAllAlerts')} <ArrowRight className="ml-2 h-4 w-4"/>
                     </Link>
                 </Button>
             </CardFooter>
@@ -219,7 +227,7 @@ export default function InicioPage() {
         <AddTransactionSheet 
           open={isTransactionSheetOpen} 
           onOpenChange={setTransactionSheetOpen}
-          defaultValues={null} // Forcing creation mode from dashboard
+          defaultValues={null}
         />
 
         <ProductFormSheet 

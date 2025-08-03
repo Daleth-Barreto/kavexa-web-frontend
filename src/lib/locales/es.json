@@ -335,6 +335,17 @@
       "register": "Registrarse",
       "terms": "Términos y Privacidad"
   },
+  "tour": {
+    "step1": "¡Bienvenido a Kavexa! Te mostraremos rápidamente las funciones principales.",
+    "step2": "Usa este menú para navegar por las diferentes secciones de la aplicación.",
+    "step3": "Aquí tienes un resumen rápido de tus finanzas: ingresos, egresos y el balance total.",
+    "step4": "Este gráfico te muestra una comparación visual de tus ingresos y egresos a lo largo del tiempo.",
+    "step5": "Desde aquí puedes añadir nuevos productos a tu inventario o registrar transacciones financieras.",
+    "step6": "Mantente al día con las alertas importantes y las actividades recientes de tu negocio.",
+    "step7": "¡Listo! Ya conoces lo básico. Explora las demás secciones para descubrir más herramientas.",
+    "next": "Siguiente",
+    "finish": "Finalizar"
+  },
   "toasts": {
       "error": "Error",
       "success": "Éxito",
