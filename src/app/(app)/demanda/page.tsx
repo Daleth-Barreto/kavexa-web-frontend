@@ -1,12 +1,15 @@
+
 'use client';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { PageWrapper } from "@/components/kavexa/page-wrapper";
 import { PageHeader } from "@/components/kavexa/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/contexts/app-context";
 import { calculateLinearRegression } from '@/lib/math-utils';
-import { TrendingDown, CalendarDays } from 'lucide-react';
+import { TrendingDown, CalendarDays, TrendingUp, ArrowUpDown, BarChart2 } from 'lucide-react';
 import type { InventoryItem, Transaction } from '@/lib/types';
 
 // Función para asociar transacciones a productos del inventario
@@ -30,18 +33,33 @@ const getSalesDataPerProduct = (transactions: Transaction[], inventory: Inventor
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
+type DemandAnalysisItem = InventoryItem & {
+  trend: number;
+  salesCount: number;
+  totalSold: number;
+  strongestDay: string;
+};
+
 export default function DemandaPage() {
   const { inventory, transactions } = useAppContext();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState<{ key: keyof DemandAnalysisItem | null, direction: 'ascending' | 'descending' }>({
+    key: 'trend',
+    direction: 'ascending'
+  });
 
   const demandAnalysis = useMemo(() => {
     if (inventory.length === 0 || transactions.length === 0) return [];
     
     const salesData = getSalesDataPerProduct(transactions, inventory);
     
-    return inventory.map(item => {
-      const itemSales = salesData[item.id];
-      if (!itemSales || itemSales.length < 2) {
-        return { ...item, trend: 0, salesCount: itemSales?.length || 0, strongestDay: 'N/A' }; // No hay suficientes datos para tendencia
+    return inventory.map((item): DemandAnalysisItem => {
+      const itemSales = salesData[item.id] || [];
+      const salesCount = itemSales.length;
+      const totalSold = itemSales.reduce((sum, sale) => sum + sale.quantity, 0);
+
+      if (salesCount < 2) {
+        return { ...item, trend: 0, salesCount, totalSold, strongestDay: 'N/A' };
       }
 
       // --- Cálculo de tendencia (regresión lineal) ---
@@ -64,50 +82,125 @@ export default function DemandaPage() {
       return {
         ...item,
         trend: regression.slope,
-        salesCount: itemSales.length,
+        salesCount,
+        totalSold,
         strongestDay: dayNames[strongestDayIndex],
       };
     }).filter(item => item.salesCount > 1); // Solo mostrar productos con al menos 2 ventas
   
   }, [inventory, transactions]);
   
-  const lowDemandProducts = demandAnalysis.filter(p => p.trend < 0).sort((a,b) => a.trend - b.trend);
+  const sortedAndFilteredProducts = useMemo(() => {
+    let sortableItems = [...demandAnalysis];
+
+    if (searchTerm) {
+      sortableItems = sortableItems.filter(item =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        const aValue = a[sortConfig.key!];
+        const bValue = b[sortConfig.key!];
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return sortableItems;
+  }, [demandAnalysis, searchTerm, sortConfig]);
+  
+  const requestSort = (key: keyof DemandAnalysisItem) => {
+    let direction: 'ascending' | 'descending' = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+  
+  const getSortIcon = (key: keyof DemandAnalysisItem) => {
+    if (sortConfig.key !== key) {
+        return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    }
+    return sortConfig.direction === 'ascending' 
+        ? <TrendingUp className="ml-2 h-4 w-4" /> 
+        : <TrendingDown className="ml-2 h-4 w-4" />;
+  }
 
   return (
     <PageWrapper>
       <PageHeader
         title="Análisis de Demanda"
-        description="Analiza la rotación de tus productos e identifica aquellos con poco movimiento y sus días de mayor venta."
+        description="Analiza la rotación de tus productos, identifica tendencias y los días de mayor venta."
       />
        <Card>
         <CardHeader>
-          <CardTitle>Productos con Tendencia de Demanda a la Baja</CardTitle>
+          <CardTitle>Análisis de Productos</CardTitle>
           <CardDescription>
-            Estos productos muestran una tendencia de ventas decreciente según el análisis de tus transacciones. El análisis requiere al menos dos ventas registradas para cada producto.
+            Observa el rendimiento de tus productos. El análisis requiere al menos dos ventas registradas.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {lowDemandProducts.length > 0 ? (
+            <div className="mb-4">
+                <Input 
+                    placeholder="Buscar producto..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="md:max-w-sm"
+                />
+            </div>
+
+          {sortedAndFilteredProducts.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Producto</TableHead>
-                  <TableHead>Stock Actual</TableHead>
-                  <TableHead className='text-center'>Tendencia (Ventas/Día)</TableHead>
+                  <TableHead>
+                     <Button variant="ghost" onClick={() => requestSort('name')}>
+                        Producto {getSortIcon('name')}
+                     </Button>
+                  </TableHead>
+                  <TableHead className='text-center'>
+                     <Button variant="ghost" onClick={() => requestSort('stock')}>
+                        Stock Actual {getSortIcon('stock')}
+                     </Button>
+                  </TableHead>
+                  <TableHead className='text-center'>
+                     <Button variant="ghost" onClick={() => requestSort('trend')}>
+                        Tendencia (Ventas/Día) {getSortIcon('trend')}
+                     </Button>
+                  </TableHead>
+                   <TableHead className='text-center'>
+                     <Button variant="ghost" onClick={() => requestSort('totalSold')}>
+                        Ventas Totales {getSortIcon('totalSold')}
+                     </Button>
+                  </TableHead>
                   <TableHead className='text-center'>Día Fuerte</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {lowDemandProducts.map((item) => (
+                {sortedAndFilteredProducts.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.stock}</TableCell>
+                    <TableCell className="text-center">{item.stock}</TableCell>
                     <TableCell className='text-center'>
-                       <span className={`flex items-center justify-center gap-2 font-semibold text-red-500`}>
-                         <TrendingDown size={16} />
+                       <span className={`flex items-center justify-center gap-2 font-semibold ${item.trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                         {item.trend > 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                          {item.trend.toFixed(4)}
                        </span>
                     </TableCell> 
+                    <TableCell className='text-center'>
+                       <span className="flex items-center justify-center gap-2 text-muted-foreground">
+                         <BarChart2 size={16} />
+                         {item.totalSold} unidades
+                       </span>
+                    </TableCell>
                     <TableCell className='text-center'>
                       <span className="flex items-center justify-center gap-2 text-muted-foreground">
                         <CalendarDays size={16} />
@@ -120,7 +213,7 @@ export default function DemandaPage() {
             </Table>
           ) : (
             <div className="text-center text-muted-foreground py-8">
-              No se han identificado productos con demanda a la baja o no hay suficientes datos de ventas para el análisis.
+              No se han identificado productos para el análisis o no hay suficientes datos de ventas.
             </div>
           )}
         </CardContent>
@@ -128,3 +221,4 @@ export default function DemandaPage() {
     </PageWrapper>
   );
 }
+
