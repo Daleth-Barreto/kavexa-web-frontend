@@ -7,16 +7,17 @@ import { ArrowRight, MessageSquareQuote } from 'lucide-react';
 import { KavexaLogoIcon } from '@/components/kavexa/kavexa-logo-icon';
 import { AbstractDashboard } from '@/components/kavexa/abstract-dashboard';
 import { useToast } from '@/hooks/use-toast';
+import { useI18n } from '@/contexts/i18n-context';
 
 export default function LandingPage() {
   const { toast } = useToast();
+  const { t } = useI18n();
   const GOOGLE_FORM_URL = "https://forms.gle/sYJRQ3rWXpjxjcCZ7";
-
 
   const handleComingSoon = () => {
     toast({
-        title: "Función no disponible",
-        description: "El sistema de cuentas y guardado en la nube estará disponible próximamente.",
+        title: t('toasts.comingSoonTitle'),
+        description: t('toasts.comingSoonDescription'),
     });
   };
 
@@ -29,38 +30,38 @@ export default function LandingPage() {
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Button variant="ghost" onClick={handleComingSoon} disabled>
-            Iniciar Sesión
+            {t('landing.login')}
           </Button>
           <Button onClick={handleComingSoon} disabled>
-            Registrarse
+            {t('landing.register')}
           </Button>
         </nav>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center text-center px-4">
         <div className="space-y-4 max-w-3xl w-full">
             <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                Tu Asistente Inteligente de Negocios y Finanzas Personales
+                {t('landing.subtitle')}
             </div>
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline text-primary">
-            Inteligencia para tus finanzas.
+            {t('landing.title')}
           </h1>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl font-headline">
-             Simple, personal y offline.
+             {t('landing.subtitle2')}
           </h2>
           <p className="max-w-[700px] mx-auto text-muted-foreground md:text-xl">
-            Desde tus finanzas personales hasta el inventario de tu pyme, Kavexa se adapta a ti. Elige tus módulos y empieza a gestionar todo de forma más inteligente. Tus datos se quedan en tu dispositivo, garantizando velocidad y privacidad.
+            {t('landing.description')}
           </p>
         </div>
         <div className="flex flex-col gap-4 min-[400px]:flex-row mt-8">
             <Button size="lg" asChild>
                 <Link href="/welcome">
-                    Empezar Gratis <ArrowRight className="ml-2"/>
+                    {t('landing.getStarted')} <ArrowRight className="ml-2"/>
                 </Link>
             </Button>
              <Button variant="outline" size="lg" asChild>
                 <Link href={GOOGLE_FORM_URL} target="_blank">
                   <MessageSquareQuote className="mr-2 h-4 w-4" />
-                  Danos tu opinión
+                  {t('common.giveFeedback')}
                 </Link>
               </Button>
         </div>
@@ -69,10 +70,10 @@ export default function LandingPage() {
         </div>
       </main>
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t mt-16">
-        <p className="text-xs text-muted-foreground">&copy; 2025 Kavexa. Todos los derechos reservados.</p>
+        <p className="text-xs text-muted-foreground">&copy; 2025 Kavexa. All rights reserved.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="/terms" className="text-xs hover:underline underline-offset-4" prefetch={false}>
-            Términos y Privacidad
+            {t('landing.terms')}
           </Link>
         </nav>
       </footer>
