@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 import withPWAInit from "@ducanh2912/next-pwa";
 
@@ -34,13 +35,6 @@ const nextConfig: NextConfig = {
     ],
   },
   devIndicators: false,
-  experimental: {
-    allowedDevOrigins: [
-        "*.cloudworkstations.dev",
-        "*.firebase.studio",
-        "*.vercel.app",
-    ]
-  }
 };
 
 
