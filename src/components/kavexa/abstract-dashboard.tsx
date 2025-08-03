@@ -15,6 +15,26 @@ export function AbstractDashboard({ className }: { className?: string }) {
         </linearGradient>
       </defs>
 
+      <style>
+        {`
+          .draw-chart-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 3s ease-out forwards;
+          }
+          .draw-chart-line-2 {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 3s ease-out 0.5s forwards;
+          }
+          @keyframes draw {
+            to {
+              stroke-dashoffset: 0;
+            }
+          }
+        `}
+      </style>
+
       {/* Main card */}
       <rect width="400" height="300" rx="12" fill="hsl(var(--card))" />
       <rect width="400" height="300" rx="12" fill="url(#grad1)" />
@@ -26,10 +46,10 @@ export function AbstractDashboard({ className }: { className?: string }) {
 
       {/* Main chart area */}
       <g transform="translate(20, 50)">
-        <path d="M 0 150 C 40 130, 80 80, 120 90 S 200 140, 240 120 S 320 60, 360 70" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" />
+        <path className="draw-chart-line" d="M 0 150 C 40 130, 80 80, 120 90 S 200 140, 240 120 S 320 60, 360 70" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" />
         <path d="M 0 150 L 0 140 C 40 120, 80 70, 120 80 S 200 130, 240 110 S 320 50, 360 60 L 360 150 Z" fill="hsl(var(--primary))" fillOpacity="0.1" />
         
-        <path d="M 0 150 C 30 160, 70 120, 110 130 S 190 180, 230 160 S 310 100, 360 110" fill="none" stroke="hsl(var(--accent))" strokeWidth="2" />
+        <path className="draw-chart-line-2" d="M 0 150 C 30 160, 70 120, 110 130 S 190 180, 230 160 S 310 100, 360 110" fill="none" stroke="hsl(var(--accent))" strokeWidth="2" />
         <path d="M 0 150 L 0 150 C 30 160, 70 120, 110 130 S 190 180, 230 160 S 310 100, 360 110 L 360 150 Z" fill="hsl(var(--accent))" fillOpacity="0.1" />
       </g>
       
