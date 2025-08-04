@@ -1,2 +1,28 @@
-
-    
+{
+  "name": "Kavexa - Asistente Financiero",
+  "short_name": "Kavexa",
+  "description": "Plataforma de asistente financiero y de inventario para PYMES.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#181828",
+  "theme_color": "#967acc",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": [
+    "business",
+    "finance",
+    "lifestyle",
+    "productivity",
+    "utilities"
+  ]
+}
