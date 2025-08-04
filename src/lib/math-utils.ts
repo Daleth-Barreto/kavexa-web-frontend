@@ -1,4 +1,5 @@
 
+
 export const Z_SCORE_THRESHOLD = 2.5; // Common threshold for anomaly detection
 
 /**
@@ -62,8 +63,15 @@ export function calculateLinearRegression(data: { x: number; y: number }[]): { s
     sumXY += point.x * point.y;
     sumXX += point.x * point.x;
   }
+  
+  const denominator = (n * sumXX - sumX * sumX);
+  
+  // Handle case where all x values are the same, causing division by zero
+  if (denominator === 0) {
+      return { slope: 0, intercept: sumY / n };
+  }
 
-  const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+  const slope = (n * sumXY - sumX * sumY) / denominator;
   const intercept = (sumY - slope * sumX) / n;
 
   return { slope, intercept };
